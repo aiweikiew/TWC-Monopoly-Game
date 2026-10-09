@@ -173,6 +173,7 @@ function configureShockScreen(title, buttonLabel){
 }
 function renderGame(){
   syncNavigation();
+  saveGameState();
   backBtn.hidden = navigationState.currentView.type === "identity" || !navigationState.previousViews.length;
   backBtn.disabled = !canNavigateBack();
   document.body.classList.toggle("has-back", !backBtn.hidden);
