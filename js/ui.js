@@ -128,6 +128,9 @@ function renderResults(){
 }
 function renderPause(){
   const info = phaseInfo[gameState.phase];
+  if(gameState.phase === "steam"){
+    return `<section class="flow-screen pause-screen"><div class="pause-mark">✓</div><div class="screen-kicker">GAME PAUSED</div><h2>${info.complete}</h2><p>Return to presentation</p><strong>Automobiles &amp; Highways</strong><p class="compact-note">After Slide 7, come back here and trigger the Jet Age Tech Shock.</p></section>`;
+  }
   return `<section class="flow-screen pause-screen"><div class="pause-mark">✓</div><div class="screen-kicker">GAME PAUSED</div><h2>${info.complete || "ERA COMPLETE"}</h2><p>Return to presentation</p><strong>${info.returnTo}</strong>${info.next ? `<p class="compact-note">Come back to Tourismopoly after the slides.</p>` : ""}</section>`;
 }
 function renderWinner(){
@@ -163,6 +166,11 @@ function renderCurrentStage(){
     default: return '<section class="flow-screen"><h2>Ready</h2></section>';
   }
 }
+function configureShockScreen(title, buttonLabel){
+  document.getElementById("industrialShockTitle").textContent = title;
+  document.getElementById("applyIndustrialBtn").textContent = buttonLabel;
+  document.getElementById("shockError").textContent = "";
+}
 function renderGame(){
   syncNavigation();
   backBtn.hidden = navigationState.currentView.type === "identity" || !navigationState.previousViews.length;
@@ -176,8 +184,15 @@ function renderGame(){
     setupScreen.classList.add("hidden"); gameScreen.hidden = true; monopolyScreen.hidden = true;
     hideBoardOverlays(); rollBtn.disabled = true; nextBtn.disabled = true;
     document.getElementById("triggerShockBtn").disabled = true;
+    configureShockScreen("INDUSTRIAL REVOLUTION","APPLY INDUSTRIAL REVOLUTION");
     industrialShockScreen.hidden = false;
-    document.getElementById("shockError").textContent = "";
+    return;
+  }
+  if(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock"){
+    setupScreen.classList.add("hidden"); gameScreen.hidden = true; monopolyScreen.hidden = true;
+    hideBoardOverlays();
+    configureShockScreen("JET AGE","APPLY JET AGE");
+    industrialShockScreen.hidden = false;
     return;
   }
   const setup = gameState.phase === "setup";
@@ -196,9 +211,13 @@ function renderGame(){
   document.getElementById("phaseEyebrow").textContent = info.slides || "Tourismopoly";
   const statusLabels = {revaluation:"MARKET SHIFT",decisions:`${gameState.teams[gameState.currentTeam]?.name.toUpperCase()}'S DECISION`,review:"REVIEW BEFORE LOCKING",event:"SHARED EVENT",crisis:"CRISIS REVEAL",results:"ERA RESULTS",pause:"WAITING FOR PRESENTER",winner:"MONEY RESULT"};
   document.getElementById("turnBadge").textContent = statusLabels[gameState.uiStage] || "TOURISMOPOLY";
-  document.getElementById("statusText").textContent = gameState.uiStage === "pause" ? `Return to presentation: ${info.returnTo}` : gameState.message;
+  document.getElementById("statusText").textContent = gameState.uiStage === "pause" ? `Return to presentation: ${gameState.phase === "steam" ? "Automobiles & Highways" : info.returnTo}` : gameState.message;
   phaseContent.innerHTML = renderCurrentStage();
-  moderatorControls.innerHTML = gameState.uiStage === "pause" && info.next ? `<button type="button" class="game-btn" data-next-phase="${gameState.phase}">${info.next}</button>` : "";
+  if(gameState.uiStage === "pause" && gameState.phase === "steam"){
+    moderatorControls.innerHTML = '<button type="button" class="game-btn" data-jet-shock>⚡ TECH SHOCK</button>';
+  } else {
+    moderatorControls.innerHTML = gameState.uiStage === "pause" && info.next ? `<button type="button" class="game-btn" data-next-phase="${gameState.phase}">${info.next}</button>` : "";
+  }
   renderPlayers();
 }
 function runAndRender(callback){
@@ -212,8 +231,11 @@ setupConfirmBtn.addEventListener("click", () => runAndRender(applySetupFromDraw)
 document.getElementById("resetGameBtn").addEventListener("click", () => runAndRender(resetGame));
 backBtn.addEventListener("click", () => runAndRender(navigateBack));
 document.getElementById("applyIndustrialBtn").addEventListener("click", () => {
-  try { applyIndustrialRevolution(); renderGame(); }
-  catch(error){ document.getElementById("shockError").textContent = error.message; }
+  try {
+    if(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock") applyJetAge();
+    else applyIndustrialRevolution();
+    renderGame();
+  } catch(error){ document.getElementById("shockError").textContent = error.message; }
 });
 document.getElementById("undoDecisionBtn").addEventListener("click", () => runAndRender(undoLastDecision));
 phaseContent.addEventListener("click", event => {
@@ -240,6 +262,11 @@ phaseContent.addEventListener("click", event => {
   runAndRender(() => openStrategySelection(team,action,selectId ? document.getElementById(selectId).value : selection,phase));
 });
 moderatorControls.addEventListener("click", event => {
+  const jetShockButton = event.target.closest("button[data-jet-shock]");
+  if(jetShockButton && !jetShockButton.disabled){
+    runAndRender(revealJetTechShock);
+    return;
+  }
   const button = event.target.closest("button[data-next-phase]");
   if(button && !button.disabled) runAndRender(() => startNextPhase(button.dataset.nextPhase));
 });
