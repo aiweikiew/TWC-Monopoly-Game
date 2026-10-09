@@ -1,28 +1,27 @@
 "use strict";
 
-// Reused identity cards; all gameplay rendering reads the central state.
-
 const setupScreen = document.getElementById("setupScreen");
-
 const setupCards = document.getElementById("setupCards");
-
 const setupSelectedEl = document.getElementById("setupSelected");
-
 const setupDrawBtn = document.getElementById("setupDrawBtn");
-
 const setupUndoBtn = document.getElementById("setupUndoBtn");
-
 const setupResetBtn = document.getElementById("setupResetBtn");
 const setupConfirmBtn = document.getElementById("setupConfirmBtn");
-
-
-
 const setupPickStatus = document.getElementById("setupPickStatus");
-
 const setupBanner = document.getElementById("setupBanner");
-
 const setupStatus = document.getElementById("setupStatus");
+const gameScreen = document.getElementById("gameScreen");
+const industrialShockScreen = document.getElementById("industrialShockScreen");
+const phaseContent = document.getElementById("phaseContent");
+const playerPanel = document.getElementById("dynamicPlayers");
+const moderatorControls = document.getElementById("moderatorControls");
+const actionError = document.getElementById("actionError");
+const backBtn = document.getElementById("backBtn");
 
+function money(value){ return value < 0 ? `-$${Math.abs(value)}` : `$${value}`; }
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+}
 function renderSetupCards(){
   setupCards.innerHTML = identityPool.map((x,idx)=>{
     const teamIdx = gameState.setupSelected.findIndex(s=>s.index===idx);
@@ -34,74 +33,40 @@ function renderSetupCards(){
       <div class="setup-desc">${x.desc}</div>
       <div class="setup-stats">
         <div class="setup-stat"><label>CASH</label><strong>$${x.cash}</strong></div>
-        <div class="setup-stat"><label>NET WORTH</label><strong>$${calculateNetWorth({cash:x.cash,assets:[{currentValue:assetTypes[x.legacyType].price}]})}</strong></div>
+        <div class="setup-stat"><label>NET WORTH</label><strong>$10</strong></div>
         <div class="setup-legacy">${assetTypes[x.legacyType].name} · $${assetTypes[x.legacyType].price}</div>
       </div>
     </article>`;
   }).join("");
 }
-
 function renderSetupSelection(){
   setupSelectedEl.innerHTML = setupTeams.map((team,i)=>{
     const entry = gameState.setupSelected[i];
     if(!entry){
-      return `<div class="setup-slot empty">
-        <div class="setup-slot-icon">${String.fromCharCode(65+i)}</div>
-        <div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${i===gameState.setupSelected.length?"Draws next...":"Waiting..."}</div></div>
-        <div class="setup-slot-worth"><label>NET WORTH</label><strong>—</strong></div>
-      </div>`;
+      return `<div class="setup-slot empty"><div class="setup-slot-icon">${String.fromCharCode(65+i)}</div><div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${i===gameState.setupSelected.length?"Draws next...":"Waiting..."}</div></div><div class="setup-slot-worth"><label>NET WORTH</label><strong>—</strong></div></div>`;
     }
     const x = identityPool[entry.index];
-    return `<div class="setup-slot">
-      <div class="setup-slot-icon">${x.icon}</div>
-      <div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${x.name}<br>Cash $${x.cash} · ${assetTypes[x.legacyType].name} · $${assetTypes[x.legacyType].price}</div></div>
-      <div class="setup-slot-worth"><label>NET WORTH</label><strong>$${calculateNetWorth({cash:x.cash,assets:[{currentValue:assetTypes[x.legacyType].price}]})}</strong></div>
-    </div>`;
+    return `<div class="setup-slot"><div class="setup-slot-icon">${x.icon}</div><div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${x.name}<br>Cash $${x.cash} · ${assetTypes[x.legacyType].name} · $${assetTypes[x.legacyType].price}</div></div><div class="setup-slot-worth"><label>NET WORTH</label><strong>$10</strong></div></div>`;
   }).join("");
-
   const ready = gameState.setupSelected.length===3;
   setupDrawBtn.disabled = ready;
   setupUndoBtn.disabled = gameState.setupSelected.length===0;
   setupConfirmBtn.disabled = !ready;
-
-
-  if(ready){
-    setupPickStatus.textContent = "3/3 drawn";
-    setupBanner.textContent = "All teams have drawn. Review identities, then confirm to start.";
-    setupDrawBtn.textContent = "✓ All Teams Drawn";
-  } else {
-    setupPickStatus.textContent = `${gameState.setupSelected.length}/3 drawn`;
-    setupBanner.textContent = `${setupTeams[gameState.setupSelected.length]}, draw your identity.`;
-    setupDrawBtn.textContent = `${setupTeams[gameState.setupSelected.length]} · Draw Identity`;
-  }
-}
-
-const gameScreen = document.getElementById("gameScreen");
-const industrialShockScreen = document.getElementById("industrialShockScreen");
-const phaseContent = document.getElementById("phaseContent");
-const playerPanel = document.getElementById("dynamicPlayers");
-const moderatorControls = document.getElementById("moderatorControls");
-const actionError = document.getElementById("actionError");
-const backBtn = document.getElementById("backBtn");
-function money(value){ return value < 0 ? `-$${Math.abs(value)}` : `$${value}`; }
-function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  setupPickStatus.textContent = ready ? "3/3 drawn" : `${gameState.setupSelected.length}/3 drawn`;
+  setupBanner.textContent = ready ? "All teams have drawn. Review identities, then confirm to start." : `${setupTeams[gameState.setupSelected.length]}, draw your identity.`;
+  setupDrawBtn.textContent = ready ? "✓ All Teams Drawn" : `${setupTeams[gameState.setupSelected.length]} · Draw Identity`;
 }
 function renderPlayers(target = playerPanel){
   const showDigital = ["digital","future","winner"].includes(gameState.phase);
   const showFuture = ["future","winner"].includes(gameState.phase);
   target.innerHTML = gameState.teams.map((team,i) => `
-    <article class="player-card ${!gameState.phaseComplete && i === gameState.currentTeam ? "active" : ""}">
-      <div class="player-head">
-        <div class="avatar">${team.identity.icon}</div>
-        <div class="player-info"><div class="team">${team.name}</div><div class="identity">${escapeHTML(team.identity.name)}</div></div>
-        <div class="pawn">${team.id}</div>
-      </div>
+    <article class="player-card ${gameState.uiStage === "decisions" && i === gameState.currentTeam ? "active" : ""}">
+      <div class="player-head"><div class="avatar">${team.identity.icon}</div><div class="player-info"><div class="team">${team.name}</div><div class="identity">${escapeHTML(team.identity.name)}</div></div><div class="pawn">${team.id}</div></div>
       <div class="portfolio-total">Net Worth <strong>${money(calculateNetWorth(team))}</strong> · Cash ${money(team.cash)}</div>
       <ul class="portfolio-assets">${team.assets.map(asset => `<li>${escapeHTML(asset.name)}: ${money(asset.currentValue)}${asset.digital ? " · Digital" : ""}</li>`).join("") || "<li>No assets</li>"}</ul>
       ${showDigital ? `<div>Digital Ready: <strong>${team.digitalReady ? "YES" : "NO"}</strong> · Pressure: ${team.destinationPressure}</div>` : ""}
-      ${showFuture ? `<div>Visitor Experience: ${team.visitorExperience}/5<br>Resident Wellbeing: ${team.residentWellbeing}/5 · Environmental Health: ${team.environmentalHealth}/5</div><div>Strategy: ${team.futureStrategy ? futureStrategies[team.futureStrategy].name : "Pending · 1 credit"}</div>` : ""}
-      ${gameState.decisions[team.id] && !showFuture ? `<div class="decision-record">✓ ${escapeHTML(gameState.decisions[team.id])}</div>` : ""}
+      ${showFuture ? `<div>Visitor Experience: ${team.visitorExperience}/5<br>Resident Wellbeing: ${team.residentWellbeing}/5 · Environmental Health: ${team.environmentalHealth}/5</div><div>Strategy: ${team.futureStrategy ? futureStrategies[team.futureStrategy].name : "Pending"}</div>` : ""}
+      ${gameState.decisions[team.id] ? `<div class="decision-record">✓ ${escapeHTML(gameState.decisions[team.id])}</div>` : ""}
     </article>`).join("");
 }
 function actionButton(team, action, label, selection="", disabled=false){
@@ -110,83 +75,93 @@ function actionButton(team, action, label, selection="", disabled=false){
 function selectionAction(team, action, label, assets, cost){
   const selectId = `select-${action}`;
   const canAfford = team.cash >= cost;
-  return `<div class="action-option"><label for="${selectId}">${label}</label>
-    <select id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>
-      ${assets.length ? assets.map(asset => `<option value="${asset.id}">${escapeHTML(asset.name)} · ${money(asset.currentValue)}</option>`).join("") : '<option value="">No eligible assets</option>'}
-    </select>
-    <button type="button" class="game-btn" data-action="${action}" data-team="${team.id}" data-phase="${gameState.phase}" data-select-id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>${action.toUpperCase()}${cost ? ` · $${cost}` : ""}</button>
-    ${!canAfford ? `<small>Requires $${cost} cash.</small>` : ""}</div>`;
+  return `<div class="action-option"><label for="${selectId}">${label}</label><select id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>${assets.length ? assets.map(asset => `<option value="${asset.id}">${escapeHTML(asset.name)} · ${money(asset.currentValue)}</option>`).join("") : '<option value="">No eligible assets</option>'}</select><button type="button" class="game-btn" data-action="${action}" data-team="${team.id}" data-phase="${gameState.phase}" data-select-id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>${action.toUpperCase()}${cost ? ` · $${cost}` : ""}</button>${!canAfford ? `<small>Requires $${cost} cash.</small>` : ""}</div>`;
 }
 function renderActions(){
   const team = gameState.teams[gameState.currentTeam];
-  const phase = gameState.phase;
-  let html = `<section class="decision-panel"><h2>${team.name} · Choose exactly ONE decision</h2>`;
-  if(phase === "future"){
+  let html = `<section class="decision-panel"><div class="screen-kicker">TEAM DECISION</div><h2>${team.name} · Choose exactly ONE move</h2>`;
+  if(gameState.phase === "future"){
     html += '<p>One Future Innovation Credit · No cash cost</p><div class="action-grid">';
-    for(const [key, strategy] of Object.entries(futureStrategies)){
-      html += `<article class="action-option"><strong>${strategy.name}</strong><p>${strategy.purpose}</p><p>Cash +$${strategy.cash} · Visitor Experience +${strategy.visitorExperience}<br>Resident Wellbeing +${strategy.residentWellbeing} · Environmental Health +${strategy.environmentalHealth}</p>${actionButton(team,"strategy",strategy.name,key)}</article>`;
-    }
+    for(const [key,strategy] of Object.entries(futureStrategies)) html += `<article class="action-option"><strong>${strategy.name}</strong><p>${strategy.purpose}</p><p>Cash +$${strategy.cash} · Visitor +${strategy.visitorExperience}<br>Resident +${strategy.residentWellbeing} · Environment +${strategy.environmentalHealth}</p>${actionButton(team,"strategy",strategy.name,key)}</article>`;
     return html + '</div></section>';
   }
-  if(phase === "digital") html += '<p><strong>QUEST: BECOME DIGITALLY READY</strong></p>';
+  if(gameState.phase === "digital") html += '<p><strong>QUEST: BECOME DIGITALLY READY</strong></p>';
   html += '<div class="action-grid">';
-  for(const type of markets[phase]){
+  for(const type of markets[gameState.phase]){
     const asset = assetTypes[type];
     html += `<div class="action-option"><strong>${escapeHTML(asset.name)} · $${asset.price}</strong>${actionButton(team,"invest",`INVEST · $${asset.price}`,type,team.cash < asset.price)}${team.cash < asset.price ? "<small>Insufficient cash</small>" : ""}</div>`;
   }
-  if(phase === "steam"){
+  if(gameState.phase === "steam"){
     html += selectionAction(team,"sell","Sell one asset at its current value",team.assets,0);
-    html += selectionAction(team,"adapt","Adapt one asset; preserve its current value",team.assets.filter(asset => Object.hasOwn(adaptations, asset.type)),1);
-    html += '<p class="action-help">Coach → Station Transfer Service · Inn → Railway-Era Hotel · Shipping → Steam Passenger Shipping · Publishing → Guidebook &amp; Travel Publishing</p>';
+    html += selectionAction(team,"adapt","Adapt one eligible asset",team.assets.filter(asset => Object.hasOwn(adaptations,asset.type)),1);
+    html += '<p class="action-help">Coach → Station Transfer · Inn → Railway-Era Hotel · Shipping → Steam Passenger Shipping · Publishing → Guidebook Publishing</p>';
   }
-  if(phase === "digital") html += selectionAction(team,"digitise","Digitise one business; preserve its current value",team.assets.filter(asset => asset.tourism && !asset.digital),2);
+  if(gameState.phase === "digital") html += selectionAction(team,"digitise","Digitise one tourism business",team.assets.filter(asset => asset.tourism && !asset.digital),2);
   html += `</div><div class="hold-action">${actionButton(team,"hold","HOLD · No change")}</div></section>`;
   return html;
-}
-function renderRevaluation(){
-  if(!revaluations[gameState.phase]) return "";
-  return `<section><h2>Market revaluation</h2>${gameState.revaluationLog.length ? `<table class="value-table"><thead><tr><th>Team</th><th>Asset</th><th>Old → New</th></tr></thead><tbody>${gameState.revaluationLog.map(row => `<tr><td>${row.team}</td><td>${escapeHTML(row.name)}</td><td>${money(row.oldValue)} → ${money(row.newValue)}</td></tr>`).join("")}</tbody></table>` : "<p>No owned assets affected.</p>"}<p class="compact-note">Other assets keep their current values. Net Worth updates immediately.</p></section>`;
 }
 function renderSelection(){
   const draft = navigationState.selection;
   const team = gameState.teams.find(t => t.id === draft.teamId);
   const asset = team.assets.find(a => a.id === draft.selection);
-  const name = draft.action === "strategy" ? futureStrategies[draft.selection].name :
-    draft.action === "invest" ? assetTypes[draft.selection].name : asset?.name || "No change";
-  const effects = {
-    invest:"Exchange cash for an asset of the same value.",sell:"Sell at the current market value.",
-    adapt:"Pay $1 and change business form; preserve the current asset value.",
-    digitise:"Pay $2 and mark this business digital; preserve its current value.",
-    hold:"Keep your portfolio as it is.",strategy:"Use your one Future Innovation Credit at no cash cost."
-  };
-  const strategy = draft.action === "strategy" ? futureStrategies[draft.selection] : null;
-  return `<section class="decision-panel"><h2>${team.name} · Confirm ${escapeHTML(draft.action.toUpperCase())}</h2>
-    <p><strong>${escapeHTML(name)}</strong></p><p>${effects[draft.action]}</p>
-    ${draft.action === "invest" ? `<p>Price: ${money(assetTypes[draft.selection].price)}</p>` : ""}
-    ${asset ? `<p>Current asset value: ${money(asset.currentValue)}</p>` : ""}
-    ${strategy ? `<p>Cash +$${strategy.cash} · Visitor Experience +${strategy.visitorExperience}<br>Resident Wellbeing +${strategy.residentWellbeing} · Environmental Health +${strategy.environmentalHealth}</p>` : ""}
-    <p>Nothing has been confirmed. Back discards this selection.</p>
-    <button class="game-btn" type="button" id="confirmDecisionBtn">Confirm Decision</button></section>`;
+  const name = draft.action === "strategy" ? futureStrategies[draft.selection].name : draft.action === "invest" ? assetTypes[draft.selection].name : asset?.name || "No change";
+  return `<section class="decision-panel focus-card"><div class="screen-kicker">CONFIRM DECISION</div><h2>${team.name} · ${escapeHTML(draft.action.toUpperCase())}</h2><p><strong>${escapeHTML(name)}</strong></p><p>Nothing is committed until you confirm. Back abandons this choice.</p><button class="game-btn" type="button" id="confirmDecisionBtn">Confirm Decision</button></section>`;
+}
+function renderRevaluation(){
+  const rows = gameState.revaluationLog;
+  return `<section class="flow-screen revaluation-screen"><div class="screen-kicker">MARKET REVALUATION</div><h2>${phaseInfo[gameState.phase].title}</h2><p>Technology has changed what existing tourism businesses are worth.</p>${rows.length ? `<div class="revaluation-grid">${rows.map(row => `<article class="value-card"><span>${escapeHTML(row.team)}</span><strong>${escapeHTML(row.name)}</strong><div>${money(row.oldValue)} <b>→</b> ${money(row.newValue)}</div></article>`).join("")}</div>` : '<p>No owned assets were directly revalued.</p>'}${gameState.phase === "jet" ? '<div class="trajectory-card"><strong>Passenger Shipping</strong><span>Pre-Industrial $4 → Steam $6 → Jet $3</span></div>' : ''}<button class="game-btn flow-continue" data-flow-action="continue">${gameState.phase === "jet" ? "Complete Past Era" : "Continue to Team Decisions"}</button></section>`;
+}
+function renderDecisionReview(){
+  const title = gameState.phase === "steam" ? "ALL TEAMS HAVE DECIDED" : gameState.phase === "digital" ? "DIGITAL DECISIONS COMPLETE" : "FUTURE STRATEGIES CHOSEN";
+  const lock = gameState.phase === "steam" ? "CONFIRM & LOCK INDUSTRIAL PORTFOLIOS" : gameState.phase === "digital" ? "CONTINUE TO FIT BOOM" : "LOCK FINAL STRATEGIES";
+  return `<section class="flow-screen review-screen"><div class="screen-kicker">REVIEW BEFORE LOCKING</div><h2>${title}</h2><div class="decision-summary">${gameState.teams.map(team => `<div><strong>${team.name}</strong><span>${escapeHTML(gameState.decisions[team.id] || "Pending")}</span></div>`).join("")}</div><p>Use Undo only if the most recent team needs to change its decision.</p><div class="review-actions"><button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>Undo Last Decision</button><button class="game-btn" data-flow-action="lock">${lock}</button></div></section>`;
+}
+function renderDigitalEvent(){
+  return `<section class="flow-screen event-screen"><div class="event-icon">📱</div><div class="screen-kicker">SHARED MARKET EVENT</div><h2>FREE INDEPENDENT TRAVEL BOOM</h2><div class="event-effects"><div><strong>ALL TEAMS</strong><span>Destination Pressure +1</span></div><div><strong>DIGITAL READY</strong><span>Cash +$2</span></div><div><strong>NOT READY</strong><span>No economic bonus</span></div></div><button class="game-btn flow-continue" data-flow-action="continue">View Present Era Results</button></section>`;
+}
+function renderCrisis(){
+  return `<section class="flow-screen crisis-screen"><div class="event-icon">🚨</div><div class="screen-kicker">2035 TOURISM CRISIS</div><h2>THE DESTINATION IS UNDER PRESSURE</h2><div class="crisis-list"><span>Visitor demand surges</span><span>Major attraction overcrowded</span><span>Extreme weather disruption</span><span>Transport strained</span><span>Resident frustration rising</span></div><div class="crisis-impact"><strong>CRISIS IMPACT</strong><span>Cash −$2 · Visitor −2 · Resident −1 · Environment −1</span></div><button class="game-btn flow-continue" data-flow-action="continue">Choose a Future Strategy</button></section>`;
+}
+function renderResults(){
+  const future = gameState.phase === "future";
+  return `<section class="flow-screen results-screen"><div class="screen-kicker">${future ? "FINAL OUTCOMES" : "PRESENT ERA COMPLETE"}</div><h2>${future ? "HOW DID EACH TOURISM SYSTEM PERFORM?" : "DIGITAL TRANSFORMATION RESULTS"}</h2><div class="result-grid">${gameState.teams.map(team => `<article class="result-card"><h3>${team.name}</h3><strong>${money(calculateNetWorth(team))}</strong><span>Net Worth</span>${future ? `<p>Visitor ${team.visitorExperience}/5<br>Resident ${team.residentWellbeing}/5<br>Environment ${team.environmentalHealth}/5</p>` : `<p>Digital Ready: ${team.digitalReady ? "YES" : "NO"}<br>Pressure: ${team.destinationPressure}</p>`}</article>`).join("")}</div><button class="game-btn flow-continue" data-flow-action="continue">Return to Presentation</button></section>`;
+}
+function renderPause(){
+  const info = phaseInfo[gameState.phase];
+  return `<section class="flow-screen pause-screen"><div class="pause-mark">✓</div><div class="screen-kicker">GAME PAUSED</div><h2>${info.complete || "ERA COMPLETE"}</h2><p>Return to presentation</p><strong>${info.returnTo}</strong>${info.next ? `<p class="compact-note">Come back to Tourismopoly after the slides.</p>` : ""}</section>`;
+}
+function renderWinner(){
+  const winners = getMoneyWinners();
+  return `<section class="flow-screen winner-screen"><div class="winner-trophy">🏆</div><div class="screen-kicker">TOURISMOPOLY WINNER</div><h2>${winners.length > 1 ? "JOINT MONEY WINNERS" : winners[0].name}</h2><div class="winner-worth">${money(calculateNetWorth(winners[0]))}</div>${winners.length > 1 ? `<p>${winners.map(t => t.name).join(" · ")}</p>` : ""}<p>Highest calculated Net Worth wins the money game.</p><div class="winner-handoff">Return to presentation → <strong>But Did You Actually Win?</strong></div></section>`;
 }
 function renderHistoricalView(){
   const view = navigationState.currentView;
   setupScreen.classList.add("hidden");
   monopolyScreen.hidden = true;
   hideBoardOverlays();
+  industrialShockScreen.hidden = true;
   gameScreen.hidden = false;
-  document.getElementById("phaseTitle").textContent = view.phase === "setup" ? "IDENTITY DRAW" : phaseInfo[view.phase].title;
+  document.getElementById("phaseTitle").textContent = view.phase === "setup" ? "IDENTITY DRAW" : phaseInfo[view.phase]?.title || "TOURISMOPOLY";
   document.getElementById("phaseEyebrow").textContent = view.label;
   document.getElementById("turnBadge").textContent = "VIEWING A PREVIOUS SCREEN";
-  document.getElementById("statusText").textContent = "Navigation only. Current portfolios remain committed.";
-  let html = `<h2>${escapeHTML(view.label)}</h2><p>${escapeHTML(view.message)}</p>`;
-  if(view.phase === "setup") html += `<p>${gameState.teams.map(team => `${team.name}: ${escapeHTML(team.identity.name)}`).join("<br>")}</p><p>Identities have been confirmed. Return to the current game to continue.</p>`;
-  if(view.landing) html += `<p>${escapeHTML(view.teamName)} landed on ${escapeHTML(tileNames[view.landing.tile])}. This previous landing view cannot replay a confirmed action.</p>`;
-  if(view.revaluationLog.length) html += `<table class="value-table"><thead><tr><th>Team</th><th>Asset</th><th>Revaluation</th></tr></thead><tbody>${view.revaluationLog.map(row => `<tr><td>${row.team}</td><td>${escapeHTML(row.name)}</td><td>${money(row.oldValue)} &rarr; ${money(row.newValue)}</td></tr>`).join("")}</tbody></table>`;
-  if(view.type === "pause") html += `<p>Return to presentation: <strong>${phaseInfo[view.phase].returnTo}</strong></p>`;
-  html += '<p>This view is read-only. The team panel shows current committed values.</p><button type="button" class="game-btn secondary" data-navigation="resume">Return to current game</button>';
-  phaseContent.innerHTML = html;
+  document.getElementById("statusText").textContent = "Navigation only. Confirmed gameplay remains unchanged.";
+  phaseContent.innerHTML = `<section class="flow-screen historical-screen"><h2>${escapeHTML(view.label)}</h2><p>${escapeHTML(view.message || "Previous screen")}</p><p>This view is read-only.</p><button type="button" class="game-btn secondary" data-navigation="resume">Return to current game</button></section>`;
   moderatorControls.innerHTML = "";
   renderPlayers();
+}
+function renderCurrentStage(){
+  if(navigationState.currentView.type === "selection") return renderSelection();
+  switch(gameState.uiStage){
+    case "revaluation": return renderRevaluation();
+    case "decisions": return renderActions();
+    case "review": return renderDecisionReview();
+    case "event": return renderDigitalEvent();
+    case "crisis": return renderCrisis();
+    case "results": return renderResults();
+    case "pause": return renderPause();
+    case "winner": return renderWinner();
+    default: return '<section class="flow-screen"><h2>Ready</h2></section>';
+  }
 }
 function renderGame(){
   syncNavigation();
@@ -196,17 +171,10 @@ function renderGame(){
   actionError.textContent = "";
   document.getElementById("undoDecisionBtn").hidden = true;
   industrialShockScreen.hidden = true;
-  if(!isCurrentView()){
-    renderHistoricalView();
-    return;
-  }
+  if(!isCurrentView()){ renderHistoricalView(); return; }
   if(gameState.phase === "industrialShockRevealed"){
-    setupScreen.classList.add("hidden");
-    gameScreen.hidden = true;
-    monopolyScreen.hidden = true;
-    hideBoardOverlays();
-    rollBtn.disabled = true;
-    nextBtn.disabled = true;
+    setupScreen.classList.add("hidden"); gameScreen.hidden = true; monopolyScreen.hidden = true;
+    hideBoardOverlays(); rollBtn.disabled = true; nextBtn.disabled = true;
     document.getElementById("triggerShockBtn").disabled = true;
     industrialShockScreen.hidden = false;
     document.getElementById("shockError").textContent = "";
@@ -219,38 +187,18 @@ function renderGame(){
   monopolyScreen.hidden = !monopoly;
   if(!monopoly) hideBoardOverlays();
   if(setup){
-    renderSetupCards();
-    renderSetupSelection();
-    setupStatus.textContent = gameState.message;
-    phaseContent.innerHTML = "";
-    moderatorControls.innerHTML = "";
-    playerPanel.innerHTML = "";
-    return;
+    renderSetupCards(); renderSetupSelection(); setupStatus.textContent = gameState.message;
+    phaseContent.innerHTML = ""; moderatorControls.innerHTML = ""; playerPanel.innerHTML = ""; return;
   }
   if(monopoly){ renderBoard(); return; }
   const info = phaseInfo[gameState.phase];
   document.getElementById("phaseTitle").textContent = info.title;
-  document.getElementById("phaseEyebrow").textContent = `${revaluations[gameState.phase] ? "TECH SHOCK · " : ""}${info.slides}`;
-  document.getElementById("turnBadge").textContent = gameState.phaseComplete ? "WAITING FOR PRESENTER" : `${gameState.teams[gameState.currentTeam].name.toUpperCase()}'S DECISION`;
-  document.getElementById("statusText").textContent = gameState.phaseComplete ? "All outcomes locked. Return to the presentation." : gameState.message;
-  let html = renderRevaluation();
-  if(gameState.phase === "jet") html += '<p class="teaching-note"><strong>Passenger Shipping</strong><br>Pre-Industrial: $4 → Steam Era: $6 → Jet Age: $3</p><p>Revaluation only. No team decisions in this phase.</p>';
-  if(gameState.phase === "future") html += '<p>Visitor demand surges; a major attraction becomes overcrowded; extreme weather disrupts another attraction; transport is strained; residents are frustrated; travellers still expect seamless personalised journeys.</p><p class="teaching-note">Start at 3/5 for each outcome. Accumulated Destination Pressure reduces resident wellbeing and environmental health first.<br><strong>Crisis applied once:</strong> cash −$2 · visitor experience −2 · resident wellbeing −1 · environmental health −1. Scores stay within 0–5.</p>';
-  if(gameState.phase === "digital" && gameState.events.fitBoom) html += '<p class="teaching-note"><strong>FREE INDEPENDENT TRAVEL BOOM</strong><br>All teams: Destination Pressure +1.<br>Digital Ready teams: cash +$2. Other teams: no economic bonus.<br>Shared event applied once.</p>';
-  if(!gameState.phaseComplete) html += navigationState.currentView.type === "selection" ? renderSelection() : renderActions();
-  if(gameState.phase === "winner"){
-    const winners = getMoneyWinners();
-    html += `<h2>${winners.length > 1 ? "Joint money winners" : "Money winner"}: ${winners.map(team => team.name).join(" & ")} · ${money(calculateNetWorth(winners[0]))}</h2><p>Highest calculated Net Worth determines the money winner. Visitor, resident and environmental outcomes remain visible alongside it.</p>`;
-  }
-  if(gameState.phaseComplete && navigationState.currentView.type === "pause"){
-    html += `<section class="pause-panel"><h2>${info.complete || "MONEY RESULT COMPLETE"}</h2>${gameState.phase === "future" ? "<strong>FINAL OUTCOMES LOCKED</strong>" : ""}<p>Return to presentation:<br><strong>${info.returnTo}</strong></p><p>${info.next ? "The presenter starts the next phase after the slides." : "Continue to the Canva conclusion on slide 17."}</p></section>`;
-  }
-  if(gameState.phaseComplete && navigationState.currentView.type === "phase-review"){
-    html += `<section class="pause-panel"><h2>${info.complete || "MONEY RESULT COMPLETE"}</h2><p>Completed phase review. Committed outcomes remain unchanged.</p><button class="game-btn secondary" data-navigation="pause" type="button">Return to presentation pause</button></section>`;
-  }
-  phaseContent.innerHTML = html;
-  moderatorControls.innerHTML = info.next ? `<button type="button" class="game-btn" data-next-phase="${gameState.phase}" ${!gameState.phaseComplete ? "disabled" : ""}>${info.next}</button>` : "";
-  document.getElementById("undoDecisionBtn").hidden = !gameState.lastDecision || navigationState.currentView.type === "selection";
+  document.getElementById("phaseEyebrow").textContent = info.slides || "Tourismopoly";
+  const statusLabels = {revaluation:"MARKET SHIFT",decisions:`${gameState.teams[gameState.currentTeam]?.name.toUpperCase()}'S DECISION`,review:"REVIEW BEFORE LOCKING",event:"SHARED EVENT",crisis:"CRISIS REVEAL",results:"ERA RESULTS",pause:"WAITING FOR PRESENTER",winner:"MONEY RESULT"};
+  document.getElementById("turnBadge").textContent = statusLabels[gameState.uiStage] || "TOURISMOPOLY";
+  document.getElementById("statusText").textContent = gameState.uiStage === "pause" ? `Return to presentation: ${info.returnTo}` : gameState.message;
+  phaseContent.innerHTML = renderCurrentStage();
+  moderatorControls.innerHTML = gameState.uiStage === "pause" && info.next ? `<button type="button" class="game-btn" data-next-phase="${gameState.phase}">${info.next}</button>` : "";
   renderPlayers();
 }
 function runAndRender(callback){
@@ -264,14 +212,18 @@ setupConfirmBtn.addEventListener("click", () => runAndRender(applySetupFromDraw)
 document.getElementById("resetGameBtn").addEventListener("click", () => runAndRender(resetGame));
 backBtn.addEventListener("click", () => runAndRender(navigateBack));
 document.getElementById("applyIndustrialBtn").addEventListener("click", () => {
-  try {applyIndustrialRevolution();renderGame();}
-  catch(error){document.getElementById("shockError").textContent = error.message;}
+  try { applyIndustrialRevolution(); renderGame(); }
+  catch(error){ document.getElementById("shockError").textContent = error.message; }
 });
 document.getElementById("undoDecisionBtn").addEventListener("click", () => runAndRender(undoLastDecision));
 phaseContent.addEventListener("click", event => {
   const navigationButton = event.target.closest("button[data-navigation]");
-  if(navigationButton){
-    runAndRender(navigationButton.dataset.navigation === "pause" ? showPresentationPause : resumeCurrentGame);
+  if(navigationButton){ runAndRender(resumeCurrentGame); return; }
+  const flowButton = event.target.closest("button[data-flow-action]");
+  if(flowButton){
+    if(flowButton.dataset.flowAction === "continue") runAndRender(continuePhaseStage);
+    else if(flowButton.dataset.flowAction === "lock") runAndRender(confirmPhaseReview);
+    else if(flowButton.dataset.flowAction === "undo") runAndRender(undoLastDecision);
     return;
   }
   if(event.target.closest("#confirmDecisionBtn")){
@@ -284,8 +236,8 @@ phaseContent.addEventListener("click", event => {
   }
   const button = event.target.closest("button[data-action]");
   if(!button || button.disabled) return;
-  const {team, action, selection, selectId, phase} = button.dataset;
-  runAndRender(() => openStrategySelection(team, action, selectId ? document.getElementById(selectId).value : selection, phase));
+  const {team,action,selection,selectId,phase} = button.dataset;
+  runAndRender(() => openStrategySelection(team,action,selectId ? document.getElementById(selectId).value : selection,phase));
 });
 moderatorControls.addEventListener("click", event => {
   const button = event.target.closest("button[data-next-phase]");
