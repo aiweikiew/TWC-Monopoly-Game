@@ -1,85 +1,35 @@
-"use strict";
+﻿"use strict";
 
-// Random identity draw, undo/reset, confirmation, and Change Identities.
-
+// Reuse the original draw-without-replacement and undo/reset interaction.
 function setupDraw(){
-  if(gameState.setupSelected.length>=3) return;
-  const used = new Set(gameState.setupSelected.map(s=>s.index));
-  const available = identityPool.map((_,i)=>i).filter(i=>!used.has(i));
-  const index = available[Math.floor(Math.random()*available.length)];
+  if(gameState.phase !== "setup" || gameState.setupSelected.length >= 3) return false;
+  const used = new Set(gameState.setupSelected.map(s => s.index));
+  const available = identityPool.map((_, i) => i).filter(i => !used.has(i));
+  const index = available[Math.floor(Math.random() * available.length)];
   gameState.setupSelected.push({index});
-  setupStatus.textContent = `${setupTeams[gameState.setupSelected.length-1]} drew ${identityPool[index].name}.`;
-  renderSetupCards();
-  renderSetupSelection();
+  gameState.message = `${setupTeams[gameState.setupSelected.length - 1]} drew ${identityPool[index].name}.`;
+  if(gameState.setupSelected.length === 3) return applySetupFromDraw();
+  return true;
 }
-
 function setupUndo(){
-  if(!gameState.setupSelected.length) return;
-  const removed=gameState.setupSelected.pop();
-  setupStatus.textContent = `${identityPool[removed.index].name} returned to the pool.`;
-  renderSetupCards();
-  renderSetupSelection();
+  if(gameState.phase !== "setup" || !gameState.setupSelected.length) return false;
+  const removed = gameState.setupSelected.pop();
+  gameState.message = `${identityPool[removed.index].name} returned to the pool.`;
+  return true;
 }
-
 function setupReset(){
-  gameState.setupSelected=[];
-  setupStatus.textContent="Team A draws first.";
-  renderSetupCards();
-  renderSetupSelection();
+  if(gameState.phase !== "setup") return false;
+  resetGame();
+  return true;
 }
-
 function applySetupFromDraw(){
-  gameState.setup = gameState.setupSelected.map((entry,i)=>{
-    const r = identityPool[entry.index];
-    return {
-      teamIndex:i,
-      teamName:setupTeams[i],
-      roleKey:r.key,
-      roleName:r.name,
-      icon:r.icon,
-      cash:r.cash,
-      netWorth:10,
-      legacy:r.legacy,
-      legacyValue:r.legacyValue,
-      sector:r.sector
-    };
-  });
-
-  gameState.teamNames = gameState.setup.map(x=>x.teamName.toUpperCase());
-
-  gameState.cash.splice(0,gameState.cash.length,...gameState.setup.map(x=>x.cash));
-  gameState.positions.splice(0,gameState.positions.length,0,0,0);
-
-  renderPlayers();
-
-  cards.splice(0,cards.length,...document.querySelectorAll(".player-card"));
-
-  tiles.forEach(tile=>{
-    const zone=tile.querySelector(".token-zone");
-    if(zone) zone.innerHTML="";
-  });
-  tokens.forEach((_,i)=>placeToken(i,0,false));
-
-  gameState.currentTeam=0;
-  statusText.textContent="Ready to roll";
-  statusSub.textContent="The dice appears briefly, your traveller moves, then the landing popup resolves the turn.";
-  rollBtn.disabled=false;
-  nextBtn.disabled=true;
-  setupScreen.classList.add("hidden");
-  updateTurnUI();
+  const selected = gameState.setupSelected;
+  if(gameState.phase !== "setup" || selected.length !== 3 ||
+     new Set(selected.map(s => s.index)).size !== 3 ||
+     selected.some(s => !Number.isInteger(s.index) || !identityPool[s.index])) return false;
+  gameState.teams = selected.map((entry, i) => createTeam(entry.index, i));
+  gameState.phase = "starting";
+  gameState.decisions = {};
+  gameState.message = "Each team chooses exactly one investment or holds.";
+  return true;
 }
-
-setupDrawBtn.addEventListener("click",setupDraw);
-
-setupUndoBtn.addEventListener("click",setupUndo);
-
-setupResetBtn.addEventListener("click",setupReset);
-
-setupConfirmBtn.addEventListener("click",()=>{
-  if(gameState.setupSelected.length!==3) return;
-  applySetupFromDraw();
-});
-
-document.getElementById("changeSetupBtn").addEventListener("click",()=>{
-  document.getElementById("setupScreen").classList.remove("hidden");
-});

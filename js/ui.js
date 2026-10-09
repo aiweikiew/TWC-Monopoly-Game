@@ -1,6 +1,6 @@
 "use strict";
 
-// DOM references, identity/player rendering, landing popups, and visual animations.
+// Reused identity cards; all gameplay rendering reads the central state.
 
 const setupScreen = document.getElementById("setupScreen");
 
@@ -14,7 +14,7 @@ const setupUndoBtn = document.getElementById("setupUndoBtn");
 
 const setupResetBtn = document.getElementById("setupResetBtn");
 
-const setupConfirmBtn = document.getElementById("setupConfirmBtn");
+
 
 const setupPickStatus = document.getElementById("setupPickStatus");
 
@@ -33,8 +33,8 @@ function renderSetupCards(){
       <div class="setup-desc">${x.desc}</div>
       <div class="setup-stats">
         <div class="setup-stat"><label>CASH</label><strong>$${x.cash}</strong></div>
-        <div class="setup-stat"><label>NET WORTH</label><strong>$10</strong></div>
-        <div class="setup-legacy">${x.legacy}</div>
+        <div class="setup-stat"><label>NET WORTH</label><strong>$${calculateNetWorth({cash:x.cash,assets:[{currentValue:assetTypes[x.legacyType].price}]})}</strong></div>
+        <div class="setup-legacy">${assetTypes[x.legacyType].name} · $${assetTypes[x.legacyType].price}</div>
       </div>
     </article>`;
   }).join("");
@@ -47,319 +47,154 @@ function renderSetupSelection(){
       return `<div class="setup-slot empty">
         <div class="setup-slot-icon">${String.fromCharCode(65+i)}</div>
         <div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${i===gameState.setupSelected.length?"Draws next...":"Waiting..."}</div></div>
-        <div class="setup-slot-worth"><label>NET WORTH</label><strong>$10</strong></div>
+        <div class="setup-slot-worth"><label>NET WORTH</label><strong>—</strong></div>
       </div>`;
     }
     const x = identityPool[entry.index];
     return `<div class="setup-slot">
       <div class="setup-slot-icon">${x.icon}</div>
-      <div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${x.name}<br>Cash $${x.cash} · ${x.legacy}</div></div>
-      <div class="setup-slot-worth"><label>NET WORTH</label><strong>$10</strong></div>
+      <div><div class="setup-slot-name">${team}</div><div class="setup-slot-role">${x.name}<br>Cash $${x.cash} · ${assetTypes[x.legacyType].name} · $${assetTypes[x.legacyType].price}</div></div>
+      <div class="setup-slot-worth"><label>NET WORTH</label><strong>$${calculateNetWorth({cash:x.cash,assets:[{currentValue:assetTypes[x.legacyType].price}]})}</strong></div>
     </div>`;
   }).join("");
 
   const ready = gameState.setupSelected.length===3;
   setupDrawBtn.disabled = ready;
   setupUndoBtn.disabled = gameState.setupSelected.length===0;
-  setupConfirmBtn.disabled = !ready;
+
 
   if(ready){
     setupPickStatus.textContent = "3/3 drawn";
-    setupBanner.textContent = "All teams have drawn. Confirm to begin.";
+    setupBanner.textContent = "All teams have drawn. Starting market is open.";
     setupDrawBtn.textContent = "✓ All Teams Drawn";
   } else {
     setupPickStatus.textContent = `${gameState.setupSelected.length}/3 drawn`;
     setupBanner.textContent = `${setupTeams[gameState.setupSelected.length]}, draw your identity.`;
-    setupDrawBtn.textContent = `🎲 ${setupTeams[gameState.setupSelected.length]} · Draw Identity`;
+    setupDrawBtn.textContent = `${setupTeams[gameState.setupSelected.length]} · Draw Identity`;
   }
 }
 
-const board = document.getElementById("board");
-
-const overlay = document.getElementById("diceOverlay");
-
-const die = document.getElementById("die");
-
-const rollCaption = document.getElementById("rollCaption");
-
-const rollBtn = document.getElementById("rollBtn");
-
-const nextBtn = document.getElementById("nextBtn");
-
-const turnBadge = document.getElementById("turnBadge");
-
-const statusText = document.getElementById("statusText");
-
-const statusSub = document.getElementById("statusSub");
-
+const gameScreen = document.getElementById("gameScreen");
+const phaseContent = document.getElementById("phaseContent");
 const playerPanel = document.getElementById("dynamicPlayers");
-
-renderPlayers();
-
-const cards = [...document.querySelectorAll(".player-card")];
-
-const tiles = [...document.querySelectorAll(".tile[data-index]")];
-
-const landingModal = document.getElementById("landingModal");
-
-const landingEyebrow = document.getElementById("landingEyebrow");
-
-const landingIcon = document.getElementById("landingIcon");
-
-const landingTitle = document.getElementById("landingTitle");
-
-const landingDesc = document.getElementById("landingDesc");
-
-const landingPrice = document.getElementById("landingPrice");
-
-const landingBalance = document.getElementById("landingBalance");
-
-const buyBtn = document.getElementById("buyBtn");
-
-const passBtn = document.getElementById("passBtn");
-
-const chanceModal = document.getElementById("chanceModal");
-
-const chanceTitle = document.getElementById("chanceTitle");
-
-const chanceStory = document.getElementById("chanceStory");
-
-const chanceEffect = document.getElementById("chanceEffect");
-
-const chanceSector = document.getElementById("chanceSector");
-
-const chanceContinueBtn = document.getElementById("chanceContinueBtn");
-
-const feeModal = document.getElementById("feeModal");
-
-const feeIcon = document.getElementById("feeIcon");
-
-const feeTitle = document.getElementById("feeTitle");
-
-const feeOwner = document.getElementById("feeOwner");
-
-const feeAmount = document.getElementById("feeAmount");
-
-const feeTransfer = document.getElementById("feeTransfer");
-
-const feeSpecialNote = document.getElementById("feeSpecialNote");
-
-const payFeeBtn = document.getElementById("payFeeBtn");
-
-const ownModal = document.getElementById("ownModal");
-
-const ownTitle = document.getElementById("ownTitle");
-
-const ownDesc = document.getElementById("ownDesc");
-
-const upgradeOffer = document.getElementById("upgradeOffer");
-
-const alreadyUpgraded = document.getElementById("alreadyUpgraded");
-
-const upgradeBenefit = document.getElementById("upgradeBenefit");
-
-const upgradeBtn = document.getElementById("upgradeBtn");
-
-const keepBtn = document.getElementById("keepBtn");
-
-const ownContinueBtn = document.getElementById("ownContinueBtn");
-
-const opportunityModal = document.getElementById("opportunityModal");
-
-const opportunityBalance = document.getElementById("opportunityBalance");
-
-const opportunityContinueBtn = document.getElementById("opportunityContinueBtn");
-
-const startModal = document.getElementById("startModal");
-
-const startBalance = document.getElementById("startBalance");
-
-const startContinueBtn = document.getElementById("startContinueBtn");
-
-const tokens = [
-  createToken("A","a","Team A"),
-  createToken("B","b","Team B"),
-  createToken("C","c","Team C")
-];
-
-function createToken(label, cls, aria){
-  const el = document.createElement("div");
-  el.className = `token ${cls}`;
-  el.textContent = label;
-  el.setAttribute("aria-label", aria + " token");
-  return el;
+const moderatorControls = document.getElementById("moderatorControls");
+const actionError = document.getElementById("actionError");
+function money(value){ return value < 0 ? `-$${Math.abs(value)}` : `$${value}`; }
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 }
-
-function placeToken(teamIndex, tileIndex, animate=false){
-  const zone = tiles[tileIndex].querySelector(".token-zone");
-  zone.appendChild(tokens[teamIndex]);
-  if(animate){
-    tokens[teamIndex].classList.remove("walking");
-    void tokens[teamIndex].offsetWidth;
-    tokens[teamIndex].classList.add("walking");
-  }
-}
-
-tokens.forEach((_,i)=>placeToken(i,0,false));
-
-function updateTurnUI(){
-  turnBadge.textContent = `${gameState.teamNames[gameState.currentTeam]}'S TURN`;
-  cards.forEach((card,i)=>card.classList.toggle("active",i===gameState.currentTeam));
-}
-
-async function animateDice(finalValue){
-  overlay.classList.add("show");
-  die.classList.add("rolling");
-  rollCaption.textContent = `${gameState.teamNames[gameState.currentTeam]} ROLLING...`;
-
-  for(let i=0;i<12;i++){
-    die.textContent = faces[Math.floor(Math.random()*6)];
-    await sleep(85);
-  }
-
-  die.classList.remove("rolling");
-  die.textContent = faces[finalValue-1];
-  rollCaption.textContent = `${gameState.teamNames[gameState.currentTeam]} ROLLED ${finalValue}`;
-  await sleep(950);
-
-  overlay.classList.remove("show");
-  await sleep(260);
-}
-
-function showPropertyPopup(teamIndex, tileIndex){
-  const p = properties[tileIndex];
-  if(!p) return false;
-
-  landingEyebrow.textContent = "UNOWNED PROPERTY";
-  landingIcon.textContent = p.icon;
-  landingTitle.textContent = p.name;
-  landingDesc.textContent = p.desc;
-  landingPrice.textContent = `$${p.price}`;
-  landingBalance.textContent = `${gameState.teamNames[teamIndex]} Cash · $${gameState.cash[teamIndex]}`;
-  buyBtn.disabled = gameState.cash[teamIndex] < p.price;
-  landingModal.classList.add("show");
-  nextBtn.disabled = true;
-  return true;
-}
-
-function closeLandingPopup(){
-  landingModal.classList.remove("show");
-  nextBtn.disabled = false;
-}
-
-function showChancePopup(teamIndex){
-  const card = chanceCards[Math.floor(Math.random()*chanceCards.length)];
-  const result = evaluateChanceCard(teamIndex, card);
-
-  chanceTitle.textContent = card.title;
-  chanceStory.textContent = card.story;
-  chanceEffect.textContent = result.effect > 0 ? `+$${result.effect}` : result.effect < 0 ? `-$${Math.abs(result.effect)}` : "$0";
-  chanceSector.textContent = result.reason;
-
-  if(result.effect !== 0){
-    gameState.cash[teamIndex] = Math.max(0, gameState.cash[teamIndex] + result.effect);
-    cards[teamIndex].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[teamIndex]}`;
-  }
-
-  chanceModal.classList.add("show");
-  nextBtn.disabled = true;
-
-  statusText.textContent = `${gameState.teamNames[teamIndex]} drew a Situation Card`;
-  statusSub.textContent = `Chance cards use small effects: beneficial +$1, harmful -$1, not relevant $0.`;
-}
-
-function showOwnedPropertyPopup(teamIndex, tileIndex){
-  const owner = gameState.owners[tileIndex];
-  const p = properties[tileIndex];
-  const special = getSpecialisationSector(owner) === p.sector;
-
-  let fee = 1;
-  if(special) fee += 1;
-  if(gameState.upgraded[tileIndex]) fee += 1;
-
-  feeIcon.textContent = p.icon;
-  feeTitle.textContent = p.name;
-  feeOwner.textContent = `Owned by ${gameState.teamNames[owner]}`;
-  feeAmount.textContent = `$${fee}`;
-  feeTransfer.textContent = `${gameState.teamNames[teamIndex]} pays ${gameState.teamNames[owner]}.`;
-
-  const notes = [];
-  if(special) notes.push(`Specialisation Bonus: +$1 landing fee.`);
-  if(gameState.upgraded[tileIndex]) notes.push(`Business Upgrade: +$1 landing fee.`);
-
-  if(notes.length){
-    feeSpecialNote.hidden = false;
-    feeSpecialNote.textContent = notes.join(" ");
-  } else {
-    feeSpecialNote.hidden = true;
-    feeSpecialNote.textContent = "";
-  }
-
-  gameState.pendingFee = {fee, owner};
-  feeModal.classList.add("show");
-  nextBtn.disabled = true;
-}
-
-function showOwnPropertyPopup(tileIndex){
-  const p = properties[tileIndex];
-  ownTitle.textContent = p.name;
-  ownDesc.textContent = "You landed on your own tourism business.";
-
-  const special = getSpecialisationSector(gameState.currentTeam) === p.sector;
-  const futureFee = 1 + (special ? 1 : 0) + 1;
-
-  if(gameState.upgraded[tileIndex]){
-    upgradeOffer.hidden = true;
-    alreadyUpgraded.hidden = false;
-  } else {
-    upgradeOffer.hidden = false;
-    alreadyUpgraded.hidden = true;
-    upgradeBenefit.textContent = `Upgrade for $1. Future visitors will pay $${futureFee} landing fee${special ? " because your Specialisation Bonus also applies" : ""}.`;
-    upgradeBtn.disabled = gameState.cash[gameState.currentTeam] < 1;
-  }
-
-  ownModal.classList.add("show");
-  nextBtn.disabled = true;
-}
-
-function showBusinessOpportunityPopup(teamIndex){
-  gameState.cash[teamIndex] += 1;
-  cards[teamIndex].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[teamIndex]}`;
-  opportunityBalance.textContent = `${gameState.teamNames[teamIndex]} Cash · $${gameState.cash[teamIndex]}`;
-  opportunityModal.classList.add("show");
-  nextBtn.disabled = true;
-  statusText.textContent = `${gameState.teamNames[teamIndex]} found a Business Opportunity`;
-  statusSub.textContent = "+$1 cash has been applied.";
-}
-
-function showStartPopup(teamIndex){
-  startBalance.textContent = `${gameState.teamNames[teamIndex]} Cash · $${gameState.cash[teamIndex]}`;
-  startModal.classList.add("show");
-  nextBtn.disabled = true;
-  statusText.textContent = `${gameState.teamNames[teamIndex]} reached GO`;
-  statusSub.textContent = "Grand Tour Payday: +$1 cash.";
-}
-
-renderSetupCards();
-
-renderSetupSelection();
-
-updateTurnUI();
-
 function renderPlayers(){
-  playerPanel.innerHTML = gameState.setup.map((p,i)=>`
-    <div class="player-card ${i===0?"active":""}" data-team="${i}">
+  const showDigital = ["digital","future","winner"].includes(gameState.phase);
+  const showFuture = ["future","winner"].includes(gameState.phase);
+  playerPanel.innerHTML = gameState.teams.map((team,i) => `
+    <article class="player-card ${!gameState.phaseComplete && i === gameState.currentTeam ? "active" : ""}">
       <div class="player-head">
-        <div class="avatar">${p.icon}</div>
-        <div class="player-info">
-          <div class="team">${p.teamName}</div>
-          <div class="identity">${p.roleName}</div>
-        </div>
-        <div class="pawn">${["🔵","🟣","🟢"][i]}</div>
+        <div class="avatar">${team.identity.icon}</div>
+        <div class="player-info"><div class="team">${team.name}</div><div class="identity">${escapeHTML(team.identity.name)}</div></div>
+        <div class="pawn">${team.id}</div>
       </div>
-      <div class="networth-row"><div class="currency">$</div><div class="networth">${p.netWorth}</div></div>
-      <div class="cash-row">Cash · $${gameState.cash[i]}</div>
-      <div class="cash-row">Legacy · ${p.legacy}</div>
-    </div>
-  `).join("");
+      <div class="portfolio-total">Net Worth <strong>${money(calculateNetWorth(team))}</strong> · Cash ${money(team.cash)}</div>
+      <ul class="portfolio-assets">${team.assets.map(asset => `<li>${escapeHTML(asset.name)}: ${money(asset.currentValue)}${asset.digital ? " · Digital" : ""}</li>`).join("") || "<li>No assets</li>"}</ul>
+      ${showDigital ? `<div>Digital Ready: <strong>${team.digitalReady ? "YES" : "NO"}</strong> · Pressure: ${team.destinationPressure}</div>` : ""}
+      ${showFuture ? `<div>Visitor Experience: ${team.visitorExperience}/5<br>Resident Wellbeing: ${team.residentWellbeing}/5 · Environmental Health: ${team.environmentalHealth}/5</div><div>Strategy: ${team.futureStrategy ? futureStrategies[team.futureStrategy].name : "Pending · 1 credit"}</div>` : ""}
+      ${gameState.decisions[team.id] && !showFuture ? `<div class="decision-record">✓ ${escapeHTML(gameState.decisions[team.id])}</div>` : ""}
+    </article>`).join("");
 }
+function actionButton(team, action, label, selection="", disabled=false){
+  return `<button type="button" class="game-btn" data-action="${action}" data-team="${team.id}" data-phase="${gameState.phase}" data-selection="${selection}" ${disabled ? "disabled" : ""}>${label}</button>`;
+}
+function selectionAction(team, action, label, assets, cost){
+  const selectId = `select-${action}`;
+  const canAfford = team.cash >= cost;
+  return `<div class="action-option"><label for="${selectId}">${label}</label>
+    <select id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>
+      ${assets.length ? assets.map(asset => `<option value="${asset.id}">${escapeHTML(asset.name)} · ${money(asset.currentValue)}</option>`).join("") : '<option value="">No eligible assets</option>'}
+    </select>
+    <button type="button" class="game-btn" data-action="${action}" data-team="${team.id}" data-phase="${gameState.phase}" data-select-id="${selectId}" ${!assets.length || !canAfford ? "disabled" : ""}>${action.toUpperCase()}${cost ? ` · $${cost}` : ""}</button>
+    ${!canAfford ? `<small>Requires $${cost} cash.</small>` : ""}</div>`;
+}
+function renderActions(){
+  const team = gameState.teams[gameState.currentTeam];
+  const phase = gameState.phase;
+  let html = `<section class="decision-panel"><h2>${team.name} · Choose exactly ONE decision</h2>`;
+  if(phase === "future"){
+    html += '<p>One Future Innovation Credit · No cash cost</p><div class="action-grid">';
+    for(const [key, strategy] of Object.entries(futureStrategies)){
+      html += `<article class="action-option"><strong>${strategy.name}</strong><p>${strategy.purpose}</p><p>Cash +$${strategy.cash} · Visitor Experience +${strategy.visitorExperience}<br>Resident Wellbeing +${strategy.residentWellbeing} · Environmental Health +${strategy.environmentalHealth}</p>${actionButton(team,"strategy",strategy.name,key)}</article>`;
+    }
+    return html + '</div></section>';
+  }
+  if(phase === "digital") html += '<p><strong>QUEST: BECOME DIGITALLY READY</strong></p>';
+  html += '<div class="action-grid">';
+  for(const type of markets[phase]){
+    const asset = assetTypes[type];
+    html += `<div class="action-option"><strong>${escapeHTML(asset.name)} · $${asset.price}</strong>${actionButton(team,"invest",`INVEST · $${asset.price}`,type,team.cash < asset.price)}${team.cash < asset.price ? "<small>Insufficient cash</small>" : ""}</div>`;
+  }
+  if(phase === "steam"){
+    html += selectionAction(team,"sell","Sell one asset at its current value",team.assets,0);
+    html += selectionAction(team,"adapt","Adapt one asset; preserve its current value",team.assets.filter(asset => Object.hasOwn(adaptations, asset.type)),1);
+    html += '<p class="action-help">Coach → Station Transfer Service · Inn → Railway-Era Hotel · Shipping → Steam Passenger Shipping · Publishing → Guidebook &amp; Travel Publishing</p>';
+  }
+  if(phase === "digital") html += selectionAction(team,"digitise","Digitise one business; preserve its current value",team.assets.filter(asset => asset.tourism && !asset.digital),2);
+  html += `</div><div class="hold-action">${actionButton(team,"hold","HOLD · No change")}</div></section>`;
+  return html;
+}
+function renderRevaluation(){
+  if(!revaluations[gameState.phase]) return "";
+  return `<section><h2>Market revaluation</h2>${gameState.revaluationLog.length ? `<table class="value-table"><thead><tr><th>Team</th><th>Asset</th><th>Old → New</th></tr></thead><tbody>${gameState.revaluationLog.map(row => `<tr><td>${row.team}</td><td>${escapeHTML(row.name)}</td><td>${money(row.oldValue)} → ${money(row.newValue)}</td></tr>`).join("")}</tbody></table>` : "<p>No owned assets affected.</p>"}<p class="compact-note">Other assets keep their current values. Net Worth updates immediately.</p></section>`;
+}
+function renderGame(){
+  actionError.textContent = "";
+  const setup = gameState.phase === "setup";
+  setupScreen.classList.toggle("hidden", !setup);
+  gameScreen.hidden = setup;
+  if(setup){
+    renderSetupCards();
+    renderSetupSelection();
+    setupStatus.textContent = gameState.message;
+    phaseContent.innerHTML = "";
+    moderatorControls.innerHTML = "";
+    playerPanel.innerHTML = "";
+    return;
+  }
+  const info = phaseInfo[gameState.phase];
+  document.getElementById("phaseTitle").textContent = info.title;
+  document.getElementById("phaseEyebrow").textContent = `${revaluations[gameState.phase] ? "TECH SHOCK · " : ""}${info.slides}`;
+  document.getElementById("turnBadge").textContent = gameState.phaseComplete ? "WAITING FOR PRESENTER" : `${gameState.teams[gameState.currentTeam].name.toUpperCase()}'S DECISION`;
+  document.getElementById("statusText").textContent = gameState.phaseComplete ? "All outcomes locked. Return to the presentation." : gameState.message;
+  let html = renderRevaluation();
+  if(gameState.phase === "starting") html += '<p>Invest in one asset or hold. Investments convert cash to assets of equal value. Multiple teams may buy the same asset type.</p>';
+  if(gameState.phase === "jet") html += '<p class="teaching-note"><strong>Passenger Shipping</strong><br>Pre-Industrial: $4 → Steam Era: $6 → Jet Age: $3</p><p>Revaluation only. No team decisions in this phase.</p>';
+  if(gameState.phase === "future") html += '<p>Visitor demand surges; a major attraction becomes overcrowded; extreme weather disrupts another attraction; transport is strained; residents are frustrated; travellers still expect seamless personalised journeys.</p><p class="teaching-note">Start at 3/5 for each outcome. Accumulated Destination Pressure reduces resident wellbeing and environmental health first.<br><strong>Crisis applied once:</strong> cash −$2 · visitor experience −2 · resident wellbeing −1 · environmental health −1. Scores stay within 0–5.</p>';
+  if(gameState.phase === "digital" && gameState.events.fitBoom) html += '<p class="teaching-note"><strong>FREE INDEPENDENT TRAVEL BOOM</strong><br>All teams: Destination Pressure +1.<br>Digital Ready teams: cash +$2. Other teams: no economic bonus.<br>Shared event applied once.</p>';
+  if(!gameState.phaseComplete) html += renderActions();
+  if(gameState.phase === "winner"){
+    const winners = getMoneyWinners();
+    html += `<h2>${winners.length > 1 ? "Joint money winners" : "Money winner"}: ${winners.map(team => team.name).join(" & ")} · ${money(calculateNetWorth(winners[0]))}</h2><p>Highest calculated Net Worth determines the money winner. Visitor, resident and environmental outcomes remain visible alongside it.</p>`;
+  }
+  if(gameState.phaseComplete){
+    html += `<section class="pause-panel"><h2>${info.complete || "MONEY RESULT COMPLETE"}</h2>${gameState.phase === "future" ? "<strong>FINAL OUTCOMES LOCKED</strong>" : ""}<p>Return to presentation:<br><strong>${info.returnTo}</strong></p><p>${info.next ? "The presenter starts the next phase after the slides." : "Continue to the Canva conclusion on slide 17."}</p></section>`;
+  }
+  phaseContent.innerHTML = html;
+  moderatorControls.innerHTML = info.next ? `<button type="button" class="game-btn" data-next-phase="${gameState.phase}" ${!gameState.phaseComplete ? "disabled" : ""}>${info.next}</button>` : "";
+  renderPlayers();
+}
+function runAndRender(callback){
+  try { callback(); renderGame(); }
+  catch(error){ actionError.textContent = error.message; }
+}
+setupDrawBtn.addEventListener("click", () => runAndRender(setupDraw));
+setupUndoBtn.addEventListener("click", () => runAndRender(setupUndo));
+setupResetBtn.addEventListener("click", () => runAndRender(setupReset));
+document.getElementById("resetGameBtn").addEventListener("click", () => runAndRender(resetGame));
+phaseContent.addEventListener("click", event => {
+  const button = event.target.closest("button[data-action]");
+  if(!button || button.disabled) return;
+  const {team, action, selection, selectId, phase} = button.dataset;
+  runAndRender(() => takeAction(team, action, selectId ? document.getElementById(selectId).value : selection, phase));
+});
+moderatorControls.addEventListener("click", event => {
+  const button = event.target.closest("button[data-next-phase]");
+  if(button && !button.disabled) runAndRender(() => startNextPhase(button.dataset.nextPhase));
+});
+renderGame();

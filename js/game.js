@@ -1,231 +1,132 @@
-"use strict";
+﻿"use strict";
 
-// Turn flow, tile movement, Chance evaluation, and landing action handlers.
-
-function getTeamSectors(teamIndex){
-  const owned = Object.entries(gameState.owners)
-    .filter(([tileIdx, owner]) => owner === teamIndex)
-    .map(([tileIdx]) => properties[Number(tileIdx)]?.sector)
-    .filter(Boolean);
-
-  if(owned.length > 0){
-    return [...new Set(owned)];
-  }
-
-  return gameState.setup[teamIndex]?.sector ? [gameState.setup[teamIndex].sector] : ["none"];
+// Rules have no DOM dependency; UI events call these guarded transitions.
+function requireRule(condition, message){
+  if(!condition) throw new Error(message);
 }
-
-function evaluateChanceCard(teamIndex, card){
-  const sectors = getTeamSectors(teamIndex);
-  const matched = [];
-
-  for(const sector of sectors){
-    const effect = card.sectorEffects[sector];
-    if(effect){
-      matched.push({sector,value:effect.value,reason:effect.reason});
+function revalueAssets(phase){
+  const values = revaluations[phase];
+  gameState.revaluationLog = [];
+  for(const team of gameState.teams){
+    for(const asset of team.assets){
+      if(Object.hasOwn(values, asset.type)){
+        const oldValue = asset.currentValue;
+        asset.currentValue = values[asset.type];
+        gameState.revaluationLog.push({team:team.name,name:asset.name,oldValue,newValue:asset.currentValue});
+      }
     }
   }
-
-  if(matched.length === 0){
-    return {
-      effect:0,
-      reason:card.neutralReason || "No change to your business."
-    };
+}
+function applyFITBoom(){
+  requireRule(gameState.phase === "digital" && gameState.teams.length === 3 &&
+    gameState.teams.every(team => gameState.decisions[team.id]), "Finish all digital decisions first.");
+  if(gameState.events.fitBoom) return;
+  gameState.events.fitBoom = true;
+  // Shared destination pressure counts events, not the sum across teams.
+  gameState.destinationPressure += 1;
+  for(const team of gameState.teams){
+    team.destinationPressure += 1;
+    if(team.digitalReady) team.cash += 2;
   }
-
-  const hasPositive = matched.some(x => x.value > 0);
-  const hasNegative = matched.some(x => x.value < 0);
-
-  if(hasPositive && hasNegative){
-    return {
-      effect:0,
-      reason:"One of your businesses benefits while another is harmed, so the effects cancel out."
-    };
+}
+function applyFutureCrisis(){
+  requireRule(gameState.phase === "future", "The crisis belongs to the future phase.");
+  if(gameState.events.crisis) return;
+  gameState.events.crisis = true;
+  for(const team of gameState.teams){
+    team.visitorExperience = 3;
+    team.residentWellbeing = 3 - team.destinationPressure;
+    team.environmentalHealth = 3 - team.destinationPressure;
+    clampScores(team);
+    team.cash -= 2;
+    team.visitorExperience -= 2;
+    team.residentWellbeing -= 1;
+    team.environmentalHealth -= 1;
+    clampScores(team);
+    team.futureInnovationCredit = 1;
   }
-
-  const chosen = matched[0];
-  return {
-    effect:chosen.value > 0 ? 1 : -1,
-    reason:chosen.reason
+}
+function startNextPhase(expectedPhase){
+  requireRule(gameState.phase === expectedPhase, "This phase control is no longer current.");
+  const index = phaseOrder.indexOf(gameState.phase);
+  requireRule(index >= 0 && index < phaseOrder.length - 1, "There is no next phase.");
+  requireRule(gameState.phaseComplete && (gameState.phase === "jet" ||
+    gameState.teams.every(team => gameState.decisions[team.id])), "Resolve all team decisions before continuing.");
+  gameState.phase = phaseOrder[index + 1];
+  gameState.phaseComplete = false;
+  gameState.decisions = {};
+  gameState.currentTeam = 0;
+  gameState.revaluationLog = [];
+  gameState.message = "";
+  if(revaluations[gameState.phase]) revalueAssets(gameState.phase);
+  if(gameState.phase === "future") applyFutureCrisis();
+  if(gameState.phase === "jet" || gameState.phase === "winner") gameState.phaseComplete = true;
+}
+function takeAction(teamId, action, selection, expectedPhase){
+  requireRule(gameState.phase === expectedPhase, "This decision belongs to an earlier phase.");
+  requireRule(!gameState.phaseComplete && ["starting","steam","digital","future"].includes(gameState.phase), "No strategy actions are available in this phase.");
+  const team = gameState.teams.find(t => t.id === teamId);
+  requireRule(team && team === gameState.teams[gameState.currentTeam], "Wait for this team's turn.");
+  requireRule(!gameState.decisions[teamId], "This team already acted.");
+  const allowed = {
+    starting:["invest","hold"],steam:["hold","sell","adapt","invest"],
+    digital:["digitise","invest","hold"],future:["strategy"]
   };
-}
-
-function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
-
-function getSpecialisationSector(teamIndex){
-  return gameState.setup[teamIndex]?.sector || null;
-}
-
-function resolveLanding(teamIndex){
-  const tileIndex = gameState.positions[teamIndex];
-
-  if(properties[tileIndex]){
-    if(gameState.owners[tileIndex] === undefined){
-      showPropertyPopup(teamIndex, tileIndex);
-      return;
-    }
-    if(gameState.owners[tileIndex] === teamIndex){
-      showOwnPropertyPopup(tileIndex);
-      return;
-    }
-    showOwnedPropertyPopup(teamIndex, tileIndex);
-    return;
+  requireRule(allowed[gameState.phase].includes(action), "This action is not available in this phase.");
+  const asset = team.assets.find(a => a.id === selection);
+  let description = action.toUpperCase();
+  if(action === "invest"){
+    requireRule(markets[gameState.phase].includes(selection), "Choose an asset from this era's market.");
+    const price = assetTypes[selection].price;
+    requireRule(team.cash >= price, "Insufficient cash for this investment.");
+    team.cash -= price;
+    team.assets.push(createAsset(selection));
+    if(assetTypes[selection].digital) team.digitalReady = true;
+    description += `: ${assetTypes[selection].name}`;
+  } else if(action === "sell"){
+    requireRule(asset, "Select an owned asset to sell.");
+    team.cash += asset.currentValue;
+    team.assets = team.assets.filter(a => a.id !== asset.id);
+    description += `: ${asset.name}`;
+  } else if(action === "adapt"){
+    requireRule(asset && Object.hasOwn(adaptations, asset.type), "Choose an eligible tourism asset to adapt.");
+    requireRule(team.cash >= 1, "Adaptation requires $1 cash.");
+    team.cash -= 1;
+    asset.type = adaptations[asset.type];
+    asset.name = assetTypes[asset.type].name;
+    asset.form = asset.name;
+    asset.era = "steam";
+    description += `: ${asset.name}`;
+  } else if(action === "digitise"){
+    requireRule(asset && asset.tourism && !asset.digital, "Choose a non-digital tourism business.");
+    requireRule(team.cash >= 2, "Digitisation requires $2 cash.");
+    team.cash -= 2;
+    asset.digital = true;
+    team.digitalReady = true;
+    description += `: ${asset.name}`;
+  } else if(action === "strategy"){
+    requireRule(Object.hasOwn(futureStrategies, selection), "Choose a future strategy.");
+    requireRule(team.futureInnovationCredit === 1 && team.futureStrategy === null, "This team's innovation credit has already been used.");
+    const strategy = futureStrategies[selection];
+    team.cash += strategy.cash;
+    for(const key of ["visitorExperience","residentWellbeing","environmentalHealth"]) team[key] += strategy[key];
+    clampScores(team);
+    team.futureStrategy = selection;
+    team.futureInnovationCredit = 0;
+    description = strategy.name;
   }
-
-  if(tileIndex === 2 || tileIndex === 6){
-    showChancePopup(teamIndex);
-    return;
+  gameState.decisions[team.id] = description;
+  gameState.message = `${team.name}: ${description}.`;
+  const nextTeam = gameState.teams.findIndex(t => !gameState.decisions[t.id]);
+  if(nextTeam === -1){
+    if(gameState.phase === "digital") applyFITBoom();
+    gameState.phaseComplete = true;
+  } else {
+    gameState.currentTeam = nextTeam;
   }
-
-  if(tileIndex === 4){
-    showBusinessOpportunityPopup(teamIndex);
-    return;
-  }
-
-  if(tileIndex === 0){
-    showStartPopup(teamIndex);
-    return;
-  }
-
-  nextBtn.disabled = false;
 }
-
-async function moveToken(teamIndex, steps){
-  statusText.textContent = `${gameState.teamNames[teamIndex]} is travelling...`;
-  statusSub.textContent = `Moving ${steps} tile${steps===1?"":"s"} around the board.`;
-
-  for(let step=0; step<steps; step++){
-    const nextPos = (gameState.positions[teamIndex] + 1) % tiles.length;
-    if(nextPos === 0){
-      gameState.cash[teamIndex] += 1;
-      cards[teamIndex].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[teamIndex]}`;
-    }
-    gameState.positions[teamIndex] = nextPos;
-    placeToken(teamIndex, gameState.positions[teamIndex], true);
-    await sleep(430);
-  }
-
-  const landed = tileNames[gameState.positions[teamIndex]];
-  statusText.textContent = `${gameState.teamNames[teamIndex]} landed on ${landed}`;
-  statusSub.textContent = "Resolve the landing action before continuing.";
-  resolveLanding(teamIndex);
+function getMoneyWinners(){
+  if(!gameState.teams.length) return [];
+  const highest = Math.max(...gameState.teams.map(calculateNetWorth));
+  return gameState.teams.filter(team => calculateNetWorth(team) === highest);
 }
-
-async function rollDice(){
-  if(gameState.busy) return;
-  gameState.busy = true;
-  rollBtn.disabled = true;
-  nextBtn.disabled = true;
-
-  const result = Math.floor(Math.random()*6)+1;
-  statusText.textContent = "Rolling...";
-  statusSub.textContent = "Watch the centre of the board.";
-
-  await animateDice(result);
-  await moveToken(gameState.currentTeam,result);
-
-  gameState.busy = false;
-}
-
-function nextTeam(){
-  if(gameState.busy) return;
-  gameState.currentTeam = (gameState.currentTeam + 1) % gameState.teamNames.length;
-  updateTurnUI();
-  statusText.textContent = "Ready to roll";
-  statusSub.textContent = "The dice appears briefly, your traveller moves, then the landing popup resolves the turn.";
-  rollBtn.disabled = false;
-  nextBtn.disabled = true;
-  die.textContent = "⚀";
-}
-
-buyBtn.addEventListener("click",()=>{
-  const tileIndex = gameState.positions[gameState.currentTeam];
-  const p = properties[tileIndex];
-  if(!p || gameState.cash[gameState.currentTeam] < p.price) return;
-  gameState.cash[gameState.currentTeam] -= p.price;
-  gameState.owners[tileIndex] = gameState.currentTeam;
-  cards[gameState.currentTeam].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[gameState.currentTeam]}`;
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} bought ${p.name}`;
-  statusSub.textContent = `Paid $${p.price}. Property ownership will be styled on the board in the next step.`;
-  closeLandingPopup();
-});
-
-passBtn.addEventListener("click",()=>{
-  const tileIndex = gameState.positions[gameState.currentTeam];
-  const p = properties[tileIndex];
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} passed on ${p ? p.name : "the property"}`;
-  statusSub.textContent = "The property remains unowned.";
-  closeLandingPopup();
-});
-
-chanceContinueBtn.addEventListener("click",()=>{
-  chanceModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]}'s Situation Card resolved`;
-  statusSub.textContent = "Turn complete. Move to the next team.";
-  nextBtn.disabled = false;
-});
-
-payFeeBtn.addEventListener("click",()=>{
-  const {fee, owner} = gameState.pendingFee;
-
-  const paid = Math.min(fee, gameState.cash[gameState.currentTeam]);
-  gameState.cash[gameState.currentTeam] -= paid;
-  gameState.cash[owner] += paid;
-
-  cards[gameState.currentTeam].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[gameState.currentTeam]}`;
-  cards[owner].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[owner]}`;
-
-  feeModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} paid ${gameState.teamNames[owner]} $${paid}`;
-  statusSub.textContent = "Landing fee resolved. Turn complete.";
-  nextBtn.disabled = false;
-});
-
-upgradeBtn.addEventListener("click",()=>{
-  const tileIndex = gameState.positions[gameState.currentTeam];
-  const p = properties[tileIndex];
-  if(!p || gameState.upgraded[tileIndex] || gameState.cash[gameState.currentTeam] < 1) return;
-
-  gameState.cash[gameState.currentTeam] -= 1;
-  gameState.upgraded[tileIndex] = true;
-  cards[gameState.currentTeam].querySelector(".cash-row").textContent = `Cash · $${gameState.cash[gameState.currentTeam]}`;
-
-  ownModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} upgraded ${p.name}`;
-  statusSub.textContent = "Paid $1. Future visitors pay +$1 landing fee on this business.";
-  nextBtn.disabled = false;
-});
-
-keepBtn.addEventListener("click",()=>{
-  const tileIndex = gameState.positions[gameState.currentTeam];
-  const p = properties[tileIndex];
-  ownModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} kept ${p.name} as is`;
-  statusSub.textContent = "No upgrade purchased. Turn complete.";
-  nextBtn.disabled = false;
-});
-
-ownContinueBtn.addEventListener("click",()=>{
-  ownModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} landed on their upgraded business`;
-  statusSub.textContent = "No further Past Era upgrade is available. Turn complete.";
-  nextBtn.disabled = false;
-});
-
-opportunityContinueBtn.addEventListener("click",()=>{
-  opportunityModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} collected +$1`;
-  statusSub.textContent = "Business Opportunity resolved. Turn complete.";
-  nextBtn.disabled = false;
-});
-
-startContinueBtn.addEventListener("click",()=>{
-  startModal.classList.remove("show");
-  statusText.textContent = `${gameState.teamNames[gameState.currentTeam]} collected Grand Tour Payday`;
-  statusSub.textContent = "+$1 cash received. Turn complete.";
-  nextBtn.disabled = false;
-});
-
-rollBtn.addEventListener("click",rollDice);
-
-nextBtn.addEventListener("click",nextTeam);

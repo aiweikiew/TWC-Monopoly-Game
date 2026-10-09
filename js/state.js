@@ -1,25 +1,39 @@
-"use strict";
+﻿"use strict";
 
-// Central mutable state. Preserve prototype cash, ownership, setup, and turn semantics.
-
+// All mutable gameplay data lives here. Net Worth is always derived.
 const gameState = {};
-
-gameState.setupSelected = [];
-
-gameState.setup = fallbackSetup.map(x => ({...x}));
-
-gameState.teamNames = gameState.setup.map(x => x.teamName.toUpperCase());
-
-gameState.positions = [0,0,0];
-
-gameState.cash = gameState.setup.map(x => Number(x.cash) || 0);
-
-gameState.owners = {};
-
-gameState.upgraded = {};
-
-gameState.currentTeam = 0;
-
-gameState.busy = false;
-
-gameState.pendingFee = null;
+function resetGame(){
+  Object.keys(gameState).forEach(key => delete gameState[key]);
+  Object.assign(gameState, {
+    phase:"setup",teams:[],phaseComplete:false,destinationPressure:0,
+    setupSelected:[],currentTeam:0,nextAssetId:1,decisions:{},
+    revaluationLog:[],events:{fitBoom:false,crisis:false},message:"Team A draws first."
+  });
+}
+function calculateNetWorth(team){
+  return team.cash + team.assets.reduce((total, asset) => total + asset.currentValue, 0);
+}
+function createAsset(type){
+  const definition = assetTypes[type];
+  return {
+    id:`asset-${gameState.nextAssetId++}`,type,name:definition.name,
+    era:definition.era,form:definition.name,currentValue:definition.price,
+    tourism:definition.tourism !== false,digital:definition.digital === true
+  };
+}
+function createTeam(identityIndex, teamIndex){
+  const identity = identityPool[identityIndex];
+  return {
+    id:String.fromCharCode(65 + teamIndex),name:setupTeams[teamIndex],
+    identity:{key:identity.key,name:identity.name,icon:identity.icon},
+    cash:identity.cash,assets:[createAsset(identity.legacyType)],digitalReady:false,
+    destinationPressure:0,visitorExperience:null,residentWellbeing:null,
+    environmentalHealth:null,futureStrategy:null,futureInnovationCredit:0
+  };
+}
+function clampScores(team){
+  for(const key of ["visitorExperience","residentWellbeing","environmentalHealth"]){
+    team[key] = Math.max(0, Math.min(5, team[key]));
+  }
+}
+resetGame();
