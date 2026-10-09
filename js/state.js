@@ -106,8 +106,6 @@ function mountLandingScreen(){
     landing.className = "tourismopoly-landing";
     landing.setAttribute("aria-label","Tourismopoly start screen");
     landing.innerHTML = `
-      <img class="landing-artwork" src="assets/landing-background.png" alt="Evolution of tourism from horse-drawn travel and steam transport to aviation and AI-enabled future travel" />
-      <div class="landing-vignette" aria-hidden="true"></div>
       <div class="landing-title-card">
         <h1>TOURISMOPOLY</h1>
         <p class="landing-theme">ACCESS → AUTONOMY → ADAPTATION</p>
