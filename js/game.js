@@ -191,10 +191,21 @@ function revealJetTechShock(){
 function applyJetAge(){
   requireRule(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock",
     "Trigger the Jet Age Tech Shock first.");
-  // startNextPhase deliberately accepts only a presentation pause, so restore that
-  // checkpoint immediately before applying the already-tested Jet revaluation.
   gameState.uiStage = "pause";
   startNextPhase("steam");
+}
+function revealDigitalTechShock(){
+  requireRule(gameState.mode === "strategy" && gameState.phase === "jet" &&
+    gameState.phaseComplete && gameState.uiStage === "pause",
+    "Complete the Jet Age revaluation before triggering the Digital Transformation Tech Shock.");
+  gameState.uiStage = "digitalShock";
+  gameState.message = "Return to presentation. Apply Digital Transformation when you return.";
+}
+function applyDigitalTransformation(){
+  requireRule(gameState.mode === "strategy" && gameState.phase === "jet" && gameState.uiStage === "digitalShock",
+    "Trigger the Digital Transformation Tech Shock first.");
+  gameState.uiStage = "pause";
+  startNextPhase("jet");
 }
 function getMoneyWinners(){
   if(!gameState.teams.length) return [];
