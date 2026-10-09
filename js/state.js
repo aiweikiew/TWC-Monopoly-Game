@@ -5,7 +5,7 @@ const gameState = {};
 function resetGame(){
   Object.keys(gameState).forEach(key => delete gameState[key]);
   Object.assign(gameState, {
-    phase:"setup",mode:"setup",teams:[],phaseComplete:false,destinationPressure:0,
+    phase:"setup",mode:"setup",uiStage:"setup",teams:[],phaseComplete:false,destinationPressure:0,
     totalTurnCount:0,roundNumber:1,
     board:{positions:[0,0,0],owners:{},rolls:[0,0,0],
       status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0,history:[]},
