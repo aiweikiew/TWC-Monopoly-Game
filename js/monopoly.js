@@ -60,8 +60,15 @@ function advanceMonopolyStep(){
   const board = requireMonopoly("moving");
   requireRule(board.stepsRemaining > 0, "This roll has already finished moving.");
   const teamIndex = gameState.currentTeam;
+  const team = gameState.teams[teamIndex];
   board.positions[teamIndex] = (board.positions[teamIndex] + 1) % tileNames.length;
-  if(board.positions[teamIndex] === 0) gameState.teams[teamIndex].cash += 1;
+
+  // GO payday is automatic the instant a traveller crosses/reaches tile 0.
+  // This means a player does not need to LAND on GO to receive the money.
+  if(board.positions[teamIndex] === 0){
+    team.cash += 1;
+    gameState.message = `${team.name} passed GO and automatically collected +$1.`;
+  }
   board.stepsRemaining -= 1;
 }
 function resolveLanding(){
@@ -80,7 +87,9 @@ function resolveLanding(){
   } else landing.kind = tile === 4 ? "opportunity" : "go";
   board.pendingLanding = landing;
   board.status = "landing";
-  gameState.message = `${team.name} landed on ${tileNames[tile]}. Resolve the landing.`;
+  gameState.message = landing.kind === "go"
+    ? `${team.name} reached GO. The +$1 payday was collected automatically.`
+    : `${team.name} landed on ${tileNames[tile]}. Resolve the landing.`;
 }
 function finishMonopolyLanding(action){
   const board = requireMonopoly("landing");
@@ -108,7 +117,9 @@ function finishMonopolyLanding(action){
   gameState.totalTurnCount += 1;
   gameState.roundNumber = Math.floor(gameState.totalTurnCount / gameState.teams.length) + 1;
   board.status = "resolved";
-  gameState.message = `${team.name}'s turn is complete. Select Next Team.`;
+  gameState.message = landing.kind === "go"
+    ? `${team.name} collected +$1 at GO. Select Next Team.`
+    : `${team.name}'s turn is complete. Select Next Team.`;
 }
 function nextTeam(){
   const board = requireMonopoly("resolved");
@@ -117,35 +128,52 @@ function nextTeam(){
   board.lastRoll = null;
   gameState.message = "Ready to roll.";
 }
-function undoLastGrandTourTurn(){
-  const board = requireMonopoly();
-  requireRule(canUndoGrandTourTurn(), "Finish the turn before using Undo Last Turn.");
-  const snapshot = board.history.pop();
+function restoreGrandTourSnapshot(snapshot){
+  const board = gameState.board;
   gameState.teams = snapshot.teams;
   gameState.currentTeam = snapshot.currentTeam;
   gameState.nextAssetId = snapshot.nextAssetId;
   gameState.totalTurnCount = snapshot.totalTurnCount;
   gameState.roundNumber = snapshot.roundNumber;
+  gameState.message = snapshot.message;
+  Object.assign(board,{
+    positions:snapshot.positions,owners:snapshot.owners,rolls:snapshot.rolls,
+    status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0,history:[]
+  });
+}
+function undoLastGrandTourTurn(){
+  const board = requireMonopoly();
+  requireRule(canUndoGrandTourTurn(), "Finish the turn before using Undo Last Turn.");
+  const snapshot = board.history[board.history.length - 1];
+  restoreGrandTourSnapshot(snapshot);
   gameState.message = `Last turn undone. ${gameState.teams[gameState.currentTeam].name} can roll again.`;
-  Object.assign(board,{positions:snapshot.positions,owners:snapshot.owners,rolls:snapshot.rolls,status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0});
 }
 function canUndoGrandTourTurn(){
   return gameState.mode === "monopoly" && gameState.phase === "starting" &&
     ["resolved","ready"].includes(gameState.board.status) && gameState.board.history.length > 0;
 }
 function canTriggerTechShock(){
-  const {board,totalTurnCount,teams,currentTeam} = gameState;
-  if(gameState.mode !== "monopoly" || gameState.phase !== "starting" || teams.length !== 3 ||
-     totalTurnCount === 0 || totalTurnCount % teams.length !== 0 || board.pendingLanding || board.stepsRemaining !== 0) return false;
-  const betweenRounds = (board.status === "resolved" && currentTeam === 2) || (board.status === "ready" && currentTeam === 0);
-  return betweenRounds && board.rolls.every(rolls => rolls === totalTurnCount / teams.length);
+  return gameState.mode === "monopoly" && gameState.phase === "starting" &&
+    !gameState.phaseComplete && gameState.teams.length === 3 && gameState.board.status !== "shock";
 }
 function triggerTechShock(){
-  requireRule(canTriggerTechShock(), "Trigger the Tech Shock after Team C completes a round, before Team A rolls.");
+  requireRule(canTriggerTechShock(), "The Tech Shock is only available during the Grand Tour.");
+  const board = gameState.board;
+
+  // A technology shock can happen at any moment. If it interrupts an unfinished
+  // roll/movement/landing, cancel that incomplete turn back to its pre-roll snapshot
+  // so no half-finished purchase, fee or movement leaks into the next era.
+  if(["rolling","moving","landing"].includes(board.status) && board.history.length){
+    restoreGrandTourSnapshot(board.history[board.history.length - 1]);
+  }
+
   gameState.phase = "industrialShockRevealed";
   gameState.uiStage = "shock";
-  gameState.board.status = "shock";
-  gameState.board.history = [];
+  board.status = "shock";
+  board.pendingLanding = null;
+  board.stepsRemaining = 0;
+  board.lastRoll = null;
+  board.history = [];
   gameState.message = "Return to presentation. Apply Industrial Revolution when you return.";
 }
 function applyIndustrialRevolution(){
