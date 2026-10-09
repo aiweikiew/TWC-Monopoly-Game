@@ -13,32 +13,21 @@ function evaluateChanceCard(teamIndex, card){
   }
 
   if(matched.length === 0){
-    return {
-      effect:0,
-      reason:card.neutralReason || "No change to your business."
-    };
+    return {effect:0,reason:card.neutralReason || "No change to your business."};
   }
 
   const hasPositive = matched.some(x => x.value > 0);
   const hasNegative = matched.some(x => x.value < 0);
-
   if(hasPositive && hasNegative){
-    return {
-      effect:0,
-      reason:"One of your businesses benefits while another is harmed, so the effects cancel out."
-    };
+    return {effect:0,reason:"One of your businesses benefits while another is harmed, so the effects cancel out."};
   }
 
   const chosen = matched[0];
-  return {
-    effect:chosen.value > 0 ? 1 : -1,
-    reason:chosen.reason
-  };
+  return {effect:chosen.value > 0 ? 1 : -1,reason:chosen.reason};
 }
 
 function getTeamSectors(teamIndex){
   const team = gameState.teams[teamIndex];
-  // Preserve legacy precedence: purchased businesses, otherwise legacy business.
   const owned = team.assets.filter(a => a.boardTile !== undefined)
     .map(a => boardProperties[a.boardTile].sector);
   if(owned.length) return [...new Set(owned)];
@@ -47,14 +36,13 @@ function getTeamSectors(teamIndex){
 }
 function requireMonopoly(status){
   requireRule(gameState.mode === "monopoly" && gameState.phase === "starting" && !gameState.phaseComplete,
-    "Grand Tour board actions are only available before portfolio lock.");
+    "Grand Tour board actions are only available before the Tech Shock.");
   if(status) requireRule(gameState.board.status === status, "Finish the current turn step first.");
   return gameState.board;
 }
 function beginMonopolyRoll(result = Math.floor(Math.random() * 6) + 1){
   const board = requireMonopoly("ready");
   requireRule(Number.isInteger(result) && result >= 1 && result <= 6, "A roll must be between 1 and 6.");
-  // Snapshot every affected value before a turn, including transfers to other teams.
   board.history = [JSON.parse(JSON.stringify({
     teams:gameState.teams,currentTeam:gameState.currentTeam,nextAssetId:gameState.nextAssetId,
     positions:board.positions,owners:board.owners,rolls:board.rolls,
@@ -67,9 +55,7 @@ function beginMonopolyRoll(result = Math.floor(Math.random() * 6) + 1){
   gameState.message = `${gameState.teams[gameState.currentTeam].name} is rolling...`;
   return board;
 }
-function beginMonopolyMovement(){
-  requireMonopoly("rolling").status = "moving";
-}
+function beginMonopolyMovement(){ requireMonopoly("rolling").status = "moving"; }
 function advanceMonopolyStep(){
   const board = requireMonopoly("moving");
   requireRule(board.stepsRemaining > 0, "This roll has already finished moving.");
@@ -84,7 +70,6 @@ function resolveLanding(){
   const team = gameState.teams[gameState.currentTeam];
   const tile = board.positions[gameState.currentTeam];
   let landing = {tile,teamId:team.id};
-  // Reuse the legacy property / Chance / opportunity / GO dispatch.
   if(boardProperties[tile]){
     const owner = board.owners[tile];
     landing.kind = owner === undefined ? "property" : owner === team.id ? "own" : "fee";
@@ -92,9 +77,7 @@ function resolveLanding(){
   } else if(tile === 2 || tile === 6){
     const cardIndex = Math.floor(Math.random() * chanceCards.length);
     landing = {...landing,kind:"chance",cardIndex,...evaluateChanceCard(gameState.currentTeam,chanceCards[cardIndex])};
-  } else {
-    landing.kind = tile === 4 ? "opportunity" : "go";
-  }
+  } else landing.kind = tile === 4 ? "opportunity" : "go";
   board.pendingLanding = landing;
   board.status = "landing";
   gameState.message = `${team.name} landed on ${tileNames[tile]}. Resolve the landing.`;
@@ -118,14 +101,9 @@ function finishMonopolyLanding(action){
   } else if(landing.kind === "fee"){
     const owner = gameState.teams.find(t => t.id === landing.owner);
     requireRule(owner && owner !== team, "Invalid service fee recipient.");
-    team.cash -= 1;
-    owner.cash += 1;
-  } else if(landing.kind === "opportunity"){
-    team.cash += 1;
-  } else if(landing.kind === "chance"){
-    team.cash += landing.effect;
-  }
-  // GO was paid during movement, including an exact landing; never pay it again here.
+    team.cash -= 1; owner.cash += 1;
+  } else if(landing.kind === "opportunity") team.cash += 1;
+  else if(landing.kind === "chance") team.cash += landing.effect;
   board.pendingLanding = null;
   gameState.totalTurnCount += 1;
   gameState.roundNumber = Math.floor(gameState.totalTurnCount / gameState.teams.length) + 1;
@@ -149,11 +127,7 @@ function undoLastGrandTourTurn(){
   gameState.totalTurnCount = snapshot.totalTurnCount;
   gameState.roundNumber = snapshot.roundNumber;
   gameState.message = `Last turn undone. ${gameState.teams[gameState.currentTeam].name} can roll again.`;
-  Object.assign(board, {
-    positions:snapshot.positions,owners:snapshot.owners,rolls:snapshot.rolls,
-    status:"ready",pendingLanding:null,
-    lastRoll:null,stepsRemaining:0
-  });
+  Object.assign(board,{positions:snapshot.positions,owners:snapshot.owners,rolls:snapshot.rolls,status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0});
 }
 function canUndoGrandTourTurn(){
   return gameState.mode === "monopoly" && gameState.phase === "starting" &&
@@ -162,19 +136,17 @@ function canUndoGrandTourTurn(){
 function canTriggerTechShock(){
   const {board,totalTurnCount,teams,currentTeam} = gameState;
   if(gameState.mode !== "monopoly" || gameState.phase !== "starting" || teams.length !== 3 ||
-     totalTurnCount === 0 || totalTurnCount % teams.length !== 0 ||
-     board.pendingLanding || board.stepsRemaining !== 0) return false;
-  const betweenRounds = (board.status === "resolved" && currentTeam === 2) ||
-    (board.status === "ready" && currentTeam === 0);
+     totalTurnCount === 0 || totalTurnCount % teams.length !== 0 || board.pendingLanding || board.stepsRemaining !== 0) return false;
+  const betweenRounds = (board.status === "resolved" && currentTeam === 2) || (board.status === "ready" && currentTeam === 0);
   return betweenRounds && board.rolls.every(rolls => rolls === totalTurnCount / teams.length);
 }
 function triggerTechShock(){
   requireRule(canTriggerTechShock(), "Trigger the Tech Shock after Team C completes a round, before Team A rolls.");
   gameState.phase = "industrialShockRevealed";
+  gameState.uiStage = "shock";
   gameState.board.status = "shock";
   gameState.board.history = [];
   gameState.message = "Return to presentation. Apply Industrial Revolution when you return.";
-  // This reveal only freezes play. Cash, assets, ownership and positions stay untouched.
 }
 function applyIndustrialRevolution(){
   requireRule(gameState.phase === "industrialShockRevealed" && gameState.board.status === "shock",
