@@ -181,6 +181,21 @@ function confirmPhaseReview(){
   } else if(gameState.phase === "future") gameState.uiStage = "results";
   else throw new Error("This phase does not use a decision review.");
 }
+function revealJetTechShock(){
+  requireRule(gameState.mode === "strategy" && gameState.phase === "steam" &&
+    gameState.phaseComplete && gameState.uiStage === "pause",
+    "Lock the Industrial portfolios before triggering the Jet Age Tech Shock.");
+  gameState.uiStage = "jetShock";
+  gameState.message = "Return to presentation. Apply the Jet Age when you return.";
+}
+function applyJetAge(){
+  requireRule(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock",
+    "Trigger the Jet Age Tech Shock first.");
+  // startNextPhase deliberately accepts only a presentation pause, so restore that
+  // checkpoint immediately before applying the already-tested Jet revaluation.
+  gameState.uiStage = "pause";
+  startNextPhase("steam");
+}
 function getMoneyWinners(){
   if(!gameState.teams.length) return [];
   const highest = Math.max(...gameState.teams.map(calculateNetWorth));
