@@ -17,7 +17,9 @@ const triggerShockBtn = document.getElementById("triggerShockBtn");
 // The old Presenter drawer is no longer part of the classroom flow.
 // Reuse its top-level button as the one-click surprise Tech Shock control,
 // and move Undo alongside it so the board keeps a compact control strip.
-shockBtn.textContent = "⚡ TECH SHOCK";
+shockBtn.textContent = "⚡";
+shockBtn.title = "Trigger Tech Shock";
+shockBtn.setAttribute("aria-label","Trigger Tech Shock");
 shockBtn.removeAttribute("aria-controls");
 shockBtn.removeAttribute("aria-expanded");
 shockBtn.classList.add("tech-shock-trigger");
