@@ -1,5 +1,5 @@
 /* Tourismopoly landing screen
-   Full-resolution artwork + live HTML UI. No embedded/compressed image copy. */
+   Full-resolution artwork + live HTML UI. The artwork is always shown in full. */
 
 .tourismopoly-landing{
   position:fixed;
@@ -7,9 +7,13 @@
   z-index:10000;
   overflow:hidden;
   box-sizing:border-box;
-  background:
-    linear-gradient(to bottom, rgba(20,12,7,.06), rgba(20,12,7,.10)),
-    url("../assets/landing-background.png") center center / cover no-repeat;
+  background-color:#2b2119;
+  background-image:
+    linear-gradient(to bottom, rgba(20,12,7,.04), rgba(20,12,7,.08)),
+    url("../assets/landing-background.png");
+  background-position:center center;
+  background-size:contain;
+  background-repeat:no-repeat;
   color:#f7e7bd;
   font-family:Georgia, "Times New Roman", serif;
   opacity:1;
