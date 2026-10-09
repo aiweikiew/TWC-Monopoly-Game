@@ -1,12 +1,15 @@
-﻿"use strict";
+"use strict";
 
 // All mutable gameplay data lives here. Net Worth is always derived.
 const gameState = {};
 function resetGame(){
   Object.keys(gameState).forEach(key => delete gameState[key]);
   Object.assign(gameState, {
-    phase:"setup",teams:[],phaseComplete:false,destinationPressure:0,
-    setupSelected:[],currentTeam:0,nextAssetId:1,decisions:{},
+    phase:"setup",mode:"setup",teams:[],phaseComplete:false,destinationPressure:0,
+    totalTurnCount:0,roundNumber:1,
+    board:{positions:[0,0,0],owners:{},rolls:[0,0,0],
+      status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0,history:[]},
+    setupSelected:[],currentTeam:0,nextAssetId:1,decisions:{},lastDecision:null,
     revaluationLog:[],events:{fitBoom:false,crisis:false},message:"Team A draws first."
   });
 }

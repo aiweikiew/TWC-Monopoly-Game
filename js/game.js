@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 // Rules have no DOM dependency; UI events call these guarded transitions.
 function requireRule(condition, message){
@@ -47,12 +47,17 @@ function applyFutureCrisis(){
   }
 }
 function startNextPhase(expectedPhase){
+  const applyingShock = expectedPhase === "industrialShockRevealed";
+  requireRule(applyingShock ? gameState.mode === "monopoly" && gameState.board.status === "shock" : gameState.mode === "strategy",
+    "Reveal and apply the Grand Tour Tech Shock first.");
   requireRule(gameState.phase === expectedPhase, "This phase control is no longer current.");
-  const index = phaseOrder.indexOf(gameState.phase);
+  const index = phaseOrder.indexOf(applyingShock ? "starting" : gameState.phase);
   requireRule(index >= 0 && index < phaseOrder.length - 1, "There is no next phase.");
-  requireRule(gameState.phaseComplete && (gameState.phase === "jet" ||
-    gameState.teams.every(team => gameState.decisions[team.id])), "Resolve all team decisions before continuing.");
+  requireRule(applyingShock || (gameState.phaseComplete && (gameState.phase === "jet" ||
+    gameState.teams.every(team => gameState.decisions[team.id]))), "Resolve all team decisions before continuing.");
   gameState.phase = phaseOrder[index + 1];
+  gameState.mode = "strategy";
+  gameState.lastDecision = null;
   gameState.phaseComplete = false;
   gameState.decisions = {};
   gameState.currentTeam = 0;
@@ -63,16 +68,23 @@ function startNextPhase(expectedPhase){
   if(gameState.phase === "jet" || gameState.phase === "winner") gameState.phaseComplete = true;
 }
 function takeAction(teamId, action, selection, expectedPhase){
+  requireRule(gameState.mode === "strategy", "Finish and lock the Grand Tour before strategy decisions.");
   requireRule(gameState.phase === expectedPhase, "This decision belongs to an earlier phase.");
-  requireRule(!gameState.phaseComplete && ["starting","steam","digital","future"].includes(gameState.phase), "No strategy actions are available in this phase.");
+  requireRule(!gameState.phaseComplete && ["steam","digital","future"].includes(gameState.phase), "No strategy actions are available in this phase.");
   const team = gameState.teams.find(t => t.id === teamId);
   requireRule(team && team === gameState.teams[gameState.currentTeam], "Wait for this team's turn.");
   requireRule(!gameState.decisions[teamId], "This team already acted.");
   const allowed = {
-    starting:["invest","hold"],steam:["hold","sell","adapt","invest"],
+    steam:["hold","sell","adapt","invest"],
     digital:["digitise","invest","hold"],future:["strategy"]
   };
   requireRule(allowed[gameState.phase].includes(action), "This action is not available in this phase.");
+  const checkpoint = JSON.parse(JSON.stringify({
+    phase:gameState.phase,teams:gameState.teams,currentTeam:gameState.currentTeam,
+    decisions:gameState.decisions,phaseComplete:gameState.phaseComplete,
+    destinationPressure:gameState.destinationPressure,events:gameState.events,
+    nextAssetId:gameState.nextAssetId,message:gameState.message
+  }));
   const asset = team.assets.find(a => a.id === selection);
   let description = action.toUpperCase();
   if(action === "invest"){
@@ -116,6 +128,7 @@ function takeAction(teamId, action, selection, expectedPhase){
     description = strategy.name;
   }
   gameState.decisions[team.id] = description;
+  gameState.lastDecision = checkpoint;
   gameState.message = `${team.name}: ${description}.`;
   const nextTeam = gameState.teams.findIndex(t => !gameState.decisions[t.id]);
   if(nextTeam === -1){
@@ -124,6 +137,12 @@ function takeAction(teamId, action, selection, expectedPhase){
   } else {
     gameState.currentTeam = nextTeam;
   }
+}
+function undoLastDecision(){
+  const checkpoint = gameState.lastDecision;
+  requireRule(gameState.mode === "strategy" && checkpoint && checkpoint.phase === gameState.phase,
+    "Only the most recent decision in the current phase can be undone.");
+  Object.assign(gameState, checkpoint, {lastDecision:null});
 }
 function getMoneyWinners(){
   if(!gameState.teams.length) return [];

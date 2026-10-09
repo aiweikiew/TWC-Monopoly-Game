@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 // Reuse the original draw-without-replacement and undo/reset interaction.
 function setupDraw(){
@@ -8,7 +8,6 @@ function setupDraw(){
   const index = available[Math.floor(Math.random() * available.length)];
   gameState.setupSelected.push({index});
   gameState.message = `${setupTeams[gameState.setupSelected.length - 1]} drew ${identityPool[index].name}.`;
-  if(gameState.setupSelected.length === 3) return applySetupFromDraw();
   return true;
 }
 function setupUndo(){
@@ -29,7 +28,8 @@ function applySetupFromDraw(){
      selected.some(s => !Number.isInteger(s.index) || !identityPool[s.index])) return false;
   gameState.teams = selected.map((entry, i) => createTeam(entry.index, i));
   gameState.phase = "starting";
+  gameState.mode = "monopoly";
   gameState.decisions = {};
-  gameState.message = "Each team chooses exactly one investment or holds.";
+  gameState.message = "Ready to roll. Teams take turns around the Grand Tour.";
   return true;
 }

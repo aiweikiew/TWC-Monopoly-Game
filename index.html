@@ -7,12 +7,19 @@
 <link rel="stylesheet" href="css/styles.css" />
 <!-- Deferred scripts share scope and execute in dependency order. -->
 <script defer src="js/data.js"></script>
+<script defer src="js/board-data.js"></script>
 <script defer src="js/state.js"></script>
 <script defer src="js/setup.js"></script>
 <script defer src="js/game.js"></script>
+<script defer src="js/monopoly.js"></script>
+<script defer src="js/navigation.js"></script>
+<script defer src="js/board-ui.js"></script>
 <script defer src="js/ui.js"></script>
 </head>
 <body>
+<nav id="navigationControls" aria-label="Game navigation">
+  <button id="backBtn" class="game-btn secondary nav-back" type="button" hidden>&larr; Back</button>
+</nav>
 <div id="setupScreen">
   <header class="setup-topbar">
     <div>
@@ -44,8 +51,9 @@
       <div class="setup-selected" id="setupSelected"></div>
       <div class="setup-controls">
         <button class="setup-btn primary full" id="setupDrawBtn" type="button">Team A · Draw Identity</button>
-        <button class="setup-btn secondary" id="setupUndoBtn" type="button" disabled>↶ Undo</button>
-        <button class="setup-btn secondary" id="setupResetBtn" type="button">Reset</button>
+        <button class="setup-btn secondary" id="setupUndoBtn" type="button" disabled>Undo Last Draw</button>
+        <button class="setup-btn secondary" id="setupResetBtn" type="button">Reset Draws</button>
+        <button class="setup-btn primary full" id="setupConfirmBtn" type="button" disabled>Confirm Identities &amp; Start Game</button>
         <div class="setup-status" id="setupStatus">Team A draws first.</div>
       </div>
     </aside>
@@ -53,6 +61,221 @@
 </div>
 
 
+<div class="app-shell monopoly-shell" id="monopolyScreen" hidden>
+  <div class="board-column">
+    <div class="board" id="board">
+      <div class="tile start go" data-index="0">
+        <div class="tile-inner"><div class="icon">🚩</div><div class="tile-title">Begin Your Grand Tour</div><div class="tile-sub">Europe · c.1825</div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile asset horse" data-index="1">
+        <div class="tile-inner"><div class="icon">🐎</div><div class="tile-title">Horse &amp; Carriage</div><div class="tile-sub">Established overland transport</div><div class="price-block"><div class="price-label">PRICE</div><div class="price-value">$3</div></div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile chance chance-one" data-index="2">
+        <div class="tile-inner"><div class="icon">✉️</div><div class="tile-title">Chance</div><div class="tile-sub">Situation Card</div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile asset inn" data-index="3">
+        <div class="tile-inner"><div class="icon">🏨</div><div class="tile-title">Inn &amp; Accommodation</div><div class="tile-sub">Lodging along major routes</div><div class="price-block"><div class="price-label">PRICE</div><div class="price-value">$3</div></div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile opportunity" data-index="4">
+        <div class="tile-inner"><div class="icon">💰</div><div class="tile-title">Business Opportunity</div><div class="tile-sub">+$1 Cash</div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile asset shipping" data-index="5">
+        <div class="tile-inner"><div class="icon">🚢</div><div class="tile-title">Passenger Shipping</div><div class="tile-sub">Sea routes &amp; passenger movement</div><div class="price-block"><div class="price-label">PRICE</div><div class="price-value">$4</div></div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile chance chance-two" data-index="6">
+        <div class="tile-inner"><div class="icon">✉️</div><div class="tile-title">Chance</div><div class="tile-sub">Situation Card</div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="tile asset guide" data-index="7">
+        <div class="tile-inner"><div class="icon">🗺️</div><div class="tile-title">Travel Guide &amp; Information</div><div class="tile-sub">Maps, guides &amp; printed knowledge</div><div class="price-block"><div class="price-label">PRICE</div><div class="price-value">$2</div></div></div>
+        <div class="token-zone"></div>
+      </div>
+
+      <div class="center">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <circle cx="200" cy="200" r="135" fill="none" stroke="#583c27" stroke-width="1.5"/>
+          <circle cx="200" cy="200" r="105" fill="none" stroke="#583c27" stroke-width="1" stroke-dasharray="4 8"/>
+          <path d="M50 245 C110 180,145 285,220 205 S330 135,365 215" fill="none" stroke="#583c27" stroke-width="2"/>
+          <path d="M200 58 L218 182 L342 200 L218 218 L200 342 L182 218 L58 200 L182 182 Z" fill="none" stroke="#735631" stroke-width="1.4"/>
+        </svg>
+        <div class="center-content">
+          <div class="crest">✦ ❖ ✦</div>
+          <div class="main-title">TOURISMOPOLY</div>
+          <div class="era">Europe · 1825</div>
+          <div class="rule"></div>
+          <div class="tagline">Travel · Trade · Fortune</div>
+          <div class="stamp">GRAND TOUR EDITION</div>
+        </div>
+      </div>
+
+
+      <div class="landing-modal" id="landingModal" aria-live="polite">
+        <div class="landing-card">
+          <div class="landing-eyebrow" id="landingEyebrow">UNOWNED PROPERTY</div>
+          <div class="landing-icon" id="landingIcon">🐎</div>
+          <div class="landing-title" id="landingTitle">Horse &amp; Carriage</div>
+          <div class="landing-desc" id="landingDesc">Established overland transport</div>
+          <div class="landing-divider"></div>
+          <div class="landing-price-label">PRICE</div>
+          <div class="landing-price" id="landingPrice">$3</div>
+          <div class="landing-balance" id="landingBalance">Team A Cash · $9</div>
+          <div class="landing-actions">
+            <button class="modal-btn primary" id="buyBtn" type="button">BUY</button>
+            <button class="modal-btn secondary" id="passBtn" type="button">PASS</button>
+          </div>
+          <div class="modal-note">Resolve this landing before the next team begins.</div>
+        </div>
+      </div>
+
+
+      <div class="landing-modal" id="chanceModal" aria-live="polite">
+        <div class="landing-card chance-card-ui">
+          <div class="chance-seal">✉</div>
+          <div class="chance-heading">Chance · Situation Card</div>
+          <div class="chance-title" id="chanceTitle">A Situation Unfolds</div>
+          <div class="chance-story" id="chanceStory">Something unexpected has happened during your journey.</div>
+          <div class="chance-effect-box">
+            <div class="chance-effect-label">EFFECT</div>
+            <div class="chance-effect" id="chanceEffect">$0</div>
+            <div class="chance-sector" id="chanceSector">No direct effect on your current portfolio.</div>
+          </div>
+          <div class="landing-actions">
+            <button class="modal-btn primary" id="chanceContinueBtn" type="button">CONTINUE</button>
+          </div>
+          <div class="modal-note">Rule: Beneficial = +$1 · Harmful = −$1 · Not relevant = $0</div>
+        </div>
+      </div>
+
+
+      <div class="landing-modal" id="feeModal" aria-live="polite">
+        <div class="landing-card fee-card-ui">
+          <div class="popup-badge">Owned Property</div>
+          <div class="landing-icon" id="feeIcon">🏨</div>
+          <div class="landing-title" id="feeTitle">Inn &amp; Accommodation</div>
+          <div class="owner-line" id="feeOwner">Owned by Team B</div>
+          <div class="landing-desc">You used another team’s tourism business.</div>
+          <div class="landing-divider"></div>
+          <div class="landing-price-label">SERVICE FEE</div>
+          <div class="fee-amount" id="feeAmount">$1</div>
+          <div class="transfer-line" id="feeTransfer">Team A pays Team B.</div>
+
+          <div class="landing-actions">
+            <button class="modal-btn primary" id="payFeeBtn" type="button">PAY FEE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-modal" id="ownModal" aria-live="polite">
+        <div class="landing-card own-card-ui">
+          <div class="success-mark">✓</div>
+          <div class="popup-badge">Your Business</div>
+          <div class="landing-title" id="ownTitle">Horse &amp; Carriage</div>
+          <div class="landing-desc" id="ownDesc">You landed on your own tourism business.</div>
+          <div class="landing-divider"></div>
+
+          <div class="landing-balance">No fee. Your business continues operating.</div>
+          <div class="landing-actions"><button class="modal-btn primary" id="ownContinueBtn" type="button">CONTINUE</button></div>
+        </div>
+      </div>
+
+      <div class="landing-modal" id="opportunityModal" aria-live="polite">
+        <div class="landing-card opportunity-card-ui">
+          <div class="opportunity-mark">💰</div>
+          <div class="popup-badge">Business Opportunity</div>
+          <div class="landing-title">A Profitable Opportunity Appears</div>
+          <div class="landing-desc">Your tourism activities benefit from a small commercial opportunity.</div>
+          <div class="landing-divider"></div>
+          <div class="landing-price-label">CASH GAIN</div>
+          <div class="landing-price">+$1</div>
+          <div class="landing-balance" id="opportunityBalance">Team A Cash · $10</div>
+          <div class="landing-actions">
+            <button class="modal-btn primary" id="opportunityContinueBtn" type="button">COLLECT &amp; CONTINUE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-modal" id="startModal" aria-live="polite">
+        <div class="landing-card start-card-ui">
+          <div class="start-mark">🚩</div>
+          <div class="popup-badge">Grand Tour Payday</div>
+          <div class="landing-title">Another Circuit Complete</div>
+          <div class="landing-desc">You have passed or landed on GO and completed another circuit of the travel market.</div>
+          <div class="landing-divider"></div>
+          <div class="landing-price-label">COLLECT</div>
+          <div class="landing-price">+$1</div>
+          <div class="landing-balance" id="startBalance">Payday has been added to your cash balance.</div>
+          <div class="landing-actions">
+            <button class="modal-btn primary" id="startContinueBtn" type="button">COLLECT &amp; CONTINUE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dice-overlay" id="diceOverlay">
+        <div class="dice-card">
+          <div class="die" id="die">⚀</div>
+          <div class="roll-caption" id="rollCaption">TEAM A ROLLING...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-column">
+    <div class="sidebar">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button id="presenterBtn" type="button" class="game-btn secondary presenter-toggle" aria-controls="presenterControls" aria-expanded="false">&#9881; Presenter</button>
+        <button id="boardResetBtn" type="button" class="game-btn secondary" style="min-height:32px;padding:5px 8px;font-size:10px">Reset Game</button>
+      </div>
+      <section id="presenterControls" class="roll-panel presenter-controls" hidden aria-label="Presenter controls">
+        <div id="presenterRound"></div>
+        <div id="presenterTurns"></div>
+        <p>Available after each completed round, before Team A rolls.</p>
+        <div class="button-stack">
+          <button id="triggerShockBtn" class="game-btn secondary" type="button" disabled>TRIGGER TECH SHOCK</button>
+          <button id="undoTurnBtn" class="game-btn secondary" type="button" disabled>Undo Last Turn</button>
+        </div>
+      </section>
+      <section class="roll-panel">
+        <div class="turn-badge" id="boardTurnBadge">TEAM A'S TURN</div>
+        <div class="roll-text" id="boardStatusText">Ready to roll</div>
+        <div class="roll-sub" id="boardStatusSub">The dice appears briefly, your traveller moves, then the landing popup resolves the turn.</div>
+        <p id="boardError" role="alert"></p>
+        <div class="button-stack">
+          <button class="game-btn" id="rollBtn" type="button">🎲 Roll Dice</button>
+          <button class="game-btn secondary" id="resolveLandingBtn" type="button" hidden>Resolve Landing</button>
+          <button class="game-btn secondary" id="nextBtn" type="button" disabled>Next Team</button>
+        </div>
+      </section>
+
+      <aside class="player-panel">
+        <h2 class="panel-title">PLAYERS</h2>
+        <div id="boardPlayers"></div></aside>
+    </div>
+  </div>
+</div>
+
+
+<section id="industrialShockScreen" class="industrial-shock-screen" hidden aria-labelledby="industrialShockTitle">
+  <div>
+    <p class="shock-kicker">&#9889; TECH SHOCK!</p>
+    <h1 id="industrialShockTitle">INDUSTRIAL REVOLUTION</h1>
+    <p>Return to presentation</p>
+    <button id="applyIndustrialBtn" class="game-btn secondary" type="button">APPLY INDUSTRIAL REVOLUTION</button>
+    <p id="shockError" role="alert"></p>
+  </div>
+</section>
 <main class="app-shell phase-shell" id="gameScreen" hidden>
   <section class="phase-panel" aria-labelledby="phaseTitle">
     <header>
@@ -68,7 +291,10 @@
       <p id="statusText" role="status"></p>
       <p id="actionError" role="alert"></p>
       <div id="moderatorControls" class="button-stack"></div>
-      <button class="game-btn secondary" id="resetGameBtn" type="button">Reset Game</button>
+      <div class="moderator-tools">
+        <button class="game-btn secondary" id="resetGameBtn" type="button">Reset Game</button>
+        <button class="game-btn secondary" id="undoDecisionBtn" type="button" hidden>Undo Last Decision</button>
+      </div>
     </section>
     <section class="player-panel">
       <h2 class="panel-title">TEAM PORTFOLIOS</h2>

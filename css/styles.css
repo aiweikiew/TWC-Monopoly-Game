@@ -743,3 +743,35 @@ button:focus-visible,select:focus-visible{outline:3px solid #245892;outline-offs
 .phase-sidebar .player-panel{padding:8px}
 .phase-sidebar .panel-title{margin-bottom:6px}
 .phase-sidebar .portfolio-assets{margin:4px 0}
+
+/* Reconnected legacy Grand Tour board; retain its layout and visual components. */
+.monopoly-shell .side-column{width:min(370px,30vw);min-width:290px}
+.monopoly-shell .player-panel{overflow:auto}
+.monopoly-shell .player-card{font-size:12px;line-height:1.2}
+.monopoly-shell .portfolio-assets{margin:5px 0;padding-left:15px}
+.monopoly-shell .portfolio-total{font-size:13px}
+.monopoly-shell .landing-modal{z-index:40}
+.monopoly-shell .market-closed-card{width:90%;max-height:95%;overflow:auto}
+.monopoly-shell #grandTourReview{font-size:13px;line-height:1.3;text-align:left}
+.monopoly-shell #boardError{color:#651b13;font-weight:bold;font-size:12px;margin:4px 0}
+.ownership-marker{position:absolute;top:10px;left:8px;right:8px;text-align:center;font-size:10px;font-weight:bold;z-index:3;background:#f2e3ba}
+.ownership-marker:empty{display:none}
+
+/* One secondary navigation control, above every era and modal. */
+#navigationControls{position:fixed;top:7px;left:10px;z-index:200}
+.nav-back{min-height:29px;padding:4px 10px;font-size:12px;border-width:1px}
+.has-back .phase-panel header{padding-left:75px}
+.has-back .monopoly-shell{padding-left:90px}
+.moderator-tools{display:flex;gap:6px;margin-top:7px}
+.phase-sidebar .moderator-tools .game-btn{min-height:30px;margin-top:0;padding:5px 8px;font-size:12px}
+
+/* Presenter-only Grand Tour transition controls and the surprise reveal. */
+.presenter-toggle{min-height:32px;padding:5px 8px;font-size:10px;margin-right:6px}
+.presenter-controls{font-size:12px}
+.presenter-controls p{margin:5px 0}
+.presenter-controls .game-btn{min-height:30px;font-size:12px;padding:5px 8px}
+.industrial-shock-screen{position:fixed;inset:0;z-index:110;display:grid;place-items:center;text-align:center;padding:50px;background:#2f2117;color:#f6dfaa}
+.shock-kicker{font-size:clamp(32px,6vw,80px);font-weight:bold;margin:0 0 20px}
+.industrial-shock-screen h1{font-size:clamp(24px,4vw,52px);margin:0 0 30px}
+.industrial-shock-screen p:not(.shock-kicker){font-size:14px}
+.industrial-shock-screen .game-btn{margin-top:16px}

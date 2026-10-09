@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 // Identity only determines starting cash and the legacy asset.
 const identityPool = [
@@ -49,7 +49,8 @@ const futureStrategies = {
 };
 const phaseOrder = ["starting","steam","jet","digital","future","winner"];
 const phaseInfo = {
-  starting:{title:"EUROPE BEFORE MASS TOURISM",slides:"After slides 1–4",complete:"PORTFOLIOS LOCKED",returnTo:"Industrial Revolution",next:"Start Industrial Revolution"},
+  industrialShockRevealed:{title:"INDUSTRIAL REVOLUTION",returnTo:"Industrial Revolution"},
+  starting:{title:"GRAND TOUR / PRE-INDUSTRIAL ERA",slides:"After slides 1–4",complete:"PORTFOLIOS LOCKED",returnTo:"Industrial Revolution",next:"Start Industrial Revolution"},
   steam:{title:"INDUSTRIAL REVOLUTION",slides:"After slides 5–6",complete:"INDUSTRIAL PORTFOLIOS LOCKED",returnTo:"Automobiles & Jet Age",next:"Start Jet Age"},
   jet:{title:"JET AGE",slides:"After slides 7–10",complete:"PAST ERA COMPLETE",returnTo:"Digital Transformation",next:"Start Digital Transformation"},
   digital:{title:"DIGITAL TRANSFORMATION",slides:"After slides 11–12",complete:"PRESENT ERA COMPLETE",returnTo:"The Future",next:"Start 2035 Crisis"},
