@@ -29,6 +29,7 @@ function applySetupFromDraw(){
   gameState.teams = selected.map((entry, i) => createTeam(entry.index, i));
   gameState.phase = "starting";
   gameState.mode = "monopoly";
+  gameState.uiStage = "board";
   gameState.decisions = {};
   gameState.message = "Ready to roll. Teams take turns around the Grand Tour.";
   return true;
