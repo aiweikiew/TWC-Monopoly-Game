@@ -22,7 +22,6 @@ function applyFITBoom(){
     gameState.teams.every(team => gameState.decisions[team.id]), "Finish all digital decisions first.");
   if(gameState.events.fitBoom) return;
   gameState.events.fitBoom = true;
-  // Shared destination pressure counts events, not the sum across teams.
   gameState.destinationPressure += 1;
   for(const team of gameState.teams){
     team.destinationPressure += 1;
@@ -46,15 +45,23 @@ function applyFutureCrisis(){
     team.futureInnovationCredit = 1;
   }
 }
+function stageForPhase(phase){
+  if(["steam","digital","jet"].includes(phase)) return "revaluation";
+  if(phase === "future") return "crisis";
+  if(phase === "winner") return "winner";
+  return "overview";
+}
 function startNextPhase(expectedPhase){
   const applyingShock = expectedPhase === "industrialShockRevealed";
   requireRule(applyingShock ? gameState.mode === "monopoly" && gameState.board.status === "shock" : gameState.mode === "strategy",
     "Reveal and apply the Grand Tour Tech Shock first.");
   requireRule(gameState.phase === expectedPhase, "This phase control is no longer current.");
+  if(!applyingShock){
+    requireRule(gameState.phaseComplete && gameState.uiStage === "pause",
+      "Finish the current phase and return to the presentation pause before starting the next era.");
+  }
   const index = phaseOrder.indexOf(applyingShock ? "starting" : gameState.phase);
   requireRule(index >= 0 && index < phaseOrder.length - 1, "There is no next phase.");
-  requireRule(applyingShock || (gameState.phaseComplete && (gameState.phase === "jet" ||
-    gameState.teams.every(team => gameState.decisions[team.id]))), "Resolve all team decisions before continuing.");
   gameState.phase = phaseOrder[index + 1];
   gameState.mode = "strategy";
   gameState.lastDecision = null;
@@ -63,24 +70,24 @@ function startNextPhase(expectedPhase){
   gameState.currentTeam = 0;
   gameState.revaluationLog = [];
   gameState.message = "";
+  gameState.uiStage = stageForPhase(gameState.phase);
   if(revaluations[gameState.phase]) revalueAssets(gameState.phase);
   if(gameState.phase === "future") applyFutureCrisis();
-  if(gameState.phase === "jet" || gameState.phase === "winner") gameState.phaseComplete = true;
+  if(gameState.phase === "jet") gameState.phaseComplete = true;
+  if(gameState.phase === "winner") gameState.phaseComplete = true;
 }
 function takeAction(teamId, action, selection, expectedPhase){
-  requireRule(gameState.mode === "strategy", "Finish and lock the Grand Tour before strategy decisions.");
+  requireRule(gameState.mode === "strategy", "Finish the Grand Tour before strategy decisions.");
   requireRule(gameState.phase === expectedPhase, "This decision belongs to an earlier phase.");
+  requireRule(gameState.uiStage === "decisions", "Continue to the team decision screen first.");
   requireRule(!gameState.phaseComplete && ["steam","digital","future"].includes(gameState.phase), "No strategy actions are available in this phase.");
   const team = gameState.teams.find(t => t.id === teamId);
   requireRule(team && team === gameState.teams[gameState.currentTeam], "Wait for this team's turn.");
   requireRule(!gameState.decisions[teamId], "This team already acted.");
-  const allowed = {
-    steam:["hold","sell","adapt","invest"],
-    digital:["digitise","invest","hold"],future:["strategy"]
-  };
+  const allowed = {steam:["hold","sell","adapt","invest"],digital:["digitise","invest","hold"],future:["strategy"]};
   requireRule(allowed[gameState.phase].includes(action), "This action is not available in this phase.");
   const checkpoint = JSON.parse(JSON.stringify({
-    phase:gameState.phase,teams:gameState.teams,currentTeam:gameState.currentTeam,
+    phase:gameState.phase,uiStage:gameState.uiStage,teams:gameState.teams,currentTeam:gameState.currentTeam,
     decisions:gameState.decisions,phaseComplete:gameState.phaseComplete,
     destinationPressure:gameState.destinationPressure,events:gameState.events,
     nextAssetId:gameState.nextAssetId,message:gameState.message
@@ -132,17 +139,47 @@ function takeAction(teamId, action, selection, expectedPhase){
   gameState.message = `${team.name}: ${description}.`;
   const nextTeam = gameState.teams.findIndex(t => !gameState.decisions[t.id]);
   if(nextTeam === -1){
-    if(gameState.phase === "digital") applyFITBoom();
     gameState.phaseComplete = true;
-  } else {
-    gameState.currentTeam = nextTeam;
-  }
+    gameState.uiStage = "review";
+  } else gameState.currentTeam = nextTeam;
 }
 function undoLastDecision(){
   const checkpoint = gameState.lastDecision;
-  requireRule(gameState.mode === "strategy" && checkpoint && checkpoint.phase === gameState.phase,
-    "Only the most recent decision in the current phase can be undone.");
+  requireRule(gameState.mode === "strategy" && checkpoint && checkpoint.phase === gameState.phase && gameState.uiStage === "review",
+    "Only the most recent decision can be undone from the review screen.");
   Object.assign(gameState, checkpoint, {lastDecision:null});
+}
+function continuePhaseStage(){
+  requireRule(gameState.mode === "strategy", "This control is only available in strategy mode.");
+  if(gameState.uiStage === "revaluation"){
+    if(gameState.phase === "jet") gameState.uiStage = "pause";
+    else gameState.uiStage = "decisions";
+    return;
+  }
+  if(gameState.uiStage === "crisis" && gameState.phase === "future"){
+    gameState.uiStage = "decisions";
+    return;
+  }
+  if(gameState.uiStage === "event" && gameState.phase === "digital"){
+    gameState.uiStage = "results";
+    return;
+  }
+  if(gameState.uiStage === "results"){
+    gameState.uiStage = "pause";
+    return;
+  }
+  throw new Error("There is no next screen from here.");
+}
+function confirmPhaseReview(){
+  requireRule(gameState.mode === "strategy" && gameState.phaseComplete && gameState.uiStage === "review",
+    "Finish all team decisions before locking the phase.");
+  gameState.lastDecision = null;
+  if(gameState.phase === "steam") gameState.uiStage = "pause";
+  else if(gameState.phase === "digital"){
+    applyFITBoom();
+    gameState.uiStage = "event";
+  } else if(gameState.phase === "future") gameState.uiStage = "results";
+  else throw new Error("This phase does not use a decision review.");
 }
 function getMoneyWinners(){
   if(!gameState.teams.length) return [];
