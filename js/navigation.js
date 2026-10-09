@@ -1,6 +1,7 @@
 "use strict";
 
-// UI history only. No function in this file rewrites gameplay state.
+// Navigation is for the CURRENT game screen only.
+// Back never walks through old turns/eras and never restores gameplay snapshots.
 const navigationState = {
   currentView:null,previousViews:[],selection:null,sessionBoard:null,
   observedKey:null,revision:0
@@ -18,9 +19,8 @@ function makeView(type){
   const team = gameState.teams[gameState.currentTeam];
   const labels = {
     identity:"Identity Draw",board:"Grand Tour",landing:"Landing resolution",
-    "landing-detail":"Landing decision",presenter:"Presenter controls",
-    "industrial-shock":"Tech Shock reveal",revaluation:"Market revaluation",
-    overview:"Team decisions",selection:"Unconfirmed decision",
+    "landing-detail":"Landing decision","industrial-shock":"Tech Shock reveal",
+    revaluation:"Market revaluation",overview:"Team decisions",selection:"Unconfirmed decision",
     "phase-review":"Decision review",event:"Shared event",crisis:"2035 crisis",
     results:"Era results",pause:"Presentation pause",winner:"Money winner"
   };
@@ -31,6 +31,14 @@ function makeView(type){
     revaluationLog:gameState.revaluationLog.map(row => ({...row}))
   };
 }
+
+// Replace the current route when gameplay itself advances. This is the key difference
+// from the old implementation: completed turns/eras are NOT added to Back history.
+function replaceView(type){
+  navigationState.currentView = makeView(type);
+}
+
+// Only explicit UI drill-downs (for example decision -> confirmation) create Back history.
 function visitView(type){
   if(navigationState.currentView) navigationState.previousViews.push(navigationState.currentView);
   navigationState.currentView = makeView(type);
@@ -42,15 +50,13 @@ function strategyViewType(){
   };
   return map[gameState.uiStage] || "overview";
 }
-function visitCurrentGame(){
-  if(gameState.phase === "setup") visitView("identity");
-  else if(gameState.phase === "industrialShockRevealed") visitView("industrial-shock");
+function replaceWithCurrentGame(){
+  if(gameState.phase === "setup") replaceView("identity");
+  else if(gameState.phase === "industrialShockRevealed") replaceView("industrial-shock");
   else if(gameState.mode === "monopoly"){
-    if(gameState.board.status === "landing"){
-      visitView("landing");
-      visitView("landing-detail");
-    } else visitView("board");
-  } else visitView(strategyViewType());
+    // A landing is one required interaction, not a historical subpage.
+    replaceView(gameState.board.status === "landing" ? "landing-detail" : "board");
+  } else replaceView(strategyViewType());
 }
 function syncNavigation(){
   if(navigationState.sessionBoard !== gameState.board){
@@ -61,7 +67,8 @@ function syncNavigation(){
     navigationState.observedKey = key;
     navigationState.revision += 1;
     navigationState.selection = null;
-    visitCurrentGame();
+    navigationState.previousViews = [];
+    replaceWithCurrentGame();
   }
   if(isCurrentView()) navigationState.currentView = makeView(navigationState.currentView.type);
 }
@@ -78,19 +85,14 @@ function navigateBack(){
 function resumeCurrentGame(){
   if(navigationBusy()) return false;
   navigationState.selection = null;
-  visitCurrentGame();
+  navigationState.previousViews = [];
+  replaceWithCurrentGame();
   return true;
 }
 function openLandingDecision(){
-  if(!isCurrentView() || navigationState.currentView.type !== "landing" || gameState.board.status !== "landing") return false;
-  visitView("landing-detail");
-  return true;
-}
-function togglePresenterControls(){
-  if(!isCurrentView() || navigationBusy() || gameState.mode !== "monopoly" || gameState.phase !== "starting") return false;
-  if(navigationState.currentView.type === "presenter") return navigateBack();
-  visitView("presenter");
-  return true;
+  // Kept for compatibility with the board button, but the landing popup is already
+  // the current required game screen, so there is no fake historical page to open.
+  return isCurrentView() && gameState.board.status === "landing";
 }
 function openStrategySelection(teamId, action, selection, phase){
   if(!isCurrentView() || navigationState.currentView.type !== "overview" || gameState.mode !== "strategy" ||
