@@ -104,11 +104,17 @@ function mountLandingScreen(){
     landing.className = "tourismopoly-landing";
     landing.setAttribute("aria-label","Tourismopoly start screen");
     landing.innerHTML = `
+      <div class="landing-title-card">
+        <h1>TOURISMOPOLY</h1>
+        <p class="landing-theme">ACCESS → AUTONOMY → ADAPTATION</p>
+        <p class="landing-tagline">A Journey Through the Evolution of Tourism</p>
+      </div>
       <div class="landing-interactive-zone">
         <button id="startTravellingBtn" class="start-travelling-btn" type="button" aria-label="Start Travelling">
           <span>Start Travelling</span><span class="start-arrow" aria-hidden="true">›</span>
         </button>
-      </div>`;
+      </div>
+      <div class="landing-footer">Grand Tour Edition · Europe c.1825 → 2035</div>`;
     document.body.appendChild(landing);
     document.getElementById("startTravellingBtn").addEventListener("click", () => {
       if(landing.classList.contains("leaving")) return;
