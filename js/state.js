@@ -1,5 +1,13 @@
 "use strict";
 
+// Load the dedicated screen-flow layer without disturbing the original board stylesheet.
+if(typeof document !== "undefined" && !document.querySelector('link[href="css/flow.css"]')){
+  const flowStyles = document.createElement("link");
+  flowStyles.rel = "stylesheet";
+  flowStyles.href = "css/flow.css";
+  document.head.appendChild(flowStyles);
+}
+
 // All mutable gameplay data lives here. Net Worth is always derived.
 const gameState = {};
 function resetGame(){
