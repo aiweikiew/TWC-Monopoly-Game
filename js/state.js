@@ -98,6 +98,8 @@ function clampScores(team){
 function mountLandingScreen(){
   if(typeof document === "undefined") return;
   let landing = document.getElementById("landingScreen");
+  let returnBtn = document.getElementById("landingReturnBtn");
+
   if(!landing){
     landing = document.createElement("section");
     landing.id = "landingScreen";
@@ -118,10 +120,31 @@ function mountLandingScreen(){
       </div>
       <div class="landing-footer">Grand Tour Edition · Europe c.1825 → 2035</div>`;
     document.body.appendChild(landing);
-    document.getElementById("startTravellingBtn").addEventListener("click", () => {
+  }
+
+  if(!returnBtn){
+    returnBtn = document.createElement("button");
+    returnBtn.id = "landingReturnBtn";
+    returnBtn.type = "button";
+    returnBtn.textContent = "← Back to Landing";
+    returnBtn.setAttribute("aria-label","Back to Tourismopoly landing page");
+    returnBtn.style.cssText = [
+      "position:fixed","top:18px","left:18px","z-index:9998",
+      "padding:10px 16px","border-radius:999px","border:1px solid rgba(97,64,34,.55)",
+      "background:rgba(246,235,207,.94)","color:#3f2917","font:700 14px Georgia,serif",
+      "box-shadow:0 6px 16px rgba(0,0,0,.16)","cursor:pointer"
+    ].join(";");
+    document.body.appendChild(returnBtn);
+  }
+
+  const startBtn = document.getElementById("startTravellingBtn");
+  if(startBtn && !startBtn.dataset.landingBound){
+    startBtn.dataset.landingBound = "true";
+    startBtn.addEventListener("click", () => {
       if(landing.classList.contains("leaving")) return;
       gameState.landingSeen = true;
       saveGameState();
+      returnBtn.hidden = false;
       landing.classList.add("leaving");
       window.setTimeout(() => {
         landing.hidden = true;
@@ -129,11 +152,26 @@ function mountLandingScreen(){
       }, 560);
     });
   }
+
+  if(!returnBtn.dataset.landingBound){
+    returnBtn.dataset.landingBound = "true";
+    returnBtn.addEventListener("click", () => {
+      // This is only navigation: do not reset identity draws or any setup progress.
+      gameState.landingSeen = false;
+      saveGameState();
+      landing.classList.remove("leaving");
+      landing.hidden = false;
+      returnBtn.hidden = true;
+    });
+  }
+
   window.syncLandingScreen = function(){
-    if(!landing) return;
-    const shouldShow = gameState.phase === "setup" && !gameState.landingSeen;
-    landing.hidden = !shouldShow;
-    if(shouldShow) landing.classList.remove("leaving");
+    if(!landing || !returnBtn) return;
+    const shouldShowLanding = gameState.phase === "setup" && !gameState.landingSeen;
+    const shouldShowReturn = gameState.phase === "setup" && gameState.landingSeen;
+    landing.hidden = !shouldShowLanding;
+    returnBtn.hidden = !shouldShowReturn;
+    if(shouldShowLanding) landing.classList.remove("leaving");
   };
   window.syncLandingScreen();
 }
