@@ -1,110 +1,88 @@
-/* Full-resolution Tourismopoly landing page.
-   The artwork is presentation-only; all title/button/footer UI remains live HTML. */
+/* Tourismopoly landing screen
+   Full-resolution artwork + live HTML UI. No embedded/compressed image copy. */
+
 .tourismopoly-landing{
   position:fixed;
   inset:0;
   z-index:10000;
   overflow:hidden;
-  isolation:isolate;
-  display:grid;
-  place-items:center;
-  background:#2b241d;
+  box-sizing:border-box;
+  background:
+    linear-gradient(to bottom, rgba(20,12,7,.06), rgba(20,12,7,.10)),
+    url("../assets/landing-background.png") center center / cover no-repeat;
   color:#f7e7bd;
+  font-family:Georgia, "Times New Roman", serif;
   opacity:1;
   visibility:visible;
-  transition:opacity .52s ease, transform .52s ease, filter .52s ease;
+  transition:opacity .46s ease, transform .46s ease, filter .46s ease;
 }
 
-/* Soft full-bleed copy fills any letterboxing without stretching the real artwork. */
-.tourismopoly-landing::before{
-  content:"";
-  position:absolute;
-  inset:-28px;
-  z-index:-3;
-  background:url("../assets/landing-background.png") center center / cover no-repeat;
-  filter:blur(18px) brightness(.55) saturate(.9);
-  transform:scale(1.06);
-}
+.tourismopoly-landing[hidden]{display:none !important;}
 
-.landing-artwork{
-  position:absolute;
-  inset:0;
-  z-index:-2;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  object-position:center;
-  display:block;
-  filter:saturate(1.02) contrast(1.02);
-  transform:scale(1);
-  transition:transform .62s cubic-bezier(.2,.8,.2,1), filter .52s ease;
-  user-select:none;
-  pointer-events:none;
-}
-
-.landing-vignette{
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 50% 29%,rgba(17,13,10,.04) 0 24%,rgba(17,13,10,.22) 72%,rgba(17,13,10,.42) 100%),
-    linear-gradient(to bottom,rgba(22,15,10,.26),rgba(22,15,10,.04) 33%,rgba(22,15,10,.06) 64%,rgba(22,15,10,.34));
-}
-
+/* Keep the title comfortably inside the viewport on laptops/projectors. */
 .landing-title-card{
   position:absolute;
-  top:7.5vh;
+  top:4.5vh;
   left:50%;
   transform:translateX(-50%);
-  width:min(720px,72vw);
+  width:min(72vw, 1040px);
+  box-sizing:border-box;
   padding:18px 34px 16px;
   text-align:center;
-  border:1px solid rgba(229,198,128,.62);
-  border-radius:8px;
-  background:linear-gradient(180deg,rgba(92,42,36,.96),rgba(67,29,27,.93));
+  border:1.5px solid rgba(213,171,96,.82);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(103,49,35,.96), rgba(77,35,28,.94));
   box-shadow:
-    0 16px 42px rgba(17,12,8,.30),
-    inset 0 0 0 2px rgba(241,214,150,.10),
-    inset 0 1px 0 rgba(255,240,198,.20);
-  backdrop-filter:blur(3px);
+    0 12px 28px rgba(20,9,4,.30),
+    inset 0 0 0 1px rgba(255,229,171,.11);
+  backdrop-filter:blur(1.5px);
 }
+
 .landing-title-card::before,
 .landing-title-card::after{
   content:"✦";
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  color:#d7b76e;
+  color:#d4a85b;
   font-size:14px;
-  opacity:.72;
+  opacity:.9;
 }
-.landing-title-card::before{left:14px}
-.landing-title-card::after{right:14px}
+.landing-title-card::before{left:16px;}
+.landing-title-card::after{right:16px;}
+
 .landing-title-card h1{
   margin:0;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(38px,5.2vw,76px);
-  line-height:.92;
-  letter-spacing:.025em;
-  color:#f6e4b5;
-  text-shadow:0 2px 0 rgba(39,19,15,.8),0 4px 12px rgba(0,0,0,.30);
-}
-.landing-theme{
-  margin:10px 0 0;
-  font-size:clamp(10px,1.05vw,14px);
-  font-weight:800;
-  letter-spacing:.17em;
-  color:#dec280;
-}
-.landing-tagline{
-  margin:7px 0 0;
-  font-size:clamp(13px,1.35vw,19px);
-  font-style:italic;
-  color:#f3dfb8;
-  letter-spacing:.015em;
+  max-width:100%;
+  color:#f4e2b8;
+  font-size:clamp(48px, 5vw, 96px);
+  line-height:.94;
+  letter-spacing:.018em;
+  font-weight:700;
+  white-space:nowrap;
+  text-shadow:0 3px 0 rgba(58,27,19,.45), 0 6px 12px rgba(0,0,0,.22);
 }
 
+.landing-theme{
+  margin:12px 0 5px;
+  color:#e9c985;
+  font-size:clamp(14px, 1.18vw, 22px);
+  line-height:1.15;
+  font-weight:700;
+  letter-spacing:.13em;
+  white-space:nowrap;
+}
+
+.landing-tagline{
+  margin:0;
+  color:#f6e8c8;
+  font-size:clamp(16px, 1.3vw, 25px);
+  line-height:1.2;
+  font-style:italic;
+  white-space:nowrap;
+}
+
+/* Bottom CTA remains a real button so hover/press feedback is crisp. */
 .landing-interactive-zone{
   position:absolute;
   left:50%;
@@ -114,102 +92,101 @@
   align-items:center;
   justify-content:center;
 }
+
 .start-travelling-btn{
-  min-width:238px;
-  min-height:58px;
-  padding:13px 28px 14px 30px;
-  border-radius:12px;
-  border:2px solid rgba(96,69,40,.84);
-  outline:1px solid rgba(235,209,151,.72);
-  outline-offset:-5px;
-  background:linear-gradient(180deg,#f0dfb8,#d9bd83);
-  color:#37291f;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(17px,1.55vw,22px);
-  font-weight:800;
-  letter-spacing:.025em;
-  cursor:pointer;
-  box-shadow:
-    0 9px 24px rgba(29,21,14,.30),
-    inset 0 1px 0 rgba(255,249,229,.82),
-    inset 0 -2px 0 rgba(94,65,35,.10);
+  appearance:none;
+  border:1.5px solid #8f6c38;
+  border-radius:13px;
+  min-width:320px;
+  padding:15px 28px 16px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:18px;
-  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;
-}
-.start-travelling-btn:hover{
-  transform:translateY(-3px) scale(1.015);
-  background:linear-gradient(180deg,#f8eac9,#e2c994);
-  border-color:#5b422b;
+  gap:16px;
+  background:linear-gradient(180deg, #f8eccd 0%, #ead4a5 100%);
+  color:#3e2718;
+  font:700 clamp(24px, 1.55vw, 31px)/1 Georgia, "Times New Roman", serif;
+  cursor:pointer;
   box-shadow:
-    0 15px 30px rgba(29,21,14,.36),
-    0 0 0 5px rgba(225,191,113,.12),
-    inset 0 1px 0 rgba(255,252,237,.92);
+    0 8px 18px rgba(46,27,13,.28),
+    inset 0 1px 0 rgba(255,255,255,.8),
+    inset 0 0 0 2px rgba(121,88,44,.09);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    background .18s ease,
+    border-color .18s ease;
 }
+
+.start-travelling-btn:hover{
+  transform:translateY(-4px) scale(1.015);
+  background:linear-gradient(180deg, #fff5db 0%, #efdbae 100%);
+  border-color:#a77d3c;
+  box-shadow:
+    0 14px 26px rgba(43,24,11,.34),
+    0 0 0 4px rgba(211,167,81,.15),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
 .start-travelling-btn:active{
-  transform:translateY(1px) scale(.985);
-  box-shadow:0 5px 12px rgba(29,21,14,.25),inset 0 2px 5px rgba(77,52,28,.16);
+  transform:translateY(1px) scale(.992);
+  box-shadow:0 5px 11px rgba(43,24,11,.25), inset 0 2px 4px rgba(83,51,22,.13);
 }
+
 .start-travelling-btn:focus-visible{
-  outline:3px solid #f3d58e;
+  outline:3px solid rgba(255,231,176,.95);
   outline-offset:4px;
 }
+
 .start-arrow{
   display:inline-block;
-  font-size:1.6em;
-  line-height:.7;
-  transform:translateX(0);
+  font-size:1.25em;
+  line-height:.8;
   transition:transform .18s ease;
 }
-.start-travelling-btn:hover .start-arrow{transform:translateX(5px)}
+.start-travelling-btn:hover .start-arrow{transform:translateX(6px);}
 
 .landing-footer{
   position:absolute;
   left:50%;
   bottom:4.2vh;
   transform:translateX(-50%);
-  padding:6px 14px;
+  box-sizing:border-box;
+  padding:7px 18px 6px;
+  border:1px solid rgba(197,151,75,.58);
   border-radius:999px;
-  background:rgba(39,28,20,.62);
-  border:1px solid rgba(226,198,137,.34);
-  color:#ead7ad;
-  font-size:clamp(9px,.9vw,12px);
+  background:rgba(70,41,23,.88);
+  color:#f3ddb0;
+  font-size:clamp(12px, .86vw, 17px);
   font-weight:700;
-  letter-spacing:.12em;
+  letter-spacing:.105em;
+  line-height:1.1;
+  text-align:center;
   text-transform:uppercase;
   white-space:nowrap;
-  text-shadow:0 1px 2px rgba(0,0,0,.55);
-  backdrop-filter:blur(3px);
+  box-shadow:0 4px 12px rgba(28,15,7,.22);
 }
 
 .tourismopoly-landing.leaving{
   opacity:0;
-  transform:scale(1.012);
-  filter:brightness(1.06);
+  transform:scale(1.015);
+  filter:blur(3px);
   pointer-events:none;
 }
-.tourismopoly-landing.leaving .landing-artwork{
-  transform:scale(1.035);
-  filter:saturate(1.04) contrast(1.03) brightness(1.05);
+
+/* Safety scaling for smaller browser windows. */
+@media (max-width:1200px){
+  .landing-title-card{width:min(78vw, 900px);padding:15px 28px 14px;}
+  .landing-title-card h1{font-size:clamp(42px, 5.7vw, 74px);}
+  .landing-theme{font-size:clamp(12px, 1.25vw, 17px);}
+  .landing-tagline{font-size:clamp(14px, 1.45vw, 19px);}
+  .start-travelling-btn{min-width:285px;padding:13px 24px 14px;}
 }
 
-@media(max-height:720px){
-  .landing-title-card{top:4.5vh;padding:12px 28px 11px}
-  .landing-title-card h1{font-size:clamp(32px,5vw,58px)}
-  .landing-theme{margin-top:7px}
-  .landing-tagline{margin-top:4px}
-  .landing-interactive-zone{bottom:10.5vh}
-  .start-travelling-btn{min-height:48px;min-width:215px;padding:10px 24px}
-  .landing-footer{bottom:2.7vh}
-}
-
-@media(max-width:900px){
-  .landing-title-card{width:min(760px,86vw)}
-  .landing-interactive-zone{bottom:10vh}
-}
-
-@media(prefers-reduced-motion:reduce){
-  .tourismopoly-landing,.landing-artwork,.start-travelling-btn,.start-arrow{transition:none}
+@media (max-height:720px){
+  .landing-title-card{top:3vh;padding-top:13px;padding-bottom:11px;}
+  .landing-title-card h1{font-size:clamp(40px, 4.7vw, 72px);}
+  .landing-theme{margin-top:8px;}
+  .landing-interactive-zone{bottom:10vh;}
+  .landing-footer{bottom:2.8vh;}
 }
