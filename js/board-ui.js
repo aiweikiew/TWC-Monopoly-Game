@@ -8,6 +8,26 @@ const nextBtn = document.getElementById("nextBtn");
 const overlay = document.getElementById("diceOverlay");
 const die = document.getElementById("die");
 const rollCaption = document.getElementById("rollCaption");
+const shockBtn = document.getElementById("presenterBtn");
+const presenterControls = document.getElementById("presenterControls");
+const undoTurnBtn = document.getElementById("undoTurnBtn");
+const boardResetBtn = document.getElementById("boardResetBtn");
+const triggerShockBtn = document.getElementById("triggerShockBtn");
+
+// The old Presenter drawer is no longer part of the classroom flow.
+// Reuse its top-level button as the one-click surprise Tech Shock control,
+// and move Undo alongside it so the board keeps a compact control strip.
+shockBtn.textContent = "⚡ TECH SHOCK";
+shockBtn.removeAttribute("aria-controls");
+shockBtn.removeAttribute("aria-expanded");
+shockBtn.classList.add("tech-shock-trigger");
+presenterControls.hidden = true;
+const topControls = shockBtn.parentElement;
+topControls.insertBefore(undoTurnBtn, boardResetBtn);
+undoTurnBtn.classList.add("board-top-action");
+boardResetBtn.classList.add("board-top-action");
+triggerShockBtn.hidden = true;
+
 const tokens = [createToken("A","a","Team A"),createToken("B","b","Team B"),createToken("C","c","Team C")];
 function createToken(label, cls, aria){
   const el = document.createElement("div");
@@ -27,7 +47,8 @@ function placeToken(teamIndex, tileIndex, animate=false){
 }
 function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 function isCurrentBoard(board){
-  return gameState.board === board && gameState.mode === "monopoly";
+  return gameState.board === board && gameState.mode === "monopoly" &&
+    gameState.phase === "starting" && board.status !== "shock";
 }
 async function animateDice(finalValue, board){
   overlay.classList.add("show");
@@ -62,7 +83,7 @@ async function moveToken(teamIndex, steps, board){
   renderGame();
 }
 async function rollDice(){
-  if(gameState.mode !== "monopoly" || gameState.board.status !== "ready") return;
+  if(gameState.mode !== "monopoly" || gameState.phase !== "starting" || gameState.board.status !== "ready") return;
   const board = beginMonopolyRoll();
   const teamIndex = gameState.currentTeam;
   renderGame();
@@ -84,7 +105,7 @@ function hideBoardOverlays(){
     modal.hidden = true;
     modal.classList.remove("show");
   });
-  if(gameState.mode !== "monopoly" || gameState.board.status !== "rolling"){
+  if(gameState.mode !== "monopoly" || gameState.phase !== "starting" || gameState.board.status !== "rolling"){
     overlay.classList.remove("show");
     die.classList.remove("rolling");
   }
@@ -137,19 +158,13 @@ function renderBoard(){
   });
   rollBtn.disabled = board.status !== "ready";
   nextBtn.disabled = board.status !== "resolved";
-  const presenting = navigationState.currentView.type === "presenter";
-  document.getElementById("presenterControls").hidden = !presenting;
-  document.getElementById("presenterBtn").disabled = navigationBusy();
-  document.getElementById("presenterBtn").setAttribute("aria-expanded",String(presenting));
-  document.getElementById("triggerShockBtn").disabled = !canTriggerTechShock();
-  document.getElementById("undoTurnBtn").disabled = !canUndoGrandTourTurn();
-  boardText("presenterRound",`Current Round: ${gameState.roundNumber}`);
-  boardText("presenterTurns",`Total Turns: ${gameState.totalTurnCount}`);
+  shockBtn.disabled = !canTriggerTechShock();
+  undoTurnBtn.disabled = !canUndoGrandTourTurn();
   const landingOverview = board.status === "landing" && navigationState.currentView.type === "landing";
   document.getElementById("resolveLandingBtn").hidden = !landingOverview;
   boardText("boardTurnBadge",`${gameState.teams[teamIndex].name.toUpperCase()}'S TURN`);
   boardText("boardStatusText",gameState.message);
-  boardText("boardStatusSub",`Round ${gameState.roundNumber} · ${gameState.totalTurnCount} turns complete`);
+  boardText("boardStatusSub",`Round ${gameState.roundNumber} · ${gameState.totalTurnCount} completed turns`);
   renderPlayers(document.getElementById("boardPlayers"));
   if(board.status === "landing" && !landingOverview){
     const landing = board.pendingLanding;
@@ -161,7 +176,7 @@ function renderBoard(){
       boardText("opportunityBalance",`${gameState.teams[teamIndex].name} Cash · ${money(gameState.teams[teamIndex].cash)} before collection`);
       showBoardModal("opportunityModal");
     } else {
-      boardText("startBalance",`+$1 already collected during movement. Cash · ${money(gameState.teams[teamIndex].cash)}`);
+      boardText("startBalance",`+$1 was automatically added as the traveller crossed GO. Cash · ${money(gameState.teams[teamIndex].cash)}`);
       showBoardModal("startModal");
     }
   }
@@ -181,7 +196,6 @@ const landingButtons = {
 for(const [id,action] of Object.entries(landingButtons)){
   document.getElementById(id).addEventListener("click",() => boardAction(() => finishMonopolyLanding(action)));
 }
-document.getElementById("boardResetBtn").addEventListener("click",() => boardAction(resetGame));
-document.getElementById("presenterBtn").addEventListener("click",() => boardAction(togglePresenterControls));
-document.getElementById("undoTurnBtn").addEventListener("click",() => boardAction(undoLastGrandTourTurn));
-document.getElementById("triggerShockBtn").addEventListener("click",() => boardAction(triggerTechShock));
+boardResetBtn.addEventListener("click",() => boardAction(resetGame));
+undoTurnBtn.addEventListener("click",() => boardAction(undoLastGrandTourTurn));
+shockBtn.addEventListener("click",() => boardAction(triggerTechShock));
