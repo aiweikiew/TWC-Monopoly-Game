@@ -23,6 +23,11 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/de
   debtScript.src = "js/debt-settlement-v4.js";
   document.head.appendChild(debtScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/shock-polish-v6.js"]')){
+  const shockPolishScript = document.createElement("script");
+  shockPolishScript.src = "js/shock-polish-v6.js";
+  document.head.appendChild(shockPolishScript);
+}
 
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
