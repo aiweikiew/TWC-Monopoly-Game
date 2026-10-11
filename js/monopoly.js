@@ -1,50 +1,106 @@
 "use strict";
 
-// Legacy Situation Card evaluation, now reading actual portfolio sectors.
-function evaluateChanceCard(teamIndex, card){
-  const sectors = getTeamSectors(teamIndex);
-  const matched = [];
-
-  for(const sector of sectors){
-    const effect = card.sectorEffects[sector];
-    if(effect){
-      matched.push({sector,value:effect.value,reason:effect.reason});
-    }
-  }
-
-  if(matched.length === 0){
-    return {effect:0,reason:card.neutralReason || "No change to your business."};
-  }
-
-  const hasPositive = matched.some(x => x.value > 0);
-  const hasNegative = matched.some(x => x.value < 0);
-  if(hasPositive && hasNegative){
-    return {effect:0,reason:"One of your businesses benefits while another is harmed, so the effects cancel out."};
-  }
-
-  const chosen = matched[0];
-  return {effect:chosen.value > 0 ? 1 : -1,reason:chosen.reason};
+function formatBusinessList(names){
+  const unique = [...new Set(names.filter(Boolean))];
+  if(unique.length === 0) return "your portfolio";
+  if(unique.length === 1) return unique[0];
+  if(unique.length === 2) return `${unique[0]} and ${unique[1]}`;
+  return `${unique.slice(0,-1).join(", ")}, and ${unique[unique.length-1]}`;
 }
 
-function getTeamSectors(teamIndex){
+function getTeamTourismHoldings(teamIndex){
   const team = gameState.teams[teamIndex];
+  const holdings = [];
 
   // Situation Cards react to the team's FULL current tourism portfolio:
   // legacy tourism businesses + every board business bought during the Grand Tour.
-  // Non-tourism assets such as the Aristocratic Household's Estate contribute no sector.
-  const sectors = [];
-
+  // Non-tourism assets such as the Aristocratic Household's Estate are excluded.
   for(const asset of team.assets){
     if(asset.boardTile !== undefined){
       const property = boardProperties[asset.boardTile];
-      if(property?.sector) sectors.push(property.sector);
+      if(property?.sector){
+        holdings.push({sector:property.sector,business:property.name,type:asset.type});
+      }
       continue;
     }
 
     const legacySector = legacySectors[asset.type];
-    if(legacySector) sectors.push(legacySector);
+    if(legacySector){
+      holdings.push({
+        sector:legacySector,
+        business:assetTypes[asset.type]?.name || sectorLabels[legacySector],
+        type:asset.type
+      });
+    }
   }
 
+  return holdings;
+}
+
+function evaluateChanceCard(teamIndex, card){
+  const holdings = getTeamTourismHoldings(teamIndex);
+  const matched = [];
+
+  for(const holding of holdings){
+    const effect = card.sectorEffects[holding.sector];
+    if(effect){
+      matched.push({
+        sector:holding.sector,
+        business:holding.business,
+        value:effect.value,
+        reason:effect.reason
+      });
+    }
+  }
+
+  if(matched.length === 0){
+    return {
+      effect:0,
+      impactTitle:"No Direct Exposure",
+      impactBusinesses:[],
+      reason:card.neutralReason || "None of your current businesses are directly affected."
+    };
+  }
+
+  const positive = matched.filter(x => x.value > 0);
+  const negative = matched.filter(x => x.value < 0);
+
+  if(positive.length && negative.length){
+    const positiveNames = [...new Set(positive.map(x => x.business))];
+    const negativeNames = [...new Set(negative.map(x => x.business))];
+    const positiveText = formatBusinessList(positiveNames);
+    const negativeText = formatBusinessList(negativeNames);
+    return {
+      effect:0,
+      impactTitle:"Mixed Impact",
+      impactBusinesses:[...new Set(matched.map(x => x.business))],
+      reason:`${positiveText} ${positiveNames.length === 1 ? "benefits" : "benefit"}, while ${negativeText} ${negativeNames.length === 1 ? "is harmed" : "are harmed"}. Effects cancel out.`
+    };
+  }
+
+  const affected = positive.length ? positive : negative;
+  const affectedNames = [...new Set(affected.map(x => x.business))];
+  let reason;
+
+  if(affected.length === 1){
+    reason = affected[0].reason.replace("{business}",affected[0].business);
+  } else {
+    const template = positive.length ? card.groupPositive : card.groupNegative;
+    reason = template
+      ? template.replace("{businesses}",formatBusinessList(affectedNames))
+      : `${formatBusinessList(affectedNames)} ${positive.length ? "benefit" : "are harmed"} from this event.`;
+  }
+
+  return {
+    effect:positive.length ? 1 : -1,
+    impactTitle:formatBusinessList(affectedNames),
+    impactBusinesses:affectedNames,
+    reason
+  };
+}
+
+function getTeamSectors(teamIndex){
+  const sectors = getTeamTourismHoldings(teamIndex).map(holding => holding.sector);
   const uniqueSectors = [...new Set(sectors)];
   return uniqueSectors.length ? uniqueSectors : ["none"];
 }
