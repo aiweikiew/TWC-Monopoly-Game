@@ -84,30 +84,22 @@
       <div class="strategy-footer fit-event-footer">
         <button class="game-btn secondary strategy-back-btn" id="strategyFlowBackBtn" type="button">← Back</button>
         <button class="game-btn secondary" id="strategyResetBtn" type="button">Reset Game</button>
-        <button class="game-btn" data-flow-action="continue" type="button">CONTINUE TO FUTURE SLIDES</button>
+        <button class="game-btn" data-flow-action="continue" type="button">CONTINUE → 2035 CRISIS</button>
       </div>
     </section>`;
   }
 
-  function renderDigitalHandoff(){
-    return `<section class="strategy-modern-screen digital-era digital-handoff-screen">
-      <div class="digital-handoff-wrap">
-        <div class="digital-handoff-icon">↗</div>
-        <div class="screen-kicker">PRESENTATION HANDOFF</div>
-        <h2>Switch to Canva</h2>
-        <p>The Digital era is complete. Continue the presentation before triggering the 2035 crisis.</p>
-        <div class="digital-handoff-card">
-          <span>SLIDES 13–15</span>
-          <strong>The Future</strong>
-          <p>Return to Tourismopoly after Regenerative Tourism.</p>
-        </div>
-      </div>
-      <div class="strategy-footer digital-handoff-footer">
-        <button class="game-btn secondary strategy-back-btn" id="strategyFlowBackBtn" type="button">← Back</button>
-        <button class="game-btn secondary" id="strategyResetBtn" type="button">Reset Game</button>
-        <button class="game-btn" data-next-phase="digital" type="button">RETURN TO GAME → 2035 CRISIS</button>
-      </div>
-    </section>`;
+  function moveDigitalToFuture(){
+    gameState.phase = "future";
+    gameState.mode = "strategy";
+    gameState.lastDecision = null;
+    gameState.phaseComplete = false;
+    gameState.decisions = {};
+    gameState.currentTeam = 0;
+    gameState.revaluationLog = [];
+    gameState.message = "";
+    gameState.uiStage = "crisis";
+    applyFutureCrisis();
   }
 
   function enhance(){
@@ -119,22 +111,21 @@
 
   function init(){
     if(document.documentElement.dataset.fitEventV17 === "true") return true;
-    if(typeof renderGame !== "function" || typeof renderPause !== "function" ||
-       typeof continuePhaseStage !== "function" || typeof gameState === "undefined" ||
+    if(typeof renderGame !== "function" || typeof continuePhaseStage !== "function" ||
+       typeof applyFutureCrisis !== "function" || typeof gameState === "undefined" ||
        typeof calculateNetWorth !== "function" || typeof money !== "function") return false;
     if(document.documentElement.dataset.strategyLayoutV14 !== "true") return false;
 
     document.documentElement.dataset.fitEventV17 = "true";
     loadStyles();
 
-    // The FIT event is already the Digital-era result. Skip the redundant Digital results page.
-    // Capture the event as history so Back from the presentation handoff returns here exactly.
+    // FIT Boom is the final Digital-era result. Move directly into the Future crisis.
+    // Store the FIT event itself so Back from 2035 returns to the exact previous game screen.
     const previousContinuePhaseStage = continuePhaseStage;
     continuePhaseStage = function(...args){
       if(gameState.phase === "digital" && gameState.uiStage === "event"){
         const before = typeof captureFlowSnapshot === "function" ? captureFlowSnapshot() : null;
-        gameState.uiStage = "pause";
-        gameState.message = "";
+        moveDigitalToFuture();
         if(before && typeof commitFlowSnapshot === "function") commitFlowSnapshot(before);
         if(typeof saveGameState === "function") saveGameState();
         return;
@@ -142,20 +133,12 @@
       return previousContinuePhaseStage.apply(this,args);
     };
 
-    // Replace the repetitive Digital checkpoint with a pure presentation handoff.
-    const previousRenderPause = renderPause;
-    renderPause = function(){
-      if(gameState.phase === "digital" && gameState.uiStage === "pause") return renderDigitalHandoff();
-      return previousRenderPause();
-    };
-
     const previousRenderGame = renderGame;
     renderGame = function(){
-      // Compatibility: saved test sessions already sitting on the removed results screen
-      // are advanced to the new handoff without requiring a restart.
-      if(gameState.phase === "digital" && gameState.uiStage === "results"){
-        gameState.uiStage = "pause";
-        gameState.message = "";
+      // Compatibility for test saves already sitting on the removed Digital results/handoff screens.
+      // Their existing flow history still points back to the FIT event, so Back remains meaningful.
+      if(gameState.phase === "digital" && ["results","pause"].includes(gameState.uiStage) && gameState.events?.fitBoom){
+        moveDigitalToFuture();
         if(typeof saveGameState === "function") saveGameState();
       }
       previousRenderGame();
