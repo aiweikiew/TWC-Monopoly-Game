@@ -25,7 +25,16 @@
     const team = currentTeam();
     if(!team) return null;
     if(!industrialDraft || industrialDraft.teamId !== team.id){
-      industrialDraft = {teamId:team.id,investment:null,portfolioAction:"hold",assetId:null};
+      industrialDraft = {
+        teamId:team.id,
+        investment:null,
+        portfolioAction:team.cash < 0 ? "sell" : "hold",
+        assetId:null
+      };
+    }
+    if(team.cash < 0){
+      industrialDraft.investment = null;
+      industrialDraft.portfolioAction = "sell";
     }
     return industrialDraft;
   }
@@ -49,12 +58,19 @@
   }
 
   function projectedNetWorth(team,draft){
-    // Buy and sell only convert cash <-> assets. Adaptation has a $1 service cost.
     return calculateNetWorth(team) - (draft.portfolioAction === "adapt" ? 1 : 0);
   }
 
   function draftIsValid(team,draft){
     if(!team || !draft) return false;
+    const startedInDebt = team.cash < 0;
+
+    if(startedInDebt){
+      if(draft.investment !== null || draft.portfolioAction !== "sell") return false;
+      const asset = selectedPortfolioAsset(team,draft);
+      return Boolean(asset) && projectedCash(team,draft) >= 0;
+    }
+
     if(draft.investment && !markets.steam.includes(draft.investment)) return false;
     if(["sell","adapt"].includes(draft.portfolioAction)){
       const asset = selectedPortfolioAsset(team,draft);
@@ -79,14 +95,14 @@
     return `Adapt ${asset.name} → ${next?.name || "New format"} · $1`;
   }
 
-  function marketCard(team,draft,type){
+  function marketCard(draft,type,locked){
     const asset = assetTypes[type];
-    const selected = draft.investment === type;
-    return `<button type="button" class="industrial-market-card ${selected ? "selected" : ""}" data-industrial-invest="${type}">
+    const selected = !locked && draft.investment === type;
+    return `<button type="button" class="industrial-market-card ${selected ? "selected" : ""}" data-industrial-invest="${type}" ${locked ? "disabled" : ""}>
       <span class="market-card-tag">NEW BUSINESS</span>
       <strong>${escapeHTML(asset.name)}</strong>
       <span class="market-card-price">${money(asset.price)}</span>
-      <span class="market-card-cta">${selected ? "✓ Selected" : "Choose investment"}</span>
+      <span class="market-card-cta">${locked ? "Debt must be cleared first" : selected ? "✓ Selected" : "Choose investment"}</span>
     </button>`;
   }
 
@@ -106,8 +122,9 @@
     return `<div class="industrial-owned-choice-grid">${eligible.map(asset => {
       const selected = draft.assetId === asset.id;
       if(draft.portfolioAction === "sell"){
-        return `<button type="button" class="industrial-owned-card sell-card ${selected ? "selected" : ""}" data-industrial-asset="${asset.id}">
-          <span>SELL</span><strong>${escapeHTML(asset.name)}</strong><b>Receive ${money(asset.currentValue)}</b>
+        const clearsDebt = team.cash >= 0 || team.cash + asset.currentValue >= 0;
+        return `<button type="button" class="industrial-owned-card sell-card ${selected ? "selected" : ""} ${team.cash < 0 && clearsDebt ? "clears-debt" : ""}" data-industrial-asset="${asset.id}">
+          <span>${team.cash < 0 && clearsDebt ? "✓ CLEARS DEBT" : "SELL"}</span><strong>${escapeHTML(asset.name)}</strong><b>Receive ${money(asset.currentValue)}</b>
         </button>`;
       }
       const next = assetTypes[adaptations[asset.type]];
@@ -119,42 +136,48 @@
 
   function renderIndustrialActions(){
     const team = currentTeam();
+    const inDebt = team.cash < 0;
     const draft = ensureDraft();
     const cashAfter = projectedCash(team,draft);
     const worthAfter = projectedNetWorth(team,draft);
     const valid = draftIsValid(team,draft);
     const sellDisabled = team.assets.length === 0;
-    const adaptDisabled = !team.assets.some(asset => Object.hasOwn(adaptations,asset.type));
+    const adaptDisabled = inDebt || !team.assets.some(asset => Object.hasOwn(adaptations,asset.type));
     const hasCommitted = committedDecisionCount() > 0;
 
-    return `<section class="industrial-turn-screen decision-screen">
+    return `<section class="industrial-turn-screen decision-screen ${inDebt ? "debt-turn" : ""}">
       <div class="industrial-turn-heading">
         <div>
           <div class="screen-kicker">TEAM DECISION · INDUSTRIAL REVOLUTION</div>
-          <h2>${escapeHTML(team.name)}, build your Industrial strategy</h2>
-          <p>Choose up to one new investment, then sell, adapt, or hold one current business.</p>
+          <h2>${escapeHTML(team.name)}, ${inDebt ? "clear your debt" : "build your Industrial strategy"}</h2>
+          <p>${inDebt ? "Your cash is below $0. Sell a business before you can invest or adapt." : "Choose up to one new investment, then sell, adapt, or hold one current business."}</p>
         </div>
-        <div class="industrial-wallet">
-          <span>CASH</span><strong>${money(team.cash)}</strong><small>Net Worth ${money(calculateNetWorth(team))}</small>
+        <div class="industrial-wallet ${inDebt ? "in-debt" : ""}">
+          <span>${inDebt ? "DEBT" : "CASH"}</span><strong>${inDebt ? money(Math.abs(team.cash)) : money(team.cash)}</strong><small>Net Worth ${money(calculateNetWorth(team))}</small>
         </div>
       </div>
 
-      <section class="industrial-step invest-step">
-        <div class="industrial-step-title"><span>1</span><div><strong>Market Investment</strong><small>Buy one new business, or skip.</small></div></div>
+      ${inDebt ? `<div class="industrial-decision-debt-alert">
+        <div><span>⚠ DEBT CLEARANCE REQUIRED</span><strong>YOU'RE IN DEBT · ${money(team.cash)} CASH</strong></div>
+        <p>Select <b>SELL</b> and choose a business that brings projected cash back to $0 or above. New investments are locked for this turn.</p>
+      </div>` : ""}
+
+      <section class="industrial-step invest-step ${inDebt ? "debt-locked" : ""}">
+        <div class="industrial-step-title"><span>1</span><div><strong>${inDebt ? "Market Investment Locked" : "Market Investment"}</strong><small>${inDebt ? "Clear debt first — no new purchase this turn." : "Buy one new business, or skip."}</small></div></div>
         <div class="industrial-market-grid">
-          ${markets.steam.map(type => marketCard(team,draft,type)).join("")}
-          <button type="button" class="industrial-market-card skip-card ${draft.investment === null ? "selected" : ""}" data-industrial-invest="">
-            <span class="market-card-tag">OPTIONAL</span><strong>Skip New Investment</strong><span class="market-card-price">$0</span><span class="market-card-cta">${draft.investment === null ? "✓ Selected" : "Choose skip"}</span>
+          ${markets.steam.map(type => marketCard(draft,type,inDebt)).join("")}
+          <button type="button" class="industrial-market-card skip-card selected" data-industrial-invest="" ${inDebt ? "disabled" : ""}>
+            <span class="market-card-tag">${inDebt ? "REQUIRED" : "OPTIONAL"}</span><strong>Skip New Investment</strong><span class="market-card-price">$0</span><span class="market-card-cta">✓ Selected</span>
           </button>
         </div>
       </section>
 
-      <section class="industrial-step portfolio-step">
-        <div class="industrial-step-title"><span>2</span><div><strong>Portfolio Move</strong><small>Choose one: Sell, Adapt, or Hold.</small></div></div>
+      <section class="industrial-step portfolio-step ${inDebt ? "debt-clearance-step" : ""}">
+        <div class="industrial-step-title"><span>2</span><div><strong>${inDebt ? "Debt Clearance" : "Portfolio Move"}</strong><small>${inDebt ? "Sell a business until projected cash is at least $0." : "Choose one: Sell, Adapt, or Hold."}</small></div></div>
         <div class="industrial-action-tabs">
           <button type="button" class="industrial-action-tab sell ${draft.portfolioAction === "sell" ? "selected" : ""}" data-industrial-portfolio="sell" ${sellDisabled ? "disabled" : ""}>SELL</button>
           <button type="button" class="industrial-action-tab adapt ${draft.portfolioAction === "adapt" ? "selected" : ""}" data-industrial-portfolio="adapt" ${adaptDisabled ? "disabled" : ""}>ADAPT · $1</button>
-          <button type="button" class="industrial-action-tab hold ${draft.portfolioAction === "hold" ? "selected" : ""}" data-industrial-portfolio="hold">HOLD</button>
+          <button type="button" class="industrial-action-tab hold ${draft.portfolioAction === "hold" ? "selected" : ""}" data-industrial-portfolio="hold" ${inDebt ? "disabled" : ""}>HOLD</button>
         </div>
         ${portfolioAssetCards(team,draft)}
       </section>
@@ -162,13 +185,13 @@
       <div class="industrial-turn-summary ${valid ? "valid" : "invalid"}">
         <div class="turn-summary-choice"><span>MARKET MOVE</span><strong>${escapeHTML(investmentLabel(draft))}</strong></div>
         <div class="turn-summary-plus">+</div>
-        <div class="turn-summary-choice"><span>PORTFOLIO MOVE</span><strong>${escapeHTML(portfolioLabel(team,draft))}</strong></div>
+        <div class="turn-summary-choice"><span>${inDebt ? "DEBT MOVE" : "PORTFOLIO MOVE"}</span><strong>${escapeHTML(portfolioLabel(team,draft))}</strong></div>
         <div class="turn-summary-finance">
           <span>PROJECTED CASH</span><strong>${money(cashAfter)}</strong><small>Net Worth ${money(worthAfter)}</small>
         </div>
-        <button type="button" class="industrial-confirm-turn" id="industrialConfirmTurnBtn" ${valid ? "" : "disabled"}>CONFIRM TEAM TURN</button>
+        <button type="button" class="industrial-confirm-turn" id="industrialConfirmTurnBtn" ${valid ? "" : "disabled"}>${inDebt ? "CLEAR DEBT & CONFIRM" : "CONFIRM TEAM TURN"}</button>
       </div>
-      ${!valid && cashAfter < 0 ? `<div class="industrial-turn-warning">This combination needs ${money(Math.abs(cashAfter))} more cash. Sell a business, choose a cheaper investment, or skip the investment.</div>` : ""}
+      ${!valid && cashAfter < 0 ? `<div class="industrial-turn-warning">Still in debt by ${money(Math.abs(cashAfter))}. Choose a higher-value business to sell.</div>` : ""}
 
       <div class="industrial-decision-controls">
         <button type="button" class="game-btn secondary decision-back-btn" id="industrialDecisionBackBtn" ${hasCommitted ? "disabled" : ""}>← BACK</button>
@@ -180,8 +203,9 @@
   function commitIndustrialTurn(){
     if(!isIndustrialDecisionScreen()) return;
     const team = currentTeam();
+    const startedInDebt = team.cash < 0;
     const draft = ensureDraft();
-    requireRule(draftIsValid(team,draft),"Finish choosing a valid Industrial turn first.");
+    requireRule(draftIsValid(team,draft),startedInDebt ? "Sell a business that clears the debt first." : "Finish choosing a valid Industrial turn first.");
 
     const checkpoint = JSON.parse(JSON.stringify({
       phase:gameState.phase,uiStage:gameState.uiStage,teams:gameState.teams,currentTeam:gameState.currentTeam,
@@ -193,13 +217,13 @@
     const descriptions = [];
     const selectedAsset = selectedPortfolioAsset(team,draft);
 
-    // Portfolio move is settled first. This allows a sale to fund the new investment.
     if(draft.portfolioAction === "sell"){
       requireRule(selectedAsset,"Choose a business to sell.");
       team.cash += selectedAsset.currentValue;
       team.assets = team.assets.filter(asset => asset.id !== selectedAsset.id);
       descriptions.push(`SELL: ${selectedAsset.name}`);
     } else if(draft.portfolioAction === "adapt"){
+      requireRule(!startedInDebt,"Clear debt before adapting a business.");
       requireRule(selectedAsset && Object.hasOwn(adaptations,selectedAsset.type),"Choose an eligible business to adapt.");
       requireRule(team.cash >= 1,"Adaptation requires $1 cash.");
       const oldName = selectedAsset.name;
@@ -210,10 +234,15 @@
       selectedAsset.era = "steam";
       descriptions.push(`ADAPT: ${oldName} → ${selectedAsset.name}`);
     } else {
+      requireRule(!startedInDebt,"Clear debt before holding the portfolio.");
       descriptions.push("HOLD CURRENT BUSINESSES");
     }
 
-    if(draft.investment){
+    if(startedInDebt){
+      requireRule(team.cash >= 0,"The selected sale does not fully clear the debt.");
+      requireRule(!draft.investment,"Teams starting the turn in debt cannot make a new investment this turn.");
+      descriptions.unshift("DEBT CLEARED");
+    } else if(draft.investment){
       requireRule(markets.steam.includes(draft.investment),"Choose a valid Industrial market investment.");
       const marketAsset = assetTypes[draft.investment];
       requireRule(team.cash >= marketAsset.price,"Insufficient cash for the selected investment.");
@@ -291,6 +320,7 @@
       if(invest){
         event.preventDefault();
         event.stopImmediatePropagation();
+        if(currentTeam().cash < 0 || invest.disabled) return;
         const draft = ensureDraft();
         draft.investment = invest.dataset.industrialInvest || null;
         renderGame();
@@ -301,6 +331,7 @@
       if(portfolio && !portfolio.disabled){
         event.preventDefault();
         event.stopImmediatePropagation();
+        if(currentTeam().cash < 0 && portfolio.dataset.industrialPortfolio !== "sell") return;
         const draft = ensureDraft();
         draft.portfolioAction = portfolio.dataset.industrialPortfolio;
         draft.assetId = null;
