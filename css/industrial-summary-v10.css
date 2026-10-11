@@ -1,4 +1,4 @@
-/* Industrial + Jet market revaluation · full-width team-first presentation summary */
+/* Industrial + Jet + Digital market revaluation · full-width team-first presentation summary */
 #gameScreen.industrial-summary-mode{
   grid-template-columns:minmax(0,1fr) !important;
   gap:0 !important;
@@ -400,7 +400,7 @@
 .industrial-summary-actions .game-btn:not(.secondary){min-width:270px}
 #industrialResetBtn{min-width:120px}
 
-/* Era-specific controls: do not carry the Industrial brown into later eras. */
+/* Era-specific controls: do not carry one era's palette into the next. */
 .steam-summary .industrial-summary-actions .game-btn:not(.secondary){
   color:#fff7e9 !important;
   background:linear-gradient(145deg,#815037,#613721) !important;
@@ -425,6 +425,55 @@
 .jet-summary .industrial-summary-actions .game-btn:hover:not(:disabled){
   filter:brightness(1.04);
 }
+
+/* Digital: electric cyan / neon blue / violet. Green and red remain semantic gain/loss colours. */
+.digital-summary{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(0,216,255,.10),transparent 32%),
+    radial-gradient(circle at 88% 3%,rgba(118,72,255,.11),transparent 34%);
+}
+.digital-summary .industrial-summary-topline .screen-kicker{color:#087b9c}
+.digital-summary .industrial-summary-topline h2{color:#241540}
+.digital-summary .industrial-summary-topline p{color:#505a79}
+.digital-summary .industrial-team-block.flat{
+  border-color:rgba(91,78,176,.28);
+  background:linear-gradient(180deg,rgba(242,247,255,.72),rgba(237,244,255,.48));
+  box-shadow:inset 0 5px 0 rgba(0,193,226,.38),0 12px 24px rgba(67,54,145,.08);
+}
+.digital-summary .industrial-team-icon{
+  background:linear-gradient(145deg,rgba(0,216,255,.16),rgba(118,72,255,.14));
+  border-color:rgba(83,80,185,.25);
+}
+.digital-summary .industrial-team-identity,
+.digital-summary .industrial-worth-label,
+.digital-summary .industrial-assets-label{color:#58627f}
+.digital-summary .industrial-worth-panel.flat{
+  background:linear-gradient(135deg,rgba(0,205,235,.07),rgba(104,76,220,.07));
+  border-color:rgba(83,80,185,.20);
+}
+.digital-summary .industrial-worth-flow b,
+.digital-summary .industrial-arrow{color:#5a62a8}
+.digital-summary .industrial-asset-row.flat{
+  border-left-color:#6357c7;
+  background:rgba(240,247,255,.62);
+}
+.digital-summary .industrial-digital-tag{
+  color:#332174;
+  background:linear-gradient(90deg,rgba(0,216,255,.16),rgba(118,72,255,.15));
+  border:1px solid rgba(85,74,190,.20);
+}
+.digital-summary .industrial-summary-actions .game-btn:not(.secondary){
+  color:#fff !important;
+  background:linear-gradient(120deg,#00a9cf 0%,#1668e8 48%,#6b43d5 100%) !important;
+  border-color:#5142bd !important;
+  box-shadow:0 0 0 1px rgba(0,209,255,.16),0 6px 16px rgba(71,55,188,.22) !important;
+}
+.digital-summary .industrial-summary-actions .game-btn.secondary{
+  color:#35406e !important;
+  background:linear-gradient(180deg,#e7f8ff,#dedfff) !important;
+  border-color:#8589c5 !important;
+}
+.digital-summary .industrial-summary-actions .game-btn:hover:not(:disabled){filter:brightness(1.04)}
 
 @media(max-height:820px){
   .industrial-summary-screen{padding:16px 20px 14px;gap:10px}
