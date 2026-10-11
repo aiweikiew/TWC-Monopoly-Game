@@ -74,6 +74,48 @@
 .v19-builder-summary .money:nth-of-type(5) strong{color:#52329f!important;font-size:25px!important}
 .v19-builder-summary small{font-size:9.5px!important;line-height:1.25!important}
 
+/* Digital review should be a concise checkpoint, not three empty full-height columns. */
+.v19-review{
+  grid-template-rows:auto auto auto!important;
+  align-content:start!important;
+  gap:14px!important;
+}
+.v19-review-grid{
+  min-height:0!important;
+  height:auto!important;
+  align-items:start!important;
+}
+.v19-review-card{
+  min-height:0!important;
+  height:auto!important;
+  align-self:start!important;
+  padding:18px!important;
+}
+.v19-review-card>header strong{font-size:23px!important}
+.v19-review-card>header span{font-size:12px!important}
+.v19-review-money span{font-size:10px!important;padding:10px!important}
+.v19-review-money b{font-size:25px!important}
+.v19-review-portfolio{overflow:visible!important;margin-top:12px!important;gap:7px!important}
+.v19-review-portfolio>div{padding:9px 10px!important;font-size:12px!important}
+.v19-review-portfolio b{font-size:15px!important}
+.v19-review-actions{
+  margin-top:12px!important;
+  padding:12px!important;
+  border:1px solid rgba(86,75,190,.14)!important;
+}
+.v19-review-actions::before{
+  content:"WHAT CHANGED";
+  display:block;
+  margin-bottom:5px;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.13em;
+  color:#6750b8;
+}
+.v19-review-actions span{font-size:16px!important}
+.v19-review-actions small{font-size:10px!important;line-height:1.35!important}
+.v19-review>.strategy-footer{margin-top:0!important}
+
 @media(max-height:850px){
   .v19-builder-head p{font-size:12px!important}
   .v19-section-head strong{font-size:18px!important}
@@ -88,4 +130,8 @@
   .v19-builder-summary strong{font-size:13px!important}
   .v19-builder-summary .money strong{font-size:21px!important}
   .v19-builder-summary small{font-size:8.5px!important}
+  .v19-review-card{padding:14px!important}
+  .v19-review-card>header strong{font-size:20px!important}
+  .v19-review-money b{font-size:22px!important}
+  .v19-review-actions span{font-size:14px!important}
 }
