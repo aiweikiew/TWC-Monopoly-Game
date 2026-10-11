@@ -1,11 +1,11 @@
 "use strict";
 
-// Identity draw v3 is isolated from the rest of the game so the visual redesign
+// Identity draw v4 is isolated from the rest of the game so the visual redesign
 // does not disturb the board or later strategy screens.
-if(typeof document !== "undefined" && !document.querySelector('link[href="css/setup-v3.css"]')){
+if(typeof document !== "undefined" && !document.querySelector('link[href="css/setup-v4.css"]')){
   const setupStyles = document.createElement("link");
   setupStyles.rel = "stylesheet";
-  setupStyles.href = "css/setup-v3.css";
+  setupStyles.href = "css/setup-v4.css";
   document.head.appendChild(setupStyles);
 }
 
