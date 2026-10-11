@@ -21,7 +21,7 @@
 
   function isMarketSummary(){
     return gameState.mode === "strategy" && gameState.uiStage === "revaluation" &&
-      ["steam","jet"].includes(gameState.phase);
+      ["steam","jet","digital"].includes(gameState.phase);
   }
 
   function phaseCopy(){
@@ -29,6 +29,13 @@
       return {
         title:"The Jet Age rewrites long-distance travel",
         lede:"Faster international air travel redistributes value across the tourism market."
+      };
+    }
+    if(gameState.phase === "digital"){
+      return {
+        title:"Digital platforms reshape intermediation",
+        lede:"Search, booking and platform technologies shift value toward digitally connected tourism businesses.",
+        continueLabel:"CONTINUE TO TEAM DECISIONS"
       };
     }
     return {
@@ -120,15 +127,17 @@
     const strongest = summaries.reduce((best,item) => item.assetDelta > best.assetDelta ? item : best,summaries[0]);
     const weakest = summaries.reduce((worst,item) => item.assetDelta < worst.assetDelta ? item : worst,summaries[0]);
     const jet = gameState.phase === "jet";
+    const digital = gameState.phase === "digital";
+    const eraClass = jet ? "jet-summary" : digital ? "digital-summary" : "steam-summary";
 
-    return `<section class="industrial-summary-screen ${jet ? "jet-summary" : "steam-summary"}">
+    return `<section class="industrial-summary-screen ${eraClass}">
       <div class="industrial-summary-topline">
         <div>
           <div class="screen-kicker">TECHNOLOGY IMPACT · MARKET REVALUATION</div>
           <h2>${copy.title}</h2>
           <p>${copy.lede}</p>
         </div>
-        ${!jet ? `<div class="industrial-market-callout">
+        ${gameState.phase === "steam" ? `<div class="industrial-market-callout">
           <span>MARKET SHIFT</span>
           <strong>${escapeHTML(strongest.team.name)} ${deltaLabel(strongest.assetDelta)}</strong>
           ${weakest !== strongest ? `<small>${escapeHTML(weakest.team.name)} ${deltaLabel(weakest.assetDelta)}</small>` : ""}
