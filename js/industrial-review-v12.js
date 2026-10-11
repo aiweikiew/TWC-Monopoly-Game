@@ -13,9 +13,13 @@
     return gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "review";
   }
 
-  function isIndustrialCheckpoint(){
+  function isIndustrialLockedSummary(){
     return gameState.mode === "strategy" && gameState.phase === "steam" &&
       gameState.phaseComplete && gameState.uiStage === "pause";
+  }
+
+  function isIndustrialSummaryScreen(){
+    return isIndustrialReview() || isIndustrialLockedSummary();
   }
 
   function actionClass(text){
@@ -67,12 +71,12 @@
     </article>`;
   }
 
-  function renderIndustrialReview(){
-    return `<section class="industrial-review-screen">
+  function renderIndustrialReview(locked = false){
+    return `<section class="industrial-review-screen ${locked ? "locked" : ""}">
       <div class="industrial-review-header">
-        <div class="screen-kicker">FINAL CHECK · INDUSTRIAL REVOLUTION</div>
-        <h2>Industrial decisions complete</h2>
-        <p>Review what each team changed, then compare the new portfolios before locking the era.</p>
+        <div class="screen-kicker">${locked ? "PORTFOLIOS LOCKED · INDUSTRIAL REVOLUTION" : "FINAL CHECK · INDUSTRIAL REVOLUTION"}</div>
+        <h2>${locked ? "Industrial portfolios locked" : "Industrial decisions complete"}</h2>
+        <p>${locked ? "The new portfolios are locked. Trigger the Jet Age when you are ready to continue." : "Review what each team changed, then compare the new portfolios before locking the era."}</p>
       </div>
 
       <section class="industrial-review-section industrial-review-actions-section">
@@ -83,16 +87,21 @@
       </section>
 
       <section class="industrial-review-section industrial-review-portfolios-section">
-        <div class="industrial-review-section-title"><span>2</span><div><strong>New team portfolios</strong><small>Cash, net worth and businesses after the Industrial decisions</small></div></div>
+        <div class="industrial-review-section-title"><span>2</span><div><strong>${locked ? "Locked team portfolios" : "New team portfolios"}</strong><small>Cash, net worth and businesses after the Industrial decisions</small></div></div>
         <div class="industrial-review-portfolio-grid">
           ${gameState.teams.map(renderPortfolioCard).join("")}
         </div>
       </section>
 
       <div class="industrial-review-controls">
-        <button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>← BACK</button>
-        <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
-        <button class="game-btn" data-flow-action="lock" type="button">LOCK INDUSTRIAL PORTFOLIOS</button>
+        ${locked ? `
+          <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
+          <button class="game-btn shock-action" data-phase-shock="jet" type="button">⚡ TRIGGER JET AGE TECH SHOCK</button>
+        ` : `
+          <button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>← BACK</button>
+          <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
+          <button class="game-btn" data-flow-action="lock" type="button">LOCK INDUSTRIAL PORTFOLIOS</button>
+        `}
       </div>
     </section>`;
   }
@@ -102,69 +111,33 @@
     if(game) game.classList.toggle("industrial-review-mode",active);
   }
 
-  function decorateIndustrialCheckpoint(){
-    if(!isIndustrialCheckpoint()) return;
-    const card = document.querySelector("#phaseContent .checkpoint-card");
-    const shock = card?.querySelector('[data-phase-shock="jet"]');
-    if(!card || !shock || card.querySelector("#industrialCheckpointBackBtn")) return;
-
-    const controls = document.createElement("div");
-    controls.className = "industrial-checkpoint-controls";
-    controls.style.cssText = "display:flex;justify-content:center;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap";
-
-    const back = document.createElement("button");
-    back.type = "button";
-    back.id = "industrialCheckpointBackBtn";
-    back.className = "game-btn secondary";
-    back.textContent = "← BACK";
-    back.style.cssText = "min-width:130px;min-height:40px";
-
-    shock.parentNode.insertBefore(controls,shock);
-    controls.append(back,shock);
-  }
-
-  function backToIndustrialReview(){
-    if(!isIndustrialCheckpoint()) return;
-    gameState.uiStage = "review";
-    gameState.phaseComplete = true;
-    gameState.message = "";
-    if(typeof navigationState !== "undefined"){
-      navigationState.selection = null;
-      navigationState.previousViews = [];
-    }
-    if(typeof saveGameState === "function") saveGameState();
-    renderGame();
-  }
-
   function init(){
     if(document.documentElement.dataset.industrialReviewV12 === "true") return true;
-    if(typeof renderDecisionReview !== "function" || typeof renderGame !== "function" || typeof calculateNetWorth !== "function") return false;
+    if(typeof renderDecisionReview !== "function" || typeof renderPause !== "function" ||
+       typeof renderGame !== "function" || typeof calculateNetWorth !== "function") return false;
 
     document.documentElement.dataset.industrialReviewV12 = "true";
     loadStyles();
 
     const originalRenderDecisionReview = renderDecisionReview;
     renderDecisionReview = function(){
-      if(isIndustrialReview()) return renderIndustrialReview();
+      if(isIndustrialReview()) return renderIndustrialReview(false);
       return originalRenderDecisionReview();
+    };
+
+    const originalRenderPause = renderPause;
+    renderPause = function(){
+      if(isIndustrialLockedSummary()) return renderIndustrialReview(true);
+      return originalRenderPause();
     };
 
     const originalRenderGame = renderGame;
     renderGame = function(){
       originalRenderGame();
-      setReviewMode(isIndustrialReview());
-      decorateIndustrialCheckpoint();
+      setReviewMode(isIndustrialSummaryScreen());
     };
 
     document.addEventListener("click",event => {
-      const checkpointBack = event.target.closest("#industrialCheckpointBackBtn");
-      if(checkpointBack){
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        backToIndustrialReview();
-        return;
-      }
-
       const reset = event.target.closest("#industrialReviewResetBtn");
       if(!reset) return;
       event.preventDefault();
