@@ -95,8 +95,9 @@
 
       <div class="industrial-review-controls">
         ${locked ? `
+          <button class="game-btn secondary" id="industrialLockedBackBtn" type="button">← BACK</button>
           <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
-          <button class="game-btn shock-action" data-phase-shock="jet" type="button">⚡ TRIGGER JET AGE TECH SHOCK</button>
+          <button class="game-btn industrial-shock-icon-btn" data-phase-shock="jet" type="button" aria-label="Trigger Jet Age Tech Shock" title="Trigger Jet Age Tech Shock">⚡</button>
         ` : `
           <button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>← BACK</button>
           <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
@@ -109,6 +110,19 @@
   function setReviewMode(active){
     const game = document.getElementById("gameScreen");
     if(game) game.classList.toggle("industrial-review-mode",active);
+  }
+
+  function backToUnlockedIndustrialReview(){
+    if(!isIndustrialLockedSummary()) return;
+    gameState.uiStage = "review";
+    gameState.phaseComplete = true;
+    gameState.message = "";
+    if(typeof navigationState !== "undefined"){
+      navigationState.selection = null;
+      navigationState.previousViews = [];
+    }
+    if(typeof saveGameState === "function") saveGameState();
+    renderGame();
   }
 
   function init(){
@@ -138,6 +152,14 @@
     };
 
     document.addEventListener("click",event => {
+      const back = event.target.closest("#industrialLockedBackBtn");
+      if(back){
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        backToUnlockedIndustrialReview();
+        return;
+      }
+
       const reset = event.target.closest("#industrialReviewResetBtn");
       if(!reset) return;
       event.preventDefault();
