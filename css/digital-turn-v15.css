@@ -52,17 +52,24 @@
 button.digital-move-card{justify-content:flex-start}
 .digital-move-card>strong{font-size:13px;line-height:1.08}
 .digital-move-card>b{font-size:18px;color:var(--era-a)}
-.digital-move-card>small{margin-top:auto;font-size:7.5px;color:#687287;line-height:1.2}
+.digital-move-card>small{font-size:7.5px;color:#687287;line-height:1.2}
+.digital-move-card:not(.digitise)>small{margin-top:auto}
 .digital-move-card:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.45)}
 .digital-move-card.hold{justify-content:center}
 .digital-move-card.hold small{margin-top:0}
 
-/* Clickable owned-business choices replace the old dropdown. */
-.digital-digitise-options{margin-top:auto;display:grid;gap:5px;max-height:112px;overflow:auto;padding:1px}
-.digital-digitise-option{width:100%;padding:6px 7px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px;align-items:center}
-.digital-digitise-option span{grid-column:1/-1;font-size:6px;font-weight:900;letter-spacing:.1em;color:var(--era-b)}
-.digital-digitise-option strong{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.digital-digitise-option b{font-size:9px;color:var(--era-a)}
+/* Clickable digital adaptations show exactly what the old business becomes. */
+.digital-digitise-options{margin-top:auto;display:grid;gap:5px;max-height:126px;overflow:auto;padding:1px}
+.digital-digitise-option{
+  width:100%;padding:7px 8px;display:grid;
+  grid-template-columns:minmax(0,1fr) auto;gap:4px 7px;align-items:center
+}
+.digital-digitise-option>span{grid-column:1/-1;font-size:6px;font-weight:900;letter-spacing:.09em;color:var(--era-b)}
+.digital-digitise-path{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:5px;align-items:center}
+.digital-digitise-path strong{font-size:8px;line-height:1.12;white-space:normal;overflow:visible;text-overflow:clip}
+.digital-digitise-path strong:last-child{color:var(--era-deep)}
+.digital-digitise-path em{font-style:normal;font-size:10px;font-weight:900;color:var(--era-a)}
+.digital-digitise-option>b{font-size:9px;color:var(--era-a);white-space:nowrap}
 .digital-digitise-empty{margin-top:auto;padding:8px;border-radius:8px;background:rgba(62,75,120,.055);font-size:7.5px;line-height:1.25;color:#6b7285}
 
 .digital-turn-summary{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--era-line);background:rgba(255,255,255,.58)}
@@ -101,8 +108,10 @@ button.digital-move-card{justify-content:flex-start}
   .digital-move-card{padding:6px 7px;gap:2px}
   .digital-move-card>strong{font-size:11px}
   .digital-move-card>b{font-size:15px}
-  .digital-digitise-options{max-height:88px;gap:3px}
+  .digital-move-card>small{font-size:6.5px}
+  .digital-digitise-options{max-height:98px;gap:3px}
   .digital-digitise-option{padding:4px 5px}
+  .digital-digitise-path strong{font-size:7px}
   .digital-turn-summary{padding:6px 8px}
   .digital-confirm-turn{min-height:34px;min-width:165px}
 }
