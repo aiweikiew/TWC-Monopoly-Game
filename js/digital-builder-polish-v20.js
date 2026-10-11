@@ -3,12 +3,17 @@
 (function(){
   const INTRO_COPY = "Restructure your portfolio for the Digital era. You may sell, digitise, or invest based on your strategy and available cash.";
 
-  function loadStyles(){
-    if(document.querySelector('link[href="css/digital-builder-polish-v20.css"]')) return;
+  function ensureStylesheet(href){
+    if(document.querySelector(`link[href="${href}"]`)) return;
     const link=document.createElement("link");
     link.rel="stylesheet";
-    link.href="css/digital-builder-polish-v20.css";
+    link.href=href;
     document.head.appendChild(link);
+  }
+
+  function loadStyles(){
+    ensureStylesheet("css/digital-builder-polish-v20.css");
+    ensureStylesheet("css/digital-pressure-polish-v21.css");
   }
 
   function setTextIfChanged(node,text){
