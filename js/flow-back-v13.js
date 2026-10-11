@@ -41,9 +41,11 @@
     renderGame = function(){
       originalRenderGame();
       syncGlobalBack();
+      // Some screen-specific render wrappers insert their inline Back after the core render.
+      // Re-check one tick later so the global control never duplicates an inline one.
+      window.setTimeout(syncGlobalBack,0);
     };
 
-    // Re-check after dynamically decorated screens add their own inline Back control.
     document.addEventListener("click",() => window.setTimeout(syncGlobalBack,0),true);
     window.setTimeout(syncGlobalBack,0);
     return true;
