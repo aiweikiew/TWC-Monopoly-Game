@@ -196,7 +196,7 @@ function applyJetAge(){
 }
 function revealDigitalTechShock(){
   requireRule(gameState.mode === "strategy" && gameState.phase === "jet" &&
-    gameState.phaseComplete && gameState.uiStage === "pause",
+    gameState.phaseComplete && ["revaluation","pause"].includes(gameState.uiStage),
     "Complete the Jet Age revaluation before triggering the Digital Transformation Tech Shock.");
   gameState.uiStage = "digitalShock";
   gameState.message = "Return to presentation. Apply Digital Transformation when you return.";
