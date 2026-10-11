@@ -1,0 +1,113 @@
+/* Tourismopoly money-result podium */
+#gameScreen[data-era="winner"][data-stage="winner"]{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+#gameScreen[data-era="winner"][data-stage="winner"] .phase-sidebar{
+  display:none!important;
+}
+#gameScreen[data-era="winner"][data-stage="winner"] .phase-panel{
+  grid-column:1/-1!important;
+  width:100%!important;
+}
+#gameScreen[data-era="winner"][data-stage="winner"] .phase-panel>header{
+  display:none!important;
+}
+#gameScreen[data-era="winner"][data-stage="winner"] #phaseContent{
+  height:100%!important;
+}
+
+.money-podium-screen{
+  box-sizing:border-box;
+  min-height:100%;
+  padding:28px 34px 22px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  gap:16px;
+  align-items:end;
+  background:
+    radial-gradient(circle at 50% 24%,rgba(255,220,116,.32),transparent 31%),
+    linear-gradient(135deg,#edf8fb 0%,#f4f0ff 52%,#f7efff 100%);
+  border-radius:22px;
+  overflow:hidden;
+}
+.money-podium-header{text-align:center;align-self:start}
+.money-podium-header .screen-kicker{font-size:15px!important;letter-spacing:.16em!important;color:#7858c7!important;font-weight:900}
+.money-podium-header h2{margin:8px 0 4px;font-size:clamp(38px,4vw,58px);line-height:1;color:#251b35}
+.money-podium-header p{margin:0;font-size:17px;color:#665e73}
+
+.money-podium-grid{
+  width:min(1400px,94%);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1.14fr 1fr;
+  gap:18px;
+  align-items:end;
+}
+.money-podium-entry{
+  position:relative;
+  min-width:0;
+  padding:22px 22px 0;
+  text-align:center;
+  border:1px solid rgba(89,74,151,.20);
+  border-radius:24px 24px 10px 10px;
+  background:rgba(255,255,255,.78);
+  box-shadow:0 18px 42px rgba(69,56,125,.12);
+  overflow:hidden;
+}
+.money-podium-entry.podium-rank-1{min-height:430px;border-color:rgba(210,155,37,.42);background:linear-gradient(180deg,rgba(255,253,241,.96),rgba(255,245,210,.90))}
+.money-podium-entry.podium-rank-2{min-height:355px;background:linear-gradient(180deg,rgba(250,252,255,.96),rgba(229,236,246,.92))}
+.money-podium-entry.podium-rank-3{min-height:315px;background:linear-gradient(180deg,rgba(255,250,247,.96),rgba(243,222,207,.92))}
+
+.podium-medal{font-size:54px;line-height:1;margin-bottom:10px}
+.podium-team-icon{width:66px;height:66px;margin:0 auto 10px;display:grid;place-items:center;border-radius:18px;background:rgba(255,255,255,.72);font-size:34px;border:1px solid rgba(79,69,128,.15)}
+.podium-team-name{display:block;font-size:30px;line-height:1.05;color:#251c35}
+.podium-identity{display:block;margin-top:5px;font-size:15px;color:#696071}
+.podium-worth-label{margin-top:24px;font-size:12px;font-weight:900;letter-spacing:.14em;color:#756b7f}
+.podium-worth{margin-top:3px;font-size:clamp(56px,5vw,78px);font-weight:900;line-height:.98;color:#2f2441}
+.podium-rank-1 .podium-worth{color:#8a5f08}
+.podium-base{
+  margin:26px -22px 0;
+  min-height:92px;
+  display:grid;
+  place-items:center;
+  font-size:29px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#fff;
+  background:linear-gradient(180deg,#a98b47,#7e6429);
+}
+.podium-rank-2 .podium-base{background:linear-gradient(180deg,#8d9bac,#687586)}
+.podium-rank-3 .podium-base{background:linear-gradient(180deg,#b27655,#845139)}
+
+.money-podium-note{
+  justify-self:center;
+  padding:11px 20px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(95,74,167,.16);
+  font-size:16px;
+  color:#514766;
+}
+.money-podium-note strong{color:#2f2545}
+.money-podium-controls{display:flex;justify-content:center;gap:10px}
+.money-podium-controls .game-btn{min-height:44px!important;font-size:13px!important;padding:8px 18px!important}
+
+@media(max-height:850px){
+  .money-podium-screen{padding:18px 26px 14px;gap:10px}
+  .money-podium-header .screen-kicker{font-size:13px!important}
+  .money-podium-header h2{font-size:42px}
+  .money-podium-header p{font-size:14px}
+  .money-podium-grid{width:min(1370px,96%);gap:14px}
+  .money-podium-entry{padding:16px 18px 0}
+  .money-podium-entry.podium-rank-1{min-height:350px}
+  .money-podium-entry.podium-rank-2{min-height:300px}
+  .money-podium-entry.podium-rank-3{min-height:270px}
+  .podium-medal{font-size:44px;margin-bottom:7px}
+  .podium-team-icon{width:54px;height:54px;font-size:28px;margin-bottom:7px}
+  .podium-team-name{font-size:25px}
+  .podium-identity{font-size:13px}
+  .podium-worth-label{margin-top:17px;font-size:10px}
+  .podium-worth{font-size:58px}
+  .podium-base{margin:18px -18px 0;min-height:68px;font-size:24px}
+  .money-podium-note{font-size:13px;padding:8px 15px}
+}
