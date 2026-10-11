@@ -84,13 +84,14 @@
   color:#78624f;
 }
 .industrial-market-callout strong{
-  font-size:15px;
-  color:#496c49;
+  font-size:16px;
+  color:#2f6b3c;
+  font-weight:900;
 }
 .industrial-market-callout small{
-  font-size:11px;
-  color:#8d463b;
-  font-weight:800;
+  font-size:12px;
+  color:#9a3f34;
+  font-weight:900;
 }
 
 .industrial-team-grid{
@@ -116,10 +117,14 @@
   overflow:hidden;
 }
 .industrial-team-block.gain{
-  box-shadow:inset 0 5px 0 rgba(72,111,73,.62),0 12px 24px rgba(72,51,32,.07);
+  border:2px solid rgba(49,111,61,.62);
+  background:linear-gradient(180deg,rgba(91,154,99,.16),rgba(255,255,255,.25) 34%);
+  box-shadow:inset 0 7px 0 #347245,0 12px 24px rgba(51,105,62,.10);
 }
 .industrial-team-block.loss{
-  box-shadow:inset 0 5px 0 rgba(148,70,57,.62),0 12px 24px rgba(72,51,32,.07);
+  border:2px solid rgba(154,63,52,.60);
+  background:linear-gradient(180deg,rgba(180,83,70,.15),rgba(255,255,255,.25) 34%);
+  box-shadow:inset 0 7px 0 #9a3f34,0 12px 24px rgba(143,61,51,.10);
 }
 
 .industrial-team-head{
@@ -158,27 +163,37 @@
 }
 .industrial-total-chip{
   flex:0 0 auto;
-  min-width:82px;
-  padding:7px 9px;
-  border-radius:9px;
+  min-width:86px;
+  padding:8px 10px;
+  border-radius:10px;
   text-align:center;
   border:1px solid rgba(74,58,43,.16);
   background:rgba(255,255,255,.40);
 }
 .industrial-total-chip span{
   display:block;
-  font-size:7.5px;
+  font-size:8px;
   letter-spacing:.12em;
   font-weight:900;
 }
 .industrial-total-chip strong{
   display:block;
   margin-top:2px;
-  font-size:21px;
+  font-size:23px;
   line-height:1;
 }
-.industrial-total-chip.gain{color:#3f6b45;background:rgba(83,128,88,.10)}
-.industrial-total-chip.loss{color:#8a4138;background:rgba(155,75,64,.10)}
+.industrial-total-chip.gain{
+  color:#fff8df;
+  background:#347245;
+  border-color:#285d37;
+  box-shadow:0 4px 10px rgba(47,107,60,.18);
+}
+.industrial-total-chip.loss{
+  color:#fff7e8;
+  background:#9a3f34;
+  border-color:#7f3129;
+  box-shadow:0 4px 10px rgba(154,63,52,.18);
+}
 
 .industrial-worth-panel{
   padding:14px 15px 13px;
@@ -187,8 +202,14 @@
   background:rgba(77,57,39,.075);
   position:relative;
 }
-.industrial-worth-panel.gain{background:rgba(79,126,83,.10);border-color:rgba(67,112,71,.24)}
-.industrial-worth-panel.loss{background:rgba(151,73,62,.09);border-color:rgba(143,68,58,.22)}
+.industrial-worth-panel.gain{
+  background:rgba(75,140,84,.16);
+  border:2px solid rgba(52,114,69,.40);
+}
+.industrial-worth-panel.loss{
+  background:rgba(172,74,62,.14);
+  border:2px solid rgba(154,63,52,.38);
+}
 .industrial-worth-label{
   font-size:8.5px;
   font-weight:900;
@@ -212,21 +233,29 @@
   color:#856a4d;
 }
 .industrial-worth-flow strong{
-  font-size:38px;
+  font-size:40px;
   line-height:1;
   color:#2e241d;
 }
+.industrial-worth-panel.gain .industrial-worth-flow strong{color:#285f36}
+.industrial-worth-panel.loss .industrial-worth-flow strong{color:#8c352d}
 .industrial-worth-change{
   position:absolute;
   right:13px;
   top:13px;
-  padding:5px 8px;
+  padding:5px 9px;
   border-radius:999px;
-  font-size:11px;
+  font-size:12px;
   font-weight:900;
 }
-.industrial-worth-change.gain{color:#3e6d45;background:rgba(77,123,82,.13)}
-.industrial-worth-change.loss{color:#8b4038;background:rgba(157,75,65,.12)}
+.industrial-worth-change.gain{
+  color:#fff8df;
+  background:#347245;
+}
+.industrial-worth-change.loss{
+  color:#fff7e8;
+  background:#9a3f34;
+}
 .industrial-worth-change.flat{color:#74685d;background:rgba(80,70,62,.08)}
 
 .industrial-assets-label{
@@ -253,8 +282,16 @@
   border:1px solid rgba(76,57,41,.13);
   background:rgba(255,255,255,.34);
 }
-.industrial-asset-row.gain{border-left:4px solid rgba(64,112,70,.76)}
-.industrial-asset-row.loss{border-left:4px solid rgba(148,65,54,.76)}
+.industrial-asset-row.gain{
+  border:1px solid rgba(52,114,69,.30);
+  border-left:7px solid #347245;
+  background:rgba(92,154,100,.14);
+}
+.industrial-asset-row.loss{
+  border:1px solid rgba(154,63,52,.28);
+  border-left:7px solid #9a3f34;
+  background:rgba(185,82,68,.13);
+}
 .industrial-asset-row.flat{border-left:4px solid rgba(111,99,87,.32)}
 .industrial-asset-name{
   min-width:0;
@@ -286,20 +323,30 @@
   color:#8a765f;
 }
 .industrial-new{
-  font-size:19px;
+  font-size:20px;
   color:#32261e;
 }
+.industrial-asset-row.gain .industrial-new{color:#285f36}
+.industrial-asset-row.loss .industrial-new{color:#8c352d}
 .industrial-asset-delta{
-  min-width:52px;
-  text-align:right;
+  min-width:56px;
+  text-align:center;
   font-size:12px;
   font-weight:900;
   white-space:nowrap;
+  padding:4px 7px;
+  border-radius:999px;
 }
 .industrial-asset-delta span{margin-right:2px}
-.industrial-asset-delta.gain{color:#3d6e43}
-.industrial-asset-delta.loss{color:#8d3d34}
-.industrial-asset-delta.flat{color:#74695e}
+.industrial-asset-delta.gain{
+  color:#fff8df;
+  background:#347245;
+}
+.industrial-asset-delta.loss{
+  color:#fff7e8;
+  background:#9a3f34;
+}
+.industrial-asset-delta.flat{color:#74695e;background:rgba(80,70,62,.08)}
 .industrial-no-assets{
   padding:15px;
   border:1px dashed rgba(80,61,43,.22);
@@ -338,14 +385,14 @@
   .industrial-team-icon{width:40px;height:40px;flex-basis:40px;font-size:21px}
   .industrial-team-name{font-size:17px}
   .industrial-team-identity{font-size:9.5px}
-  .industrial-total-chip strong{font-size:18px}
+  .industrial-total-chip strong{font-size:19px}
   .industrial-worth-panel{padding:10px 11px}
   .industrial-worth-flow span{font-size:20px}
-  .industrial-worth-flow strong{font-size:30px}
+  .industrial-worth-flow strong{font-size:32px}
   .industrial-asset-row{padding:7px 8px;gap:7px}
   .industrial-asset-name{font-size:10px}
-  .industrial-new{font-size:15px}
-  .industrial-asset-delta{font-size:10.5px}
+  .industrial-new{font-size:16px}
+  .industrial-asset-delta{font-size:10.5px;padding:3px 6px}
   .industrial-summary-actions .game-btn{min-height:39px;padding:7px 16px}
 }
 
@@ -354,7 +401,7 @@
   .industrial-team-grid{gap:9px}
   .industrial-team-block{padding:11px}
   .industrial-team-name{font-size:16px}
-  .industrial-worth-flow strong{font-size:29px}
+  .industrial-worth-flow strong{font-size:31px}
   .industrial-asset-row{grid-template-columns:minmax(0,1fr) auto}
   .industrial-asset-delta{grid-column:2;justify-self:end}
 }
