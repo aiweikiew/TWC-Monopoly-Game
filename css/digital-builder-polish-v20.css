@@ -2,19 +2,19 @@
 
 /* Three action zones should be recognisable before anyone reads the copy. */
 .v19-builder-body .v19-builder-section:nth-child(1){
-  border:2px solid rgba(210,79,91,.72)!important;
-  background:linear-gradient(155deg,rgba(255,247,248,.86),rgba(250,224,228,.42))!important;
-  box-shadow:0 10px 26px rgba(174,54,67,.08)!important;
+  border:3px solid rgba(210,79,91,.78)!important;
+  background:linear-gradient(155deg,rgba(255,247,248,.90),rgba(250,224,228,.48))!important;
+  box-shadow:0 10px 26px rgba(174,54,67,.10)!important;
 }
 .v19-builder-body .v19-builder-section:nth-child(2){
-  border:2px solid rgba(19,166,191,.68)!important;
-  background:linear-gradient(155deg,rgba(244,253,255,.88),rgba(213,244,249,.43))!important;
-  box-shadow:0 10px 26px rgba(18,137,162,.08)!important;
+  border:3px solid rgba(19,166,191,.74)!important;
+  background:linear-gradient(155deg,rgba(244,253,255,.92),rgba(213,244,249,.48))!important;
+  box-shadow:0 10px 26px rgba(18,137,162,.10)!important;
 }
 .v19-builder-body .v19-builder-section:nth-child(3){
-  border:2px solid rgba(108,74,202,.68)!important;
-  background:linear-gradient(155deg,rgba(250,248,255,.90),rgba(231,223,252,.48))!important;
-  box-shadow:0 10px 26px rgba(91,61,174,.09)!important;
+  border:3px solid rgba(108,74,202,.74)!important;
+  background:linear-gradient(155deg,rgba(250,248,255,.94),rgba(231,223,252,.52))!important;
+  box-shadow:0 10px 26px rgba(91,61,174,.11)!important;
 }
 
 .v19-builder-body .v19-builder-section:nth-child(1) .v19-section-head>div>span{background:linear-gradient(135deg,#d65a67,#a93a49)!important}
@@ -24,15 +24,20 @@
 .v19-builder-body .v19-builder-section:nth-child(2) .v19-section-head>b{color:#087f9a!important}
 .v19-builder-body .v19-builder-section:nth-child(3) .v19-section-head>b{color:#6542bd!important}
 
-/* Option cards inherit the meaning of the zone they belong to. */
-.v19-option.sell{border-color:rgba(210,79,91,.34)!important}
-.v19-option.digitise{border-color:rgba(19,166,191,.34)!important}
-.v19-option.buy{border-color:rgba(108,74,202,.34)!important}
+/* Inner business cards stay quiet. Colour belongs to the OUTER zones; only selected cards get a strong action colour. */
+.v19-builder-body .v19-option{
+  border:1px solid rgba(130,145,170,.30)!important;
+  background:rgba(255,255,255,.72)!important;
+  box-shadow:0 3px 9px rgba(40,55,95,.035)!important;
+  outline:none!important;
+}
 .v19-option.sell>span,.v19-option.sell>b{color:#ad3d4a!important}
 .v19-option.digitise>span,.v19-option.digitise>b{color:#087f9a!important}
 .v19-option.buy>span,.v19-option.buy>b{color:#6542bd!important}
-.v19-option.digitise.selected{border-color:#18a9c5!important;background:rgba(31,188,214,.10)!important;box-shadow:0 0 0 3px rgba(31,188,214,.08)!important}
-.v19-option.buy.selected{border-color:#7350cf!important;background:rgba(111,76,203,.10)!important;box-shadow:0 0 0 3px rgba(111,76,203,.08)!important}
+.v19-option.sell.selected{border:2px solid #d65a67!important;background:rgba(214,90,103,.09)!important;box-shadow:0 0 0 3px rgba(214,90,103,.07)!important}
+.v19-option.digitise.selected{border:2px solid #18a9c5!important;background:rgba(31,188,214,.10)!important;box-shadow:0 0 0 3px rgba(31,188,214,.08)!important}
+.v19-option.buy.selected{border:2px solid #7350cf!important;background:rgba(111,76,203,.10)!important;box-shadow:0 0 0 3px rgba(111,76,203,.08)!important}
+.v19-option:focus,.v19-option:focus-visible{outline:none!important}
 
 /* Projected-screen typography: do not collapse to tiny dashboard text on short displays. */
 .v19-builder-head p{font-size:14px!important;line-height:1.35!important}
@@ -47,7 +52,7 @@
 
 /* Bottom summary: actions first, then liquidity and total value as two different concepts. */
 .v19-builder-summary{gap:9px!important;padding:10px 11px!important;background:rgba(255,255,255,.78)!important}
-.v19-builder-summary>div{min-height:48px;display:flex;flex-direction:column;justify-content:center}
+.v19-builder-summary>div{padding:6px 8px;border-radius:8px;min-height:48px;display:flex;flex-direction:column;justify-content:center}
 .v19-builder-summary>div:nth-child(1){border-left:4px solid #d65a67;background:rgba(214,90,103,.07)!important}
 .v19-builder-summary>div:nth-child(2){border-left:4px solid #20b7d2;background:rgba(32,183,210,.07)!important}
 .v19-builder-summary>div:nth-child(3){border-left:4px solid #8060d6;background:rgba(128,96,214,.07)!important}
