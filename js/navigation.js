@@ -145,7 +145,6 @@ function commitFlowSnapshot(entry){
   if(!entry || !entry.state) return false;
   if(!Array.isArray(gameState.flowHistory)) gameState.flowHistory = [];
   gameState.flowHistory.push(entry);
-  // Plenty for the whole classroom flow, while preventing an accidental endless test session.
   if(gameState.flowHistory.length > 80) gameState.flowHistory.splice(0,gameState.flowHistory.length - 80);
   return true;
 }
@@ -174,9 +173,7 @@ function restoreFlowSnapshot(){
   return true;
 }
 
-// Compatibility for a save created before flowHistory existed. This makes an already-open
-// late-game screen (especially Winner) immediately escapable after the update. New playthroughs
-// use the exact snapshots above instead of these lightweight fallbacks.
+// Compatibility for saves created before flowHistory existed.
 function canUseLegacyFlowFallback(){
   if(gameState.mode !== "strategy") return false;
   if(gameState.phase === "winner" && gameState.uiStage === "winner") return true;
@@ -227,14 +224,12 @@ function canNavigateBack(){
 function navigateBack(){
   if(navigationBusy()) return false;
 
-  // Unconfirmed drill-down first: e.g. confirmation -> team choice screen.
   if(navigationState.previousViews.length > 0){
     navigationState.selection = null;
     navigationState.currentView = navigationState.previousViews.pop();
     return true;
   }
 
-  // Otherwise move to the exact previous committed screen in the game sequence.
   if(restoreFlowSnapshot()) return true;
   return useLegacyFlowFallback();
 }
@@ -256,3 +251,31 @@ function openStrategySelection(teamId, action, selection, phase){
   visitView("selection");
   return true;
 }
+
+// Record every committed strategy-screen transition at the rules layer. This keeps Back
+// correct even when different UI components trigger the same rule function.
+let flowTransitionDepth = 0;
+function withFlowHistory(original){
+  return function(...args){
+    const outermost = flowTransitionDepth === 0;
+    const before = outermost ? captureFlowSnapshot() : null;
+    flowTransitionDepth += 1;
+    try{
+      const result = original.apply(this,args);
+      if(outermost && before) commitFlowSnapshot(before);
+      return result;
+    } finally {
+      flowTransitionDepth -= 1;
+    }
+  };
+}
+
+if(typeof continuePhaseStage === "function") continuePhaseStage = withFlowHistory(continuePhaseStage);
+if(typeof confirmPhaseReview === "function") confirmPhaseReview = withFlowHistory(confirmPhaseReview);
+if(typeof revealJetTechShock === "function") revealJetTechShock = withFlowHistory(revealJetTechShock);
+if(typeof applyJetAge === "function") applyJetAge = withFlowHistory(applyJetAge);
+if(typeof revealDigitalTechShock === "function") revealDigitalTechShock = withFlowHistory(revealDigitalTechShock);
+if(typeof applyDigitalTransformation === "function") applyDigitalTransformation = withFlowHistory(applyDigitalTransformation);
+if(typeof startNextPhase === "function") startNextPhase = withFlowHistory(startNextPhase);
+if(typeof takeAction === "function") takeAction = withFlowHistory(takeAction);
+if(typeof applyIndustrialRevolution === "function") applyIndustrialRevolution = withFlowHistory(applyIndustrialRevolution);
