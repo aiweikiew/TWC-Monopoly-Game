@@ -139,10 +139,69 @@
   font-size:clamp(21px,1.5vw,27px);
 }
 
+/* Give the horizontal Team A/B/C cards enough room for their two-line portfolio text. */
+#setupScreen .setup-selected{
+  padding:10px 11px;
+  gap:10px;
+  align-items:stretch;
+}
+
+#setupScreen .setup-slot{
+  min-height:82px;
+  padding:10px 12px;
+  grid-template-columns:52px minmax(0,1fr) 86px;
+  gap:10px;
+  align-items:center;
+  overflow:visible;
+}
+
+#setupScreen .setup-slot-icon{
+  width:52px;
+  height:52px;
+  font-size:24px;
+}
+
+#setupScreen .setup-slot-name{
+  font-size:15px;
+  line-height:1.08;
+}
+
+#setupScreen .setup-slot-role{
+  margin-top:3px;
+  font-size:10.5px;
+  line-height:1.28;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+}
+
+#setupScreen .setup-slot-worth{
+  min-width:76px;
+  align-self:center;
+}
+
+#setupScreen .setup-slot-worth label{
+  line-height:1.1;
+}
+
+#setupScreen .setup-slot-worth strong{
+  margin-top:3px;
+  line-height:1;
+}
+
+/* The drawn-identity sentence beneath the controls repeats information already visible above. */
+#setupScreen .setup-status{
+  display:none !important;
+}
+
 @media (max-width:1000px){
   #setupScreen .setup-topbar{padding:0 118px;}
   #setupScreen .setup-title{font-size:clamp(29px,4vw,40px);}
   #landingReturnBtn{left:28px !important;min-width:82px !important;}
   #setupScreen .setup-stats{grid-template-rows:minmax(86px,1fr) auto;gap:7px;}
   #setupScreen .setup-legacy{padding:11px 7px;font-size:clamp(13px,1.7vw,17px);}
+  #setupScreen .setup-slot{min-height:74px;padding:8px 9px;grid-template-columns:44px minmax(0,1fr) 70px;gap:7px;}
+  #setupScreen .setup-slot-icon{width:44px;height:44px;font-size:21px;}
+  #setupScreen .setup-slot-name{font-size:13px;}
+  #setupScreen .setup-slot-role{font-size:9px;line-height:1.25;}
 }
