@@ -12,6 +12,12 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/bo
   reviewScript.src = "js/board-review-v3.js";
   document.head.appendChild(reviewScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/chance-sum-v5.js"]')){
+  const chanceScript = document.createElement("script");
+  chanceScript.src = "js/chance-sum-v5.js";
+  chanceScript.async = false;
+  document.head.appendChild(chanceScript);
+}
 if(typeof document !== "undefined" && !document.querySelector('script[src="js/debt-settlement-v4.js"]')){
   const debtScript = document.createElement("script");
   debtScript.src = "js/debt-settlement-v4.js";
