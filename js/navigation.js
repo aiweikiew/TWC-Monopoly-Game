@@ -1,5 +1,12 @@
 "use strict";
 
+// Board review enhancements are isolated so gameplay/navigation state stays untouched.
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/board-review-v3.js"]')){
+  const reviewScript = document.createElement("script");
+  reviewScript.src = "js/board-review-v3.js";
+  document.head.appendChild(reviewScript);
+}
+
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
 const navigationState = {
@@ -22,7 +29,8 @@ function makeView(type){
     "landing-detail":"Landing decision","industrial-shock":"Tech Shock reveal",
     revaluation:"Market revaluation",overview:"Team decisions",selection:"Unconfirmed decision",
     "phase-review":"Decision review",event:"Shared event",crisis:"2035 crisis",
-    results:"Era results",pause:"Presentation pause",winner:"Money winner"
+    results:"Era results",pause:"Presentation pause",winner:"Money winner",
+    "identity-review":"Confirmed identities"
   };
   return {
     type,revision:navigationState.revision,phase:gameState.phase,uiStage:gameState.uiStage,label:labels[type],
