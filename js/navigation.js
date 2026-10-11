@@ -55,8 +55,8 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/in
   document.head.appendChild(industrialReviewScript);
 }
 
-// Navigation is for the CURRENT game screen only.
-// Back never walks through old turns/eras and never restores gameplay snapshots.
+// navigationState is only for transient UI drill-downs such as an unconfirmed decision.
+// Committed game screens use gameState.flowHistory so Back follows the actual game sequence.
 const navigationState = {
   currentView:null,previousViews:[],selection:null,sessionBoard:null,
   observedKey:null,revision:0
@@ -88,13 +88,11 @@ function makeView(type){
   };
 }
 
-// Replace the current route when gameplay itself advances. This is the key difference
-// from the old implementation: completed turns/eras are NOT added to Back history.
 function replaceView(type){
   navigationState.currentView = makeView(type);
 }
 
-// Only explicit UI drill-downs (for example decision -> confirmation) create Back history.
+// Only transient, uncommitted drill-downs use previousViews.
 function visitView(type){
   if(navigationState.currentView) navigationState.previousViews.push(navigationState.currentView);
   navigationState.currentView = makeView(type);
@@ -110,7 +108,6 @@ function replaceWithCurrentGame(){
   if(gameState.phase === "setup") replaceView("identity");
   else if(gameState.phase === "industrialShockRevealed") replaceView("industrial-shock");
   else if(gameState.mode === "monopoly"){
-    // A landing is one required interaction, not a historical subpage.
     replaceView(gameState.board.status === "landing" ? "landing-detail" : "board");
   } else replaceView(strategyViewType());
 }
@@ -129,14 +126,117 @@ function syncNavigation(){
   if(isCurrentView()) navigationState.currentView = makeView(navigationState.currentView.type);
 }
 function isCurrentView(){ return navigationState.currentView?.revision === navigationState.revision; }
+
+// ---------- DETERMINISTIC GAME-FLOW BACK HISTORY ----------
+function cloneFlowState(){
+  const snapshot = JSON.parse(JSON.stringify(gameState));
+  delete snapshot.flowHistory;
+  return snapshot;
+}
+function captureFlowSnapshot(){
+  syncNavigation();
+  return {
+    state:cloneFlowState(),
+    viewType:navigationState.currentView?.type || null,
+    selection:navigationState.selection ? JSON.parse(JSON.stringify(navigationState.selection)) : null
+  };
+}
+function commitFlowSnapshot(entry){
+  if(!entry || !entry.state) return false;
+  if(!Array.isArray(gameState.flowHistory)) gameState.flowHistory = [];
+  gameState.flowHistory.push(entry);
+  // Plenty for the whole classroom flow, while preventing an accidental endless test session.
+  if(gameState.flowHistory.length > 80) gameState.flowHistory.splice(0,gameState.flowHistory.length - 80);
+  return true;
+}
+function hasFlowHistory(){
+  return Array.isArray(gameState.flowHistory) && gameState.flowHistory.length > 0;
+}
+function restoreFlowSnapshot(){
+  if(!hasFlowHistory()) return false;
+  const history = gameState.flowHistory.slice();
+  const entry = history.pop();
+  if(!entry?.state) return false;
+
+  Object.keys(gameState).forEach(key => delete gameState[key]);
+  Object.assign(gameState,JSON.parse(JSON.stringify(entry.state)));
+  gameState.flowHistory = history;
+
+  Object.assign(navigationState,{
+    currentView:null,previousViews:[],selection:null,sessionBoard:null,observedKey:null,revision:0
+  });
+  syncNavigation();
+  if(entry.viewType === "selection" && entry.selection){
+    navigationState.selection = JSON.parse(JSON.stringify(entry.selection));
+    replaceView("selection");
+  }
+  if(typeof saveGameState === "function") saveGameState();
+  return true;
+}
+
+// Compatibility for a save created before flowHistory existed. This makes an already-open
+// late-game screen (especially Winner) immediately escapable after the update. New playthroughs
+// use the exact snapshots above instead of these lightweight fallbacks.
+function canUseLegacyFlowFallback(){
+  if(gameState.mode !== "strategy") return false;
+  if(gameState.phase === "winner" && gameState.uiStage === "winner") return true;
+  if(gameState.uiStage === "jetShock" || gameState.uiStage === "digitalShock") return true;
+  if(gameState.uiStage === "pause" && ["steam","jet","digital","future"].includes(gameState.phase)) return true;
+  if(gameState.uiStage === "results" && ["digital","future"].includes(gameState.phase)) return true;
+  if(gameState.uiStage === "event" && gameState.phase === "digital") return true;
+  if(gameState.uiStage === "review" && gameState.lastDecision) return true;
+  return false;
+}
+function useLegacyFlowFallback(){
+  if(!canUseLegacyFlowFallback()) return false;
+
+  if(gameState.phase === "winner" && gameState.uiStage === "winner"){
+    gameState.phase = "future";
+    gameState.uiStage = "pause";
+    gameState.phaseComplete = true;
+  } else if(gameState.uiStage === "jetShock" && gameState.phase === "steam"){
+    gameState.uiStage = "pause";
+  } else if(gameState.uiStage === "digitalShock" && gameState.phase === "jet"){
+    gameState.uiStage = "pause";
+  } else if(gameState.uiStage === "pause"){
+    if(gameState.phase === "future" || gameState.phase === "digital") gameState.uiStage = "results";
+    else if(gameState.phase === "jet") gameState.uiStage = "revaluation";
+    else if(gameState.phase === "steam") gameState.uiStage = "review";
+  } else if(gameState.uiStage === "results"){
+    gameState.uiStage = gameState.phase === "digital" ? "event" : "review";
+  } else if(gameState.uiStage === "event" && gameState.phase === "digital"){
+    gameState.uiStage = "review";
+  } else if(gameState.uiStage === "review" && gameState.lastDecision){
+    const checkpoint = JSON.parse(JSON.stringify(gameState.lastDecision));
+    Object.assign(gameState,checkpoint,{lastDecision:null});
+  } else return false;
+
+  gameState.message = "";
+  Object.assign(navigationState,{
+    currentView:null,previousViews:[],selection:null,sessionBoard:null,observedKey:null,revision:0
+  });
+  syncNavigation();
+  if(typeof saveGameState === "function") saveGameState();
+  return true;
+}
+
 function canNavigateBack(){
-  return !navigationBusy() && navigationState.currentView?.type !== "identity" && navigationState.previousViews.length > 0;
+  if(navigationBusy() || navigationState.currentView?.type === "identity") return false;
+  return navigationState.previousViews.length > 0 || hasFlowHistory() || canUseLegacyFlowFallback();
 }
 function navigateBack(){
-  if(!canNavigateBack()) return false;
-  navigationState.selection = null;
-  navigationState.currentView = navigationState.previousViews.pop();
-  return true;
+  if(navigationBusy()) return false;
+
+  // Unconfirmed drill-down first: e.g. confirmation -> team choice screen.
+  if(navigationState.previousViews.length > 0){
+    navigationState.selection = null;
+    navigationState.currentView = navigationState.previousViews.pop();
+    return true;
+  }
+
+  // Otherwise move to the exact previous committed screen in the game sequence.
+  if(restoreFlowSnapshot()) return true;
+  return useLegacyFlowFallback();
 }
 function resumeCurrentGame(){
   if(navigationBusy()) return false;
@@ -146,8 +246,6 @@ function resumeCurrentGame(){
   return true;
 }
 function openLandingDecision(){
-  // Kept for compatibility with the board button, but the landing popup is already
-  // the current required game screen, so there is no fake historical page to open.
   return isCurrentView() && gameState.board.status === "landing";
 }
 function openStrategySelection(teamId, action, selection, phase){
