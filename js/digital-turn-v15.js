@@ -3,6 +3,24 @@
 (function(){
   let digitalDraft = null;
 
+  // Digital transformation changes the business form/channel while preserving its current market value.
+  const digitalForms = {
+    legacyShipping:"Digital Passenger Shipping Service",
+    legacyCoach:"App-Based Ground Transport Service",
+    legacyInn:"Online-Bookable Inn",
+    legacyPublishing:"Digital Travel Publishing",
+    horse:"App-Based Local Mobility Service",
+    inn:"Online-Bookable Accommodation",
+    shipping:"Digital Passenger Shipping Service",
+    guide:"Digital Travel Information Service",
+    rail:"Digital Rail Travel Service",
+    tour:"Online Tour Operator",
+    hotel:"Online-Bookable Hotel",
+    steamShipping:"Digital Passenger Shipping Service",
+    transfer:"App-Based Transfer Service",
+    guidebook:"Digital Travel Content Platform"
+  };
+
   function loadStyles(){
     if(document.querySelector('link[href="css/digital-turn-v15.css"]')) return;
     const link = document.createElement("link");
@@ -54,8 +72,15 @@
     return current.assets.filter(asset => !sold || asset.id !== sold.id);
   }
 
+  function digitalFormName(asset){
+    return asset ? digitalForms[asset.type] || `Digital ${asset.name}` : "Digital business";
+  }
+
   function digitiseCandidates(current,draft){
-    return availableAfterSale(current,draft).filter(asset => asset.tourism && !asset.digital);
+    // A fully obsolete $0 business cannot be rescued simply by putting it online.
+    return availableAfterSale(current,draft).filter(asset =>
+      asset.tourism && !asset.digital && asset.currentValue > 0 && Object.hasOwn(digitalForms,asset.type)
+    );
   }
 
   function projectedCash(current,draft){
@@ -101,7 +126,7 @@
     }
     if(draft.digitalAction === "digitise"){
       const asset = digitiseCandidates(current,draft).find(item => item.id === draft.digitalSelection);
-      return asset ? `Digitise ${asset.name} · $2` : "Choose a business to digitise";
+      return asset ? `${asset.name} → ${digitalFormName(asset)} · $2` : "Choose a business to digitise";
     }
     return "Hold · no digital spend";
   }
@@ -134,13 +159,14 @@
   }
 
   function renderDigitiseOptions(current,draft,candidates,spendable){
-    if(!candidates.length) return '<div class="digital-digitise-empty">No eligible non-digital tourism business remains.</div>';
+    if(!candidates.length) return '<div class="digital-digitise-empty">No viable non-digital tourism business remains to transform.</div>';
     if(spendable < 2) return '<div class="digital-digitise-empty">Need $2 cash to digitise a business.</div>';
     return `<div class="digital-digitise-options">${candidates.map(asset => {
       const selected = draft.digitalAction === "digitise" && draft.digitalSelection === asset.id;
+      const newName = digitalFormName(asset);
       return `<button type="button" class="digital-digitise-option ${selected ? "selected" : ""}" data-digital-move="digitise" data-digital-selection="${asset.id}">
-        <span>${selected ? "✓ SELECTED" : "DIGITISE"}</span>
-        <strong>${escapeHTML(asset.name)}</strong>
+        <span>${selected ? "✓ SELECTED · VALUE PRESERVED" : "DIGITISE · VALUE PRESERVED"}</span>
+        <div class="digital-digitise-path"><strong>${escapeHTML(asset.name)}</strong><em>→</em><strong>${escapeHTML(newName)}</strong></div>
         <b>${money(asset.currentValue)}</b>
       </button>`;
     }).join("")}</div>`;
@@ -159,7 +185,7 @@
         </button>`;
       }).join("")}
       <article class="digital-move-card digitise ${draft.digitalAction === "digitise" ? "selected" : ""}">
-        <span>TRANSFORM EXISTING BUSINESS</span><strong>Digitise one business</strong><b>$2</b>
+        <span>TRANSFORM EXISTING BUSINESS</span><strong>Digitise one business</strong><b>$2</b><small>Change its business form and preserve its current market value.</small>
         ${renderDigitiseOptions(current,draft,candidates,spendable)}
       </article>
       <button type="button" class="digital-move-card hold ${draft.digitalAction === "hold" ? "selected" : ""}" data-digital-move="hold">
@@ -191,7 +217,7 @@
       </section>
 
       <section class="digital-turn-step digital-step-two">
-        <div class="digital-step-heading"><span>2</span><div><strong>Digital Move · Choose ONE</strong><small>Invest, digitise an existing business, or hold.</small></div></div>
+        <div class="digital-step-heading"><span>2</span><div><strong>Digital Move · Choose ONE</strong><small>Invest, transform one viable existing business, or hold.</small></div></div>
         ${renderDigitalChoices(current,draft)}
       </section>
 
@@ -245,11 +271,16 @@
       descriptions.push(`INVEST: ${definition.name}`);
     } else if(draft.digitalAction === "digitise"){
       const asset = current.assets.find(item => item.id === draft.digitalSelection);
-      requireRule(asset && asset.tourism && !asset.digital,"Choose a valid business to digitise.");
+      requireRule(asset && asset.tourism && !asset.digital && asset.currentValue > 0 && Object.hasOwn(digitalForms,asset.type),"Choose a viable business to digitise.");
       requireRule(current.cash >= 2,"Digitisation requires $2 cash.");
+      const oldName = asset.name;
+      const newName = digitalFormName(asset);
       current.cash -= 2;
       asset.digital = true;
-      descriptions.push(`DIGITISE: ${asset.name}`);
+      asset.name = newName;
+      asset.form = newName;
+      asset.era = "digital";
+      descriptions.push(`DIGITISE: ${oldName} → ${newName}`);
     } else descriptions.push("HOLD DIGITAL MOVE");
 
     current.digitalReady = current.assets.some(asset => asset.digital);
