@@ -1,0 +1,111 @@
+/* FIT Boom presentation screen */
+
+/* Team name already identifies A/B/C, so remove the duplicate standalone letter badge
+   across the modern strategy layouts. */
+.strategy-team-head>b,
+.strategy-team-block-head>b,
+.fit-team-head>b{display:none!important}
+
+.fit-event-screen{
+  grid-template-rows:auto auto auto minmax(0,1fr) auto!important;
+  gap:10px!important;
+  padding:12px 18px 12px!important;
+}
+.fit-event-header{gap:3px!important}
+.fit-event-header .strategy-event-icon{font-size:34px!important}
+.fit-event-header .screen-kicker{font-size:10px!important}
+.fit-event-header h2{font-size:clamp(34px,3vw,46px)!important}
+.fit-event-header p{max-width:1050px!important;font-size:13px!important;line-height:1.32!important}
+.fit-event-header p strong{color:var(--era-deep)}
+
+.fit-event-rules{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.fit-rule-chip{
+  min-width:235px;padding:9px 16px;border-radius:999px;color:#fff;
+  background:linear-gradient(100deg,#128eae,#6f47d2);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 7px 16px rgba(67,83,165,.13)
+}
+.fit-rule-chip span{font-size:9px;font-weight:900;letter-spacing:.12em;opacity:.9}
+.fit-rule-chip strong{font-size:14px}
+
+.fit-pressure-explainer{
+  display:grid;grid-template-columns:auto minmax(0,1.2fr) minmax(320px,.8fr);gap:14px;align-items:center;
+  padding:11px 15px;border-radius:15px;border:1px solid rgba(89,76,178,.25);
+  background:linear-gradient(100deg,rgba(25,193,219,.09),rgba(117,69,220,.09));
+  box-shadow:0 8px 22px rgba(48,62,128,.06)
+}
+.fit-pressure-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:rgba(255,255,255,.65);border:1px solid rgba(86,89,171,.18)}
+.fit-pressure-copy span,.fit-pressure-consequence span{display:block;font-size:8px;font-weight:900;letter-spacing:.13em;color:#6657b6}
+.fit-pressure-copy strong{display:block;margin-top:3px;font-size:17px;line-height:1.08;color:#24254f}
+.fit-pressure-copy p{margin:4px 0 0;font-size:11px;color:#5f687b}
+.fit-pressure-consequence{padding:9px 12px;border-radius:11px;background:rgba(255,255,255,.58);border:1px solid rgba(92,86,183,.16)}
+.fit-pressure-consequence strong{display:block;margin-top:3px;font-size:14px;line-height:1.18;color:#3a2c78}
+.fit-pressure-consequence small{display:block;margin-top:3px;font-size:8px;color:#677083}
+
+.fit-team-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:0}
+.fit-team-card{
+  min-width:0;min-height:0;padding:14px;border-radius:16px;border:1px solid var(--era-line);
+  background:rgba(255,255,255,.60);box-shadow:0 10px 28px rgba(48,63,119,.07);
+  display:grid;grid-template-rows:auto auto auto auto auto auto;gap:9px;align-content:center
+}
+.fit-team-card.positive{border-color:rgba(46,145,82,.32)}
+.fit-team-head{display:flex;align-items:center;gap:10px}
+.fit-team-head>div:nth-child(2){min-width:0;flex:1}
+.fit-team-head strong{display:block;font-size:20px}
+.fit-team-head span{display:block;margin-top:2px;font-size:10px;color:#687083;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fit-team-icon{width:42px;height:42px;flex:0 0 42px;border-radius:11px;display:grid;place-items:center;font-size:23px;background:linear-gradient(145deg,rgba(57,205,231,.18),rgba(124,71,207,.15));border:1px solid var(--era-line)}
+
+.fit-readiness{justify-self:start;padding:5px 9px;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.11em;background:rgba(68,77,112,.07);color:#677083}
+.fit-readiness.ready{background:rgba(47,147,82,.12);color:#2f7845}
+.fit-readiness.not-ready{background:rgba(157,86,70,.11);color:#8b4a3f}
+
+.fit-primary-result{padding:13px;border-radius:12px;text-align:center;background:rgba(64,73,111,.055);border:1px solid rgba(75,85,126,.10)}
+.fit-primary-result.positive{background:rgba(68,157,94,.10);border-color:rgba(49,138,75,.25)}
+.fit-primary-result>span{display:block;font-size:8px;font-weight:900;letter-spacing:.13em;color:#687185}
+.fit-primary-result>strong{display:block;margin-top:3px;font-size:27px;color:#3d4766}
+.fit-primary-result.positive>strong{color:#2f7a47}
+.fit-primary-result p{margin:5px auto 0;max-width:380px;font-size:10px;line-height:1.25;color:#616a7c}
+
+.fit-pressure-change{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:11px;background:rgba(104,75,190,.065)}
+.fit-pressure-change span{display:block;font-size:8px;font-weight:900;letter-spacing:.11em;color:#687085}
+.fit-pressure-change strong{display:block;margin-top:2px;font-size:21px;color:var(--era-deep)}
+.fit-pressure-change em{font-style:normal;color:#768099;font-size:15px;margin:0 4px}
+.fit-pressure-up{font-size:22px;font-weight:900;color:#a05068}
+
+.fit-strain-list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fit-strain-list span{padding:7px 5px;border-radius:8px;text-align:center;background:rgba(55,69,111,.05);font-size:9px;font-weight:800;color:#596378}
+
+.fit-team-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.fit-team-metrics>div{padding:8px 9px;border-radius:9px;background:rgba(39,53,91,.055)}
+.fit-team-metrics span{display:block;font-size:7px;font-weight:900;letter-spacing:.11em;color:#687185}
+.fit-team-metrics strong{display:block;margin-top:2px;font-size:18px;color:#22294b}
+
+.fit-event-footer{min-height:38px!important}
+.fit-event-footer .game-btn{min-height:36px!important;font-size:9px!important}
+
+@media(max-height:850px){
+  .fit-event-screen{gap:6px!important;padding:8px 14px!important}
+  .fit-event-header .strategy-event-icon{font-size:26px!important}
+  .fit-event-header .screen-kicker{font-size:8px!important}
+  .fit-event-header h2{font-size:32px!important}
+  .fit-event-header p{font-size:10px!important}
+  .fit-rule-chip{padding:7px 12px;min-width:205px}
+  .fit-rule-chip strong{font-size:12px}
+  .fit-pressure-explainer{padding:8px 10px;gap:10px}
+  .fit-pressure-icon{width:34px;height:34px;font-size:19px}
+  .fit-pressure-copy strong{font-size:14px}
+  .fit-pressure-copy p{font-size:9px}
+  .fit-pressure-consequence strong{font-size:11px}
+  .fit-team-card{padding:10px;gap:6px}
+  .fit-team-head strong{font-size:16px}
+  .fit-team-head span{font-size:8px}
+  .fit-team-icon{width:34px;height:34px;flex-basis:34px;font-size:19px}
+  .fit-primary-result{padding:9px}
+  .fit-primary-result>strong{font-size:22px}
+  .fit-primary-result p{font-size:8px}
+  .fit-pressure-change{padding:7px 9px}
+  .fit-pressure-change strong{font-size:17px}
+  .fit-strain-list span{padding:5px 3px;font-size:7.5px}
+  .fit-team-metrics>div{padding:6px 7px}
+  .fit-team-metrics strong{font-size:15px}
+}
