@@ -36,9 +36,13 @@ const markets = {
 };
 const revaluations = {
   steam:{estate:1,legacyShipping:6,legacyCoach:2,legacyInn:6,legacyPublishing:4,horse:1,inn:4,shipping:6,guide:3},
-  // Jet Age redistributes long-distance tourism value rather than making every transport asset richer.
-  // Rail/transfer stay useful but flat; accommodation gets a modest lift; organised tours gain most; passenger shipping declines.
-  jet:{rail:4,tour:6,hotel:5,transfer:4,steamShipping:3,shipping:3,legacyShipping:3},
+  // Jet Age rewards businesses that adapted during Industrialisation and erodes unchanged Grand Tour forms.
+  // Rail/transfer remain useful; organised tours win most; hotels gain modestly; old coach/inn/info formats lose relevance; shipping declines.
+  jet:{
+    rail:4,tour:6,hotel:5,transfer:4,guidebook:4,
+    steamShipping:3,shipping:3,legacyShipping:3,
+    legacyCoach:0,horse:0,legacyInn:3,inn:2,legacyPublishing:2,guide:1
+  },
   digital:{tour:4,legacyPublishing:2,guide:2,guidebook:2}
 };
 const adaptations = {
@@ -61,12 +65,16 @@ const phaseInfo = {
 };
 
 // Compatibility repair for saved classroom/test sessions created before the realistic Jet values.
-// It only touches the Jet revaluation screen; normal fresh progression already uses revaluations.jet above.
+// It also rebuilds the Jet log so Back/recovery screens show the correct red/green deltas.
 function repairLegacyJetRevaluation(){
   if(typeof gameState === "undefined" || gameState.mode !== "strategy" ||
      gameState.phase !== "jet" || gameState.uiStage !== "revaluation" || !Array.isArray(gameState.teams)) return false;
 
-  const beforeJet = {rail:4,tour:3,hotel:4,transfer:4,steamShipping:6,shipping:6,legacyShipping:6};
+  const beforeJet = {
+    rail:4,tour:3,hotel:4,transfer:4,guidebook:4,
+    steamShipping:6,shipping:6,legacyShipping:6,
+    legacyCoach:2,horse:1,legacyInn:6,inn:4,legacyPublishing:4,guide:3
+  };
   const rows = [];
   let changed = false;
 
