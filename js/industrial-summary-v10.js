@@ -28,8 +28,7 @@
     if(gameState.phase === "jet"){
       return {
         title:"The Jet Age rewrites long-distance travel",
-        lede:"Faster international air travel redistributes value across the tourism market.",
-        continueLabel:"CONTINUE"
+        lede:"Faster international air travel redistributes value across the tourism market."
       };
     }
     return {
@@ -143,7 +142,9 @@
       <div class="industrial-summary-actions">
         <button class="game-btn secondary" id="revaluationShockBackBtn" type="button">← Back</button>
         <button class="game-btn secondary" id="industrialResetBtn" type="button">Reset Game</button>
-        <button class="game-btn" data-flow-action="continue" type="button">${copy.continueLabel}</button>
+        ${jet
+          ? '<button class="game-btn" data-phase-shock="digital" type="button" aria-label="Trigger Digital Transformation Tech Shock" title="Trigger Digital Transformation Tech Shock" style="min-width:44px;width:44px;padding:0;font-size:19px">⚡</button>'
+          : `<button class="game-btn" data-flow-action="continue" type="button">${copy.continueLabel}</button>`}
       </div>
     </section>`;
   }
