@@ -15,7 +15,6 @@
 #gameScreen.industrial-summary-mode #phaseContent{
   padding:0 !important;
 }
-
 #gameScreen.industrial-summary-mode .phase-sidebar{
   display:none !important;
 }
@@ -89,34 +88,6 @@
   font-size:12px;
   color:#9a3f34;
   font-weight:900;
-}
-
-.jet-teaching-strip{
-  width:min(920px,92%);
-  padding:8px 14px;
-  box-sizing:border-box;
-  display:grid;
-  grid-template-columns:auto auto 1fr;
-  align-items:center;
-  gap:10px;
-  border:1px solid rgba(69,89,100,.28);
-  border-radius:10px;
-  background:rgba(255,255,255,.24);
-  color:#34444c;
-}
-.jet-teaching-strip span{
-  font-size:7.5px;
-  font-weight:900;
-  letter-spacing:.13em;
-}
-.jet-teaching-strip strong{
-  font-size:12px;
-  white-space:nowrap;
-}
-.jet-teaching-strip b{
-  justify-self:end;
-  font-size:12px;
-  white-space:nowrap;
 }
 
 .industrial-team-grid{
@@ -224,7 +195,6 @@
   box-shadow:0 4px 10px rgba(154,63,52,.18);
 }
 
-/* Debt is a liquidity warning, separate from whether revaluation gained or lost value. */
 .industrial-debt-alert{
   display:grid;
   grid-template-columns:auto auto 1fr;
@@ -427,11 +397,33 @@
   padding:9px 20px;
   font-size:12px;
 }
-.industrial-summary-actions .game-btn:not(.secondary){
-  min-width:270px;
+.industrial-summary-actions .game-btn:not(.secondary){min-width:270px}
+#industrialResetBtn{min-width:120px}
+
+/* Era-specific controls: do not carry the Industrial brown into later eras. */
+.steam-summary .industrial-summary-actions .game-btn:not(.secondary){
+  color:#fff7e9 !important;
+  background:linear-gradient(145deg,#815037,#613721) !important;
+  border-color:#5c321f !important;
 }
-#industrialResetBtn{
-  min-width:120px;
+.steam-summary .industrial-summary-actions .game-btn.secondary{
+  color:#4d311f !important;
+  background:linear-gradient(180deg,#ead2a1,#d9b77c) !important;
+  border-color:#a67b45 !important;
+}
+.jet-summary .industrial-summary-actions .game-btn:not(.secondary){
+  color:#f5fbff !important;
+  background:linear-gradient(145deg,#486a78,#304d5b) !important;
+  border-color:#294552 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 4px 10px rgba(40,69,82,.16) !important;
+}
+.jet-summary .industrial-summary-actions .game-btn.secondary{
+  color:#304a57 !important;
+  background:linear-gradient(180deg,#d9e6e9,#bfd1d6) !important;
+  border-color:#78949e !important;
+}
+.jet-summary .industrial-summary-actions .game-btn:hover:not(:disabled){
+  filter:brightness(1.04);
 }
 
 @media(max-height:820px){
@@ -440,8 +432,6 @@
   .industrial-summary-topline h2{font-size:32px}
   .industrial-summary-topline p{font-size:10.5px;margin-top:4px}
   .industrial-market-callout{padding:6px 12px;min-width:230px}
-  .jet-teaching-strip{padding:6px 10px}
-  .jet-teaching-strip strong,.jet-teaching-strip b{font-size:10px}
   .industrial-team-grid{gap:10px}
   .industrial-team-block{padding:12px;gap:8px}
   .industrial-team-icon{width:40px;height:40px;flex-basis:40px;font-size:21px}
@@ -471,5 +461,4 @@
   .industrial-debt-alert small{grid-column:1/-1;justify-self:start;text-align:left}
   .industrial-asset-row{grid-template-columns:minmax(0,1fr) auto}
   .industrial-asset-delta{grid-column:2;justify-self:end}
-  .jet-teaching-strip{width:100%}
 }
