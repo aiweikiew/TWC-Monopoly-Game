@@ -1,0 +1,233 @@
+/* v24 — final late-game sweep. Industrial / Jet remain the readability baseline. */
+
+/* 2035 Crisis: use the viewport for information, not empty card height. */
+.crisis-v18-screen{
+  grid-template-rows:auto auto auto auto auto auto!important;
+  align-content:start!important;
+  gap:12px!important;
+  padding:22px 28px 18px!important;
+}
+.crisis-v18-screen .strategy-modern-header h2{
+  font-size:clamp(42px,3.8vw,58px)!important;
+}
+.crisis-v18-screen .strategy-modern-header p{
+  font-size:15px!important;
+}
+.crisis-v18-events{gap:9px!important}
+.crisis-v18-events span{
+  padding:11px 9px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+}
+.crisis-v18-rule{gap:9px!important}
+.crisis-v18-rule strong,.crisis-v18-rule span{
+  padding:8px 13px!important;
+  font-size:11.5px!important;
+}
+.crisis-v18-screen .future-objective-bar{
+  padding:10px 17px!important;
+  gap:10px!important;
+}
+.crisis-v18-screen .future-objective-bar strong{font-size:11px!important}
+.crisis-v18-screen .future-objective-bar span{font-size:16px!important}
+.crisis-team-grid-v18{
+  height:auto!important;
+  min-height:0!important;
+  align-self:start!important;
+  align-items:stretch!important;
+  gap:14px!important;
+}
+.crisis-team-v18{
+  min-height:205px!important;
+  height:auto!important;
+  padding:18px 19px!important;
+  gap:12px!important;
+  justify-content:flex-start!important;
+}
+.crisis-team-v18 header strong{font-size:22px!important}
+.crisis-team-v18 header span{font-size:13px!important}
+.crisis-team-metrics{gap:9px!important}
+.crisis-team-metrics span{
+  padding:11px!important;
+  font-size:11px!important;
+}
+.crisis-team-metrics b{font-size:30px!important}
+.crisis-team-scores{gap:8px!important}
+.crisis-team-scores span{
+  padding:9px!important;
+  font-size:11px!important;
+}
+.crisis-team-scores b{font-size:14px!important}
+.crisis-team-v18 small{
+  margin-top:2px!important;
+  font-size:11.5px!important;
+  line-height:1.35!important;
+}
+.crisis-v18-screen .future-v18-footer{margin-top:2px!important}
+
+/* Future decision cards: do not let old short-screen rules collapse the text. */
+.future-decision-v18{
+  align-content:start!important;
+  gap:12px!important;
+  padding:18px 24px 14px!important;
+}
+.future-decision-v18 .future-team-mini{padding:12px 14px!important}
+.future-decision-v18 .future-response-card{
+  padding:18px 20px!important;
+  gap:10px!important;
+}
+.future-decision-v18 .future-response-card h3{font-size:28px!important}
+.future-decision-v18 .future-response-card p{font-size:13px!important}
+.future-decision-v18 .pressure-projection{padding:11px 13px!important}
+.future-decision-v18 .pressure-projection strong{font-size:28px!important}
+.future-decision-v18 .future-response-impacts span{font-size:11.5px!important}
+
+/* Adaptation Results: content-height cards with readable outcome hierarchy. */
+.future-results-v18{
+  grid-template-rows:auto auto auto auto!important;
+  align-content:start!important;
+  gap:14px!important;
+  padding:22px 28px 18px!important;
+}
+.future-results-v18 .future-result-grid{
+  height:auto!important;
+  align-self:start!important;
+  align-items:stretch!important;
+  gap:14px!important;
+}
+.future-results-v18 .future-result-card{
+  min-height:225px!important;
+  height:auto!important;
+  padding:19px!important;
+  gap:12px!important;
+}
+.future-results-v18 .future-result-card header strong{font-size:22px!important}
+.future-results-v18 .future-result-card header span{font-size:13px!important}
+.future-results-v18 .future-result-core strong{font-size:31px!important}
+.future-results-v18 .future-result-scores span{font-size:11px!important}
+.future-results-v18 .future-result-strategy{font-size:13px!important}
+
+/* Final pause: no repeated full portfolios. */
+.future-pause-v24{
+  box-sizing:border-box;
+  height:100%;
+  min-height:0;
+  padding:30px 38px 22px;
+  display:grid;
+  grid-template-rows:auto auto auto auto;
+  align-content:center;
+  gap:18px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 14% 8%,rgba(35,205,235,.12),transparent 28%),
+    radial-gradient(circle at 88% 10%,rgba(129,67,228,.14),transparent 28%),
+    linear-gradient(135deg,#edf9ff 0%,#ececff 48%,#f4eaff 100%);
+  border:1px solid rgba(93,65,181,.22);
+  border-radius:18px;
+}
+.future-pause-v24 .strategy-modern-header .screen-kicker{
+  font-size:13px!important;
+  letter-spacing:.15em!important;
+}
+.future-pause-v24 .strategy-modern-header h2{
+  margin:2px 0 0!important;
+  font-size:clamp(42px,4vw,60px)!important;
+}
+.future-pause-v24 .strategy-modern-header p{
+  margin-top:6px!important;
+  font-size:15px!important;
+}
+.future-pause-cue{
+  width:min(960px,92%);
+  justify-self:center;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:14px;
+  align-items:center;
+  padding:17px 21px;
+  border-radius:17px;
+  border:1px solid rgba(85,71,179,.22);
+  background:rgba(255,255,255,.68);
+  box-shadow:0 12px 28px rgba(66,62,135,.08);
+}
+.future-pause-cue-icon{
+  width:54px;height:54px;border-radius:15px;display:grid;place-items:center;
+  font-size:28px;background:linear-gradient(145deg,rgba(35,199,231,.17),rgba(121,63,228,.16));
+  border:1px solid rgba(88,72,184,.20)
+}
+.future-pause-cue span{
+  display:block;font-size:11px;font-weight:900;letter-spacing:.14em;color:#6750bb
+}
+.future-pause-cue strong{
+  display:block;margin-top:3px;font-size:24px;line-height:1.1;color:#2d245f
+}
+.future-pause-cue p{
+  margin:5px 0 0!important;font-size:13px!important;color:#62687b
+}
+.future-pause-team-grid{
+  width:min(1320px,96%);
+  justify-self:center;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.future-pause-team{
+  min-width:0;
+  padding:17px 18px;
+  border-radius:16px;
+  border:1px solid rgba(84,72,176,.20);
+  background:rgba(255,255,255,.62);
+  box-shadow:0 10px 24px rgba(62,57,126,.07);
+}
+.future-pause-team-head{display:flex;align-items:center;gap:10px}
+.future-pause-team-head .strategy-team-icon{width:45px!important;height:45px!important;flex-basis:45px!important;font-size:24px!important}
+.future-pause-team-head strong{display:block;font-size:21px;line-height:1.05}
+.future-pause-team-head span{display:block;margin-top:2px;font-size:12px;color:#656b7c}
+.future-pause-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.future-pause-metrics>div{padding:10px 11px;border-radius:10px;background:rgba(57,64,117,.06)}
+.future-pause-metrics>div.pressure{background:rgba(184,54,71,.10);border:1px solid rgba(184,54,71,.16)}
+.future-pause-metrics span{display:block;font-size:10px;font-weight:900;letter-spacing:.10em;color:#667084}
+.future-pause-metrics strong{display:block;margin-top:3px;font-size:28px;color:#2b2856}
+.future-pause-metrics .pressure span,.future-pause-metrics .pressure strong{color:#963241}
+.future-pause-strategy{
+  margin-top:10px;padding:9px 10px;border-radius:9px;
+  background:linear-gradient(100deg,rgba(31,196,226,.10),rgba(123,63,228,.10));
+  font-size:12.5px;font-weight:900;color:#3c2e79
+}
+.future-pause-footer{display:flex;justify-content:center;align-items:center;gap:10px}
+.future-pause-footer .game-btn{min-height:44px!important;padding:8px 17px!important;font-size:12px!important}
+.future-pause-footer .primary{min-width:230px;color:#fff!important;background:linear-gradient(100deg,#22bad8,#7647d7)!important}
+
+/* Winner: keep the podium prominent and readable, including normal classroom-height screens. */
+.money-podium-screen{align-content:stretch!important}
+.money-podium-grid{align-self:end!important}
+.podium-team-name{font-size:30px!important}
+.podium-identity{font-size:14px!important}
+.podium-worth{font-size:clamp(58px,5vw,78px)!important}
+.podium-base{font-size:27px!important}
+
+/* Digital review / boom: cards should end with their content rather than leaving blank columns. */
+.v19-review,.v19-boom{align-content:start!important}
+.v19-review-grid,.v19-boom-grid{height:auto!important;align-items:stretch!important}
+.v19-review-card,.v19-boom-card{height:auto!important;min-height:0!important}
+
+/* Only compact when the viewport is genuinely short. */
+@media(max-height:700px){
+  .crisis-v18-screen,.future-results-v18,.future-decision-v18{padding:10px 14px!important;gap:7px!important}
+  .crisis-v18-screen .strategy-modern-header h2{font-size:34px!important}
+  .crisis-v18-screen .strategy-modern-header p{font-size:11.5px!important}
+  .crisis-team-v18{min-height:0!important;padding:11px!important;gap:7px!important}
+  .crisis-team-v18 header strong{font-size:17px!important}
+  .crisis-team-v18 header span{font-size:10px!important}
+  .crisis-team-metrics b{font-size:23px!important}
+  .crisis-team-v18 small{font-size:9.5px!important}
+  .future-results-v18 .future-result-card{min-height:0!important;padding:12px!important}
+  .future-pause-v24{padding:14px 18px 12px;gap:10px;align-content:start}
+  .future-pause-v24 .strategy-modern-header h2{font-size:34px!important}
+  .future-pause-v24 .strategy-modern-header p{font-size:11.5px!important}
+  .future-pause-cue{padding:10px 13px}.future-pause-cue-icon{width:42px;height:42px;font-size:22px}
+  .future-pause-cue strong{font-size:19px}.future-pause-cue p{font-size:10.5px!important}
+  .future-pause-team{padding:11px}.future-pause-team-head strong{font-size:17px}.future-pause-team-head span{font-size:10px}
+  .future-pause-metrics{margin-top:7px}.future-pause-metrics>div{padding:7px}.future-pause-metrics strong{font-size:22px}.future-pause-strategy{margin-top:7px;padding:7px;font-size:10.5px}
+  .podium-team-name{font-size:25px!important}.podium-worth{font-size:56px!important}.podium-base{font-size:22px!important}
+}
