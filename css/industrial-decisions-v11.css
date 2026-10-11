@@ -1,6 +1,5 @@
 /* Industrial Revolution team decisions · two-part turn + presentation-friendly controls */
 
-/* Remove repeated Tourismopoly / slide header on Industrial decision screens. */
 #gameScreen[data-era="steam"][data-stage="decisions"] .phase-panel{
   grid-template-rows:minmax(0,1fr) !important;
 }
@@ -65,8 +64,42 @@
   line-height:1;
   color:#6f4f2f;
 }
+.industrial-wallet.in-debt{
+  border:2px solid #9a3f34;
+  background:rgba(174,71,57,.13);
+}
+.industrial-wallet.in-debt span,
+.industrial-wallet.in-debt strong{color:#91392f}
 
-/* Two clearly different decision zones. */
+.industrial-decision-debt-alert{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:14px;
+  padding:9px 12px;
+  border:2px solid #9a3f34;
+  border-radius:10px;
+  background:linear-gradient(90deg,#9a3f34,#b45142);
+  color:#fff7e8;
+  box-shadow:0 6px 14px rgba(145,55,46,.17);
+}
+.industrial-decision-debt-alert > div{display:grid;gap:2px}
+.industrial-decision-debt-alert span{
+  font-size:7.5px;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+.industrial-decision-debt-alert strong{
+  font-size:16px;
+  line-height:1;
+}
+.industrial-decision-debt-alert p{
+  margin:0;
+  font-size:9.5px;
+  line-height:1.25;
+  color:#ffe7db;
+}
+
 .industrial-step{
   min-width:0;
   padding:10px 11px;
@@ -81,6 +114,14 @@
 .portfolio-step{
   border-color:rgba(102,82,55,.26);
   background:linear-gradient(180deg,rgba(149,119,71,.065),rgba(255,255,255,.16));
+}
+.invest-step.debt-locked{
+  border-color:rgba(154,63,52,.28);
+  background:linear-gradient(180deg,rgba(164,72,59,.07),rgba(255,255,255,.15));
+}
+.portfolio-step.debt-clearance-step{
+  border:2px solid rgba(154,63,52,.48);
+  background:linear-gradient(180deg,rgba(169,75,62,.10),rgba(255,255,255,.17));
 }
 .industrial-step-title{
   display:flex;
@@ -101,11 +142,11 @@
   font-weight:900;
 }
 .portfolio-step .industrial-step-title > span{background:#8b6c3f}
+.debt-clearance-step .industrial-step-title > span{background:#9a3f34}
 .industrial-step-title div{display:grid;gap:1px}
 .industrial-step-title strong{font-size:13px}
 .industrial-step-title small{font-size:9px;color:#77614c}
 
-/* MARKET: card selection instead of same brown buttons. */
 .industrial-market-grid{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
@@ -137,6 +178,11 @@
   background:rgba(83,139,151,.17);
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.34);
 }
+.industrial-market-card:disabled{
+  cursor:not-allowed;
+  opacity:.48;
+  filter:saturate(.45);
+}
 .industrial-market-card.skip-card{
   border-color:rgba(118,102,82,.25);
   background:rgba(255,250,235,.45);
@@ -145,6 +191,12 @@
 .industrial-market-card.skip-card.selected{
   border-color:#8a765a;
   background:rgba(151,126,91,.12);
+}
+.debt-locked .industrial-market-card.skip-card.selected{
+  opacity:1;
+  filter:none;
+  border:2px solid #9a3f34;
+  background:rgba(170,77,63,.10);
 }
 .market-card-tag{
   font-size:6.5px;
@@ -172,7 +224,6 @@
   color:#60767a;
 }
 
-/* PORTFOLIO ACTIONS: each action gets its own visual language. */
 .industrial-action-tabs{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -202,6 +253,11 @@
   border-color:#8d4536;
   box-shadow:0 4px 10px rgba(126,61,47,.18);
 }
+.debt-clearance-step .industrial-action-tab.sell.selected{
+  background:#9a3f34;
+  border-color:#7f3129;
+  box-shadow:0 5px 12px rgba(138,51,43,.20);
+}
 .industrial-action-tab.adapt{
   color:#46683f;
   border-color:rgba(82,120,73,.34);
@@ -225,7 +281,7 @@
   box-shadow:0 4px 10px rgba(116,89,44,.17);
 }
 .industrial-action-tab:disabled{
-  opacity:.35;
+  opacity:.30;
   cursor:not-allowed;
 }
 
@@ -269,6 +325,17 @@
   background:rgba(178,86,65,.13);
   box-shadow:inset 0 0 0 1px #a95742;
 }
+.industrial-owned-card.sell-card.clears-debt{
+  border:2px solid #3f7447;
+  border-left:6px solid #3f7447;
+  background:rgba(82,133,88,.11);
+}
+.industrial-owned-card.sell-card.clears-debt > span,
+.industrial-owned-card.sell-card.clears-debt > b{color:#35653d}
+.industrial-owned-card.sell-card.clears-debt.selected{
+  box-shadow:inset 0 0 0 2px #3f7447;
+  background:rgba(82,133,88,.17);
+}
 .industrial-owned-card.adapt-card{border-left:4px solid #698961}
 .industrial-owned-card.adapt-card > span,.industrial-owned-card.adapt-card > b{color:#55744e}
 .industrial-owned-card.adapt-card.selected{
@@ -290,7 +357,6 @@
 .industrial-hold-message strong{font-size:10.5px;color:#705a31}
 .industrial-hold-message span,.industrial-empty-choice{font-size:9px;color:#7b6851}
 
-/* Combined turn summary is the one primary commit action. */
 .industrial-turn-summary{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) 125px 190px;
@@ -300,6 +366,9 @@
   border-radius:11px;
   border:1px solid rgba(68,53,40,.20);
   background:rgba(255,255,255,.30);
+}
+.debt-turn .industrial-turn-summary{
+  border:2px solid rgba(154,63,52,.34);
 }
 .turn-summary-choice{
   min-width:0;
@@ -346,6 +415,10 @@
   letter-spacing:.04em;
   cursor:pointer;
 }
+.debt-turn .industrial-confirm-turn:not(:disabled){
+  border-color:#315f37;
+  background:linear-gradient(145deg,#5f875f,#396840);
+}
 .industrial-confirm-turn:hover:not(:disabled){filter:brightness(1.06)}
 .industrial-confirm-turn:disabled{
   opacity:.38;
@@ -359,7 +432,6 @@
   color:#944838;
 }
 
-/* Back / undo remain secondary utilities, not competing with the turn choices. */
 .industrial-decision-controls{
   display:flex;
   align-items:center;
@@ -389,6 +461,9 @@
   .industrial-turn-heading h2{font-size:25px}
   .industrial-turn-heading p{font-size:9.5px}
   .industrial-wallet{padding:7px 10px}.industrial-wallet strong{font-size:20px}
+  .industrial-decision-debt-alert{padding:6px 9px;gap:10px}
+  .industrial-decision-debt-alert strong{font-size:13px}
+  .industrial-decision-debt-alert p{font-size:8.5px}
   .industrial-step{padding:7px 9px}
   .industrial-step-title{margin-bottom:5px}.industrial-step-title > span{width:23px;height:23px;flex-basis:23px;font-size:11px}
   .industrial-market-grid{gap:5px}.industrial-market-card{min-height:76px;padding:6px 8px}.industrial-market-card > strong{font-size:10.5px}.market-card-price{font-size:15px}
