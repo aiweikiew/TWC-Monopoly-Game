@@ -1,0 +1,296 @@
+/* Tourismopoly · Era colour system v14
+   Grand Tour stays antique parchment/walnut.
+   Industrial = rust/copper/charcoal.
+   Jet = steel blue/navy/silver.
+   Digital = electric cyan/neon blue/violet.
+   Future = indigo/purple/cyan glow.
+   Semantic gain/loss/debt colours stay green/red. */
+
+/* ---------- ERA TOKENS ---------- */
+#gameScreen[data-era="steam"]{
+  --era-bg1:#9a5a3a;
+  --era-bg2:#453631;
+  --era-paper:#ead7b8;
+  --era-panel:#f4e6ce;
+  --era-accent:#9c5733;
+  --era-side:#3e302b;
+  --era-primary-a:#a55a32;
+  --era-primary-b:#6c3527;
+  --era-secondary-a:#ead2ab;
+  --era-secondary-b:#cfa373;
+  --era-secondary-ink:#41281f;
+  --era-control:#eadfc7;
+  --era-border:#a86a43;
+  --era-glow:#d58b51;
+  --era-cool:#5b4a42;
+}
+
+#gameScreen[data-era="jet"]{
+  --era-bg1:#607c8f;
+  --era-bg2:#2b4454;
+  --era-paper:#e3e8e8;
+  --era-panel:#f0f3f2;
+  --era-accent:#456f86;
+  --era-side:#263b48;
+  --era-primary-a:#557f98;
+  --era-primary-b:#33596f;
+  --era-secondary-a:#dce5e8;
+  --era-secondary-b:#b9cbd3;
+  --era-secondary-ink:#243b49;
+  --era-control:#e7eceb;
+  --era-border:#6e93a6;
+  --era-glow:#91bfd1;
+  --era-cool:#365f77;
+}
+
+#gameScreen[data-era="digital"]{
+  --era-bg1:#15566f;
+  --era-bg2:#292052;
+  --era-paper:#dfe9f1;
+  --era-panel:#eef3f8;
+  --era-accent:#178fa8;
+  --era-side:#202844;
+  --era-primary-a:#12a9c4;
+  --era-primary-b:#6550c7;
+  --era-secondary-a:#e2f4f7;
+  --era-secondary-b:#d6d9ef;
+  --era-secondary-ink:#24304d;
+  --era-control:#e7eff5;
+  --era-border:#5d8fb8;
+  --era-glow:#39d7e4;
+  --era-cool:#604fc0;
+}
+
+#gameScreen[data-era="future"],
+#gameScreen[data-era="winner"]{
+  --era-bg1:#39286d;
+  --era-bg2:#151c43;
+  --era-paper:#e7e3f1;
+  --era-panel:#f2eef8;
+  --era-accent:#6a55bd;
+  --era-side:#211c46;
+  --era-primary-a:#7254d4;
+  --era-primary-b:#257fbd;
+  --era-secondary-a:#eee8fa;
+  --era-secondary-b:#d7e4f2;
+  --era-secondary-ink:#2f2a58;
+  --era-control:#ece9f4;
+  --era-border:#7968bd;
+  --era-glow:#55d5e2;
+  --era-cool:#3d8fc5;
+}
+
+/* ---------- SHARED ERA CONTROLS ---------- */
+#gameScreen[data-era] .game-btn:not(.secondary){
+  color:#fff !important;
+  background:linear-gradient(135deg,var(--era-primary-a),var(--era-primary-b)) !important;
+  border-color:color-mix(in srgb,var(--era-primary-b) 80%,#111 20%) !important;
+  box-shadow:0 5px 13px color-mix(in srgb,var(--era-primary-b) 24%,transparent) !important;
+}
+#gameScreen[data-era] .game-btn:not(.secondary):hover:not(:disabled){
+  filter:brightness(1.06) saturate(1.08);
+}
+#gameScreen[data-era] .game-btn.secondary{
+  color:var(--era-secondary-ink) !important;
+  background:linear-gradient(135deg,var(--era-secondary-a),var(--era-secondary-b)) !important;
+  border-color:color-mix(in srgb,var(--era-border) 65%,#493629 35%) !important;
+}
+#gameScreen[data-era] .phase-sidebar .roll-panel{
+  background:var(--era-control) !important;
+  border-color:color-mix(in srgb,var(--era-border) 55%,#3a2d26 45%) !important;
+}
+#gameScreen[data-era] .phase-sidebar .turn-badge{
+  background:linear-gradient(135deg,var(--era-primary-b),var(--era-side)) !important;
+  color:#fff !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+#gameScreen[data-era] .phase-sidebar .player-panel{
+  background:linear-gradient(155deg,var(--era-side),color-mix(in srgb,var(--era-side) 72%,#111 28%)) !important;
+  border-color:color-mix(in srgb,var(--era-border) 36%,#17151c 64%) !important;
+}
+#gameScreen[data-era] .phase-sidebar .player-card.active{
+  outline-color:var(--era-glow) !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.05),0 0 16px color-mix(in srgb,var(--era-glow) 30%,transparent) !important;
+}
+#gameScreen[data-era] .screen-kicker,
+#gameScreen[data-era] .phase-panel>header .setup-kicker,
+#gameScreen[data-era] .decision-wallet strong,
+#gameScreen[data-era] .action-price,
+#gameScreen[data-era] .confirm-action{
+  color:var(--era-accent) !important;
+}
+#gameScreen[data-era] .quest-chip{
+  border-color:color-mix(in srgb,var(--era-border) 60%,transparent) !important;
+  background:color-mix(in srgb,var(--era-primary-a) 10%,white 90%) !important;
+  color:var(--era-secondary-ink) !important;
+}
+#gameScreen[data-era] .action-option,
+#gameScreen[data-era] .decision-summary>div,
+#gameScreen[data-era] .event-effects>div{
+  border-color:color-mix(in srgb,var(--era-border) 38%,transparent) !important;
+}
+#gameScreen[data-era] button:focus-visible,
+#gameScreen[data-era] select:focus-visible{
+  outline-color:var(--era-glow) !important;
+}
+
+/* ---------- INDUSTRIAL: MACHINERY / STEAM ---------- */
+#gameScreen[data-era="steam"] .phase-panel{
+  box-shadow:0 18px 36px rgba(42,27,22,.22),inset 0 0 0 4px rgba(255,238,213,.16) !important;
+}
+#gameScreen[data-era="steam"] .industrial-turn-heading .screen-kicker,
+#gameScreen[data-era="steam"] .industrial-wallet strong{
+  color:#95512f !important;
+}
+#gameScreen[data-era="steam"] .invest-step{
+  border-color:rgba(164,89,50,.42) !important;
+  background:linear-gradient(180deg,rgba(181,101,55,.14),rgba(255,248,235,.23)) !important;
+}
+#gameScreen[data-era="steam"] .portfolio-step{
+  border-color:rgba(75,59,52,.35) !important;
+  background:linear-gradient(180deg,rgba(75,59,52,.10),rgba(255,248,235,.19)) !important;
+}
+#gameScreen[data-era="steam"] .industrial-step-title>span{
+  background:#a45b34 !important;
+  color:#fff4e5 !important;
+}
+#gameScreen[data-era="steam"] .portfolio-step .industrial-step-title>span{
+  background:#51423b !important;
+}
+#gameScreen[data-era="steam"] .industrial-market-card{
+  border-color:rgba(160,88,50,.34) !important;
+  background:rgba(251,239,217,.72) !important;
+  color:#4b3025 !important;
+}
+#gameScreen[data-era="steam"] .industrial-market-card:hover:not(:disabled){
+  border-color:#aa6239 !important;
+  box-shadow:0 7px 15px rgba(124,66,39,.15) !important;
+}
+#gameScreen[data-era="steam"] .industrial-market-card.selected{
+  border-color:#9b512e !important;
+  background:rgba(181,96,52,.18) !important;
+  box-shadow:inset 0 0 0 2px rgba(255,246,227,.42),0 5px 14px rgba(125,67,40,.12) !important;
+}
+#gameScreen[data-era="steam"] .market-card-tag,
+#gameScreen[data-era="steam"] .market-card-price,
+#gameScreen[data-era="steam"] .market-card-cta{
+  color:#985532 !important;
+}
+#gameScreen[data-era="steam"] .industrial-confirm-turn{
+  background:linear-gradient(135deg,#a65b32,#603228) !important;
+  border-color:#65372c !important;
+  color:#fff7ea !important;
+}
+
+/* ---------- JET: STEEL / AVIATION ---------- */
+#gameScreen[data-era="jet"] .phase-panel{
+  box-shadow:0 18px 36px rgba(31,52,65,.18),inset 0 0 0 4px rgba(235,246,249,.18) !important;
+}
+#gameScreen[data-era="jet"] .industrial-summary-topline h2,
+#gameScreen[data-era="jet"] .industrial-team-name{
+  color:#243f50;
+}
+#gameScreen[data-era="jet"] .industrial-team-block:not(.gain):not(.loss){
+  border-color:rgba(76,112,132,.34) !important;
+  background:linear-gradient(180deg,rgba(125,160,177,.09),rgba(255,255,255,.30)) !important;
+}
+
+/* ---------- DIGITAL: ELECTRIC CYAN + VIOLET ---------- */
+#gameScreen[data-era="digital"] .phase-panel{
+  box-shadow:0 18px 38px rgba(25,36,73,.24),inset 0 0 0 2px rgba(50,216,228,.12) !important;
+}
+#gameScreen[data-era="digital"] .phase-panel>header{
+  background:linear-gradient(90deg,rgba(45,205,218,.08),rgba(104,77,204,.08)) !important;
+}
+#gameScreen[data-era="digital"] .action-option{
+  background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(73,188,208,.07),rgba(107,76,198,.06)) !important;
+}
+#gameScreen[data-era="digital"] .action-option:hover{
+  box-shadow:0 0 0 1px rgba(49,213,225,.14),0 8px 20px rgba(61,79,162,.08);
+}
+#gameScreen[data-era="digital"] .decision-record,
+#gameScreen[data-era="digital"] .player-status{
+  color:#9af3f4 !important;
+  background:rgba(76,87,191,.24) !important;
+}
+#gameScreen[data-era="digital"] .strategy-mini{
+  color:#8fe8f0 !important;
+}
+
+/* ---------- FUTURE: INDIGO / PURPLE / CYAN ---------- */
+#gameScreen[data-era="future"] .phase-panel,
+#gameScreen[data-era="winner"] .phase-panel{
+  box-shadow:0 18px 40px rgba(20,22,62,.28),inset 0 0 0 2px rgba(86,215,229,.12) !important;
+}
+#gameScreen[data-era="future"] .phase-panel>header,
+#gameScreen[data-era="winner"] .phase-panel>header{
+  background:linear-gradient(90deg,rgba(114,79,211,.08),rgba(54,185,216,.07)) !important;
+}
+#gameScreen[data-era="future"] .strategy-card{
+  border-color:rgba(104,80,194,.28) !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(112,75,211,.08),rgba(50,188,216,.06)) !important;
+}
+#gameScreen[data-era="future"] .crisis-screen{
+  background:radial-gradient(circle at 50% 30%,rgba(116,74,198,.14),transparent 44%),radial-gradient(circle at 60% 35%,rgba(37,178,210,.09),transparent 35%) !important;
+}
+#gameScreen[data-era="future"] .crisis-impact{
+  border-color:rgba(112,80,183,.36) !important;
+  background:rgba(103,73,184,.08) !important;
+}
+#gameScreen[data-era="future"] .decision-record,
+#gameScreen[data-era="future"] .player-status,
+#gameScreen[data-era="winner"] .decision-record{
+  color:#a5f0f5 !important;
+  background:rgba(102,74,190,.25) !important;
+}
+#gameScreen[data-era="future"] .strategy-mini,
+#gameScreen[data-era="winner"] .strategy-mini{
+  color:#9beef1 !important;
+}
+
+/* ---------- TECH SHOCK SCREENS ---------- */
+.industrial-shock-screen[data-shock="industrial-revolution"]{
+  background:radial-gradient(circle at 50% 32%,rgba(177,93,48,.24),transparent 36%),linear-gradient(145deg,#4b332a,#251f1d) !important;
+  color:#f4d6aa !important;
+}
+.industrial-shock-screen[data-shock="industrial-revolution"]>div{
+  border-color:rgba(199,119,68,.35) !important;
+}
+.industrial-shock-screen[data-shock="industrial-revolution"] #applyIndustrialBtn{
+  color:#fff5e8 !important;
+  background:linear-gradient(135deg,#ad6138,#68352a) !important;
+  border-color:#c1784e !important;
+}
+
+.industrial-shock-screen[data-shock="jet-age"]{
+  background:radial-gradient(circle at 50% 31%,rgba(100,157,185,.22),transparent 38%),linear-gradient(145deg,#314d5f,#182b38) !important;
+  color:#dcebf1 !important;
+}
+.industrial-shock-screen[data-shock="jet-age"] #applyIndustrialBtn{
+  color:#fff !important;
+  background:linear-gradient(135deg,#608ba3,#355d75) !important;
+  border-color:#81a9ba !important;
+}
+.industrial-shock-screen[data-shock="jet-age"] .shock-back-btn{
+  border-color:rgba(151,191,210,.46) !important;
+  background:rgba(29,48,59,.90) !important;
+  color:#e7f3f7 !important;
+}
+
+.industrial-shock-screen[data-shock="digital-transformation"]{
+  background:radial-gradient(circle at 40% 30%,rgba(34,207,220,.18),transparent 31%),radial-gradient(circle at 62% 35%,rgba(112,78,211,.22),transparent 34%),linear-gradient(145deg,#172c43,#211a4d) !important;
+  color:#e4ecff !important;
+}
+.industrial-shock-screen[data-shock="digital-transformation"] #applyIndustrialBtn{
+  color:#fff !important;
+  background:linear-gradient(135deg,#12b8cf,#6e50d2) !important;
+  border-color:#70d7e0 !important;
+  box-shadow:0 0 20px rgba(40,201,217,.18) !important;
+}
+.industrial-shock-screen[data-shock="digital-transformation"] .shock-back-btn{
+  border-color:rgba(78,220,230,.44) !important;
+  background:rgba(28,28,70,.90) !important;
+  color:#e7f8ff !important;
+}
+
+/* Negative semantic states intentionally remain red; positive revaluation states remain green. */
