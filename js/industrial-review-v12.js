@@ -13,6 +13,11 @@
     return gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "review";
   }
 
+  function isIndustrialCheckpoint(){
+    return gameState.mode === "strategy" && gameState.phase === "steam" &&
+      gameState.phaseComplete && gameState.uiStage === "pause";
+  }
+
   function actionClass(text){
     const value = String(text || "").toUpperCase();
     if(value.startsWith("BUY:")) return "buy";
@@ -97,6 +102,40 @@
     if(game) game.classList.toggle("industrial-review-mode",active);
   }
 
+  function decorateIndustrialCheckpoint(){
+    if(!isIndustrialCheckpoint()) return;
+    const card = document.querySelector("#phaseContent .checkpoint-card");
+    const shock = card?.querySelector('[data-phase-shock="jet"]');
+    if(!card || !shock || card.querySelector("#industrialCheckpointBackBtn")) return;
+
+    const controls = document.createElement("div");
+    controls.className = "industrial-checkpoint-controls";
+    controls.style.cssText = "display:flex;justify-content:center;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap";
+
+    const back = document.createElement("button");
+    back.type = "button";
+    back.id = "industrialCheckpointBackBtn";
+    back.className = "game-btn secondary";
+    back.textContent = "← BACK";
+    back.style.cssText = "min-width:130px;min-height:40px";
+
+    shock.parentNode.insertBefore(controls,shock);
+    controls.append(back,shock);
+  }
+
+  function backToIndustrialReview(){
+    if(!isIndustrialCheckpoint()) return;
+    gameState.uiStage = "review";
+    gameState.phaseComplete = true;
+    gameState.message = "";
+    if(typeof navigationState !== "undefined"){
+      navigationState.selection = null;
+      navigationState.previousViews = [];
+    }
+    if(typeof saveGameState === "function") saveGameState();
+    renderGame();
+  }
+
   function init(){
     if(document.documentElement.dataset.industrialReviewV12 === "true") return true;
     if(typeof renderDecisionReview !== "function" || typeof renderGame !== "function" || typeof calculateNetWorth !== "function") return false;
@@ -114,9 +153,18 @@
     renderGame = function(){
       originalRenderGame();
       setReviewMode(isIndustrialReview());
+      decorateIndustrialCheckpoint();
     };
 
     document.addEventListener("click",event => {
+      const checkpointBack = event.target.closest("#industrialCheckpointBackBtn");
+      if(checkpointBack){
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        backToIndustrialReview();
+        return;
+      }
+
       const reset = event.target.closest("#industrialReviewResetBtn");
       if(!reset) return;
       event.preventDefault();
