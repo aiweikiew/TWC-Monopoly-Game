@@ -13,6 +13,9 @@
       document.head.appendChild(styles);
     }
 
+    const feeDescription = document.querySelector("#feeModal .landing-desc");
+    if(feeDescription) feeDescription.textContent = "You landed on another team’s tourism business.";
+
     const originalRenderGame = renderGame;
     const originalCanNavigateBack = canNavigateBack;
     const originalNavigateBack = navigateBack;
