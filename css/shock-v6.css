@@ -4,21 +4,21 @@
 }
 .industrial-shock-screen > div{
   width:min(930px,94vw) !important;
-  padding:34px 44px 38px !important;
+  padding:28px 44px 30px !important;
   box-sizing:border-box;
 }
 .industrial-shock-screen .shock-kicker{
-  margin:0 0 18px !important;
+  margin:0 0 13px !important;
   font-size:clamp(46px,6.2vw,78px) !important;
   line-height:.95 !important;
   white-space:nowrap;
   letter-spacing:.015em !important;
 }
 .industrial-shock-screen .shock-graphic{
-  width:min(440px,72%);
-  min-height:118px;
-  margin:4px auto 20px;
-  padding:14px 24px;
+  width:min(390px,68%);
+  min-height:88px;
+  margin:2px auto 14px;
+  padding:10px 22px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -26,7 +26,7 @@
   border-top:1px solid rgba(240,207,139,.23);
   border-bottom:1px solid rgba(240,207,139,.23);
   background:linear-gradient(90deg,transparent,rgba(255,231,177,.055),transparent);
-  font-size:clamp(48px,5.5vw,72px);
+  font-size:clamp(44px,5vw,64px);
   line-height:1;
   filter:drop-shadow(0 8px 14px rgba(0,0,0,.22));
 }
@@ -37,7 +37,7 @@
 }
 .industrial-shock-screen h1{
   max-width:840px;
-  margin:0 auto 22px !important;
+  margin:0 auto 17px !important;
   font-size:clamp(34px,4.6vw,58px) !important;
   line-height:.98 !important;
   letter-spacing:.045em !important;
@@ -47,9 +47,9 @@
 }
 .industrial-shock-screen #applyIndustrialBtn{
   min-width:230px !important;
-  min-height:52px;
-  margin-top:4px !important;
-  padding:10px 30px !important;
+  min-height:50px;
+  margin-top:2px !important;
+  padding:9px 30px !important;
   font-size:17px !important;
   letter-spacing:.05em;
   text-transform:uppercase;
@@ -59,9 +59,28 @@
   display:none;
 }
 .industrial-shock-screen #shockError{
-  margin:12px auto 0;
+  margin:10px auto 0;
   color:#efb8a1;
   font-size:12px;
+}
+.industrial-shock-screen .shock-back-btn{
+  position:fixed;
+  top:18px;
+  left:18px;
+  z-index:120;
+  min-height:42px;
+  padding:9px 17px;
+  border:1px solid rgba(240,207,139,.42);
+  border-radius:999px;
+  background:rgba(41,27,21,.88);
+  color:#f7e2ad;
+  box-shadow:0 8px 22px rgba(0,0,0,.22);
+  font:800 14px Georgia,serif;
+  letter-spacing:.02em;
+  cursor:pointer;
+}
+.industrial-shock-screen .shock-back-btn:hover{
+  background:rgba(80,49,31,.94);
 }
 
 .industrial-shock-screen[data-shock="jet-age"] .shock-graphic{
@@ -74,9 +93,10 @@
 }
 
 @media(max-height:760px){
-  .industrial-shock-screen > div{padding:24px 36px 28px !important;}
-  .industrial-shock-screen .shock-kicker{font-size:clamp(40px,5.7vw,66px) !important;margin-bottom:12px !important;}
-  .industrial-shock-screen .shock-graphic{min-height:88px;margin-bottom:14px;font-size:clamp(40px,4.8vw,58px);}
-  .industrial-shock-screen h1{font-size:clamp(31px,4vw,50px) !important;margin-bottom:16px !important;}
-  .industrial-shock-screen #applyIndustrialBtn{min-height:46px;font-size:15px !important;}
+  .industrial-shock-screen > div{padding:20px 36px 23px !important;}
+  .industrial-shock-screen .shock-kicker{font-size:clamp(40px,5.7vw,66px) !important;margin-bottom:9px !important;}
+  .industrial-shock-screen .shock-graphic{min-height:70px;margin-bottom:10px;padding:8px 18px;font-size:clamp(38px,4.6vw,54px);}
+  .industrial-shock-screen h1{font-size:clamp(31px,4vw,50px) !important;margin-bottom:12px !important;}
+  .industrial-shock-screen #applyIndustrialBtn{min-height:44px;font-size:15px !important;}
+  .industrial-shock-screen .shock-back-btn{top:12px;left:12px;min-height:38px;padding:7px 14px;font-size:13px;}
 }
