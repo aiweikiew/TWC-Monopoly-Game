@@ -113,6 +113,7 @@
 
       <div class="industrial-summary-actions">
         <button class="game-btn secondary" id="revaluationShockBackBtn" type="button">← Back</button>
+        <button class="game-btn secondary" id="industrialResetBtn" type="button">Reset Game</button>
         <button class="game-btn" data-flow-action="continue" type="button">CONTINUE TO TEAM DECISIONS</button>
       </div>
     </section>`;
@@ -142,6 +143,20 @@
       originalRenderGame();
       setSummaryMode(gameState.phase === "steam" && gameState.uiStage === "revaluation" && gameState.mode === "strategy");
     };
+
+    document.addEventListener("click", event => {
+      const reset = event.target.closest("#industrialResetBtn");
+      if(!reset) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      try{
+        resetGame();
+        renderGame();
+      } catch(error){
+        const target = document.getElementById("actionError");
+        if(target) target.textContent = error.message;
+      }
+    }, true);
 
     renderGame();
     return true;
