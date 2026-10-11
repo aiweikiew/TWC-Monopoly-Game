@@ -9,6 +9,14 @@
     document.head.appendChild(link);
   }
 
+  function loadFutureCrisis(){
+    if(document.querySelector('script[src="js/future-crisis-v18.js"]')) return;
+    const script = document.createElement("script");
+    script.src = "js/future-crisis-v18.js";
+    script.async = false;
+    document.head.appendChild(script);
+  }
+
   function isFITEvent(){
     return typeof gameState !== "undefined" && gameState.mode === "strategy" &&
       gameState.phase === "digital" && gameState.uiStage === "event";
@@ -16,13 +24,14 @@
 
   function teamCard(team){
     const pressure = Number(team.destinationPressure || 0);
-    const previousPressure = Math.max(0, pressure - 1);
+    const pressureDelta = team.digitalReady ? 2 : 1;
+    const previousPressure = Math.max(0, pressure - pressureDelta);
     const status = team.digitalReady ? "DIGITAL READY" : "NOT DIGITAL READY";
     const outcomeClass = team.digitalReady ? "positive" : "neutral";
     const outcome = team.digitalReady ? "+$2 CASH" : "NO CASH BONUS";
     const explanation = team.digitalReady
-      ? "Your digital channel captures the surge in independent demand."
-      : "Demand grows, but your business is not positioned to capture the digital upside.";
+      ? "You captured more independent demand — and created more destination pressure."
+      : "Demand still grows, but you do not capture the digital cash upside.";
 
     return `<article class="fit-team-card ${outcomeClass}">
       <header class="fit-team-head">
@@ -40,7 +49,7 @@
 
       <div class="fit-pressure-change">
         <div><span>DESTINATION PRESSURE</span><strong>${previousPressure} <em>→</em> ${pressure}</strong></div>
-        <div class="fit-pressure-up">+1</div>
+        <div class="fit-pressure-up">+${pressureDelta}</div>
       </div>
 
       <div class="fit-strain-list">
@@ -73,7 +82,7 @@
         <div class="fit-pressure-consequence">
           <span>CARRIES INTO 2035</span>
           <strong>Each Pressure point = −1 Resident &amp; −1 Environment</strong>
-          <small>applied before the 2035 crisis penalties</small>
+          <small>Digital Ready teams capture more demand, so they enter 2035 with more pressure.</small>
         </div>
       </aside>
 
@@ -116,6 +125,7 @@
 
     document.documentElement.dataset.fitEventV17 = "true";
     loadStyles();
+    loadFutureCrisis();
 
     // FIT Boom is the final Digital-era result. Move directly into the Future crisis.
     // Store the FIT event itself so Back from 2035 returns to the exact previous game screen.
