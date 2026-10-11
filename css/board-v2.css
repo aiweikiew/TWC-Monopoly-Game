@@ -1,0 +1,596 @@
+/* Tourismopoly · Grand Tour board visual layer
+   UI-only override: gameplay, tile positions and board logic remain unchanged. */
+
+:root{
+  --board-ink:#302016;
+  --board-walnut:#4a2f20;
+  --board-walnut-dark:#2b1a12;
+  --board-cream:#efe0b8;
+  --board-paper:#e6d0a0;
+  --board-brass:#ad7f36;
+  --board-brass-light:#d6b366;
+  --board-sage:#68725a;
+  --board-oxblood:#7c4238;
+  --board-blue:#476d8c;
+  --board-purple:#75538a;
+  --board-green:#557658;
+}
+
+/* ---------- WHOLE BOARD STAGE ---------- */
+.monopoly-shell{
+  width:100vw;
+  height:100vh;
+  padding:16px 18px;
+  gap:18px;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(230,188,112,.14),transparent 36%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 5px),
+    linear-gradient(145deg,#563620 0%,#3b2418 58%,#2a1a13 100%);
+}
+
+.monopoly-shell .board-column{
+  height:min(calc(100vh - 32px),calc(100vw - 410px));
+  aspect-ratio:1 / 1;
+  flex:0 0 auto;
+  filter:drop-shadow(0 18px 32px rgba(24,13,7,.30));
+}
+
+.monopoly-shell .side-column{
+  width:352px;
+  min-width:320px;
+  max-width:370px;
+  height:min(calc(100vh - 32px),calc(100vw - 410px));
+}
+
+/* ---------- BOARD FRAME ---------- */
+.monopoly-shell .board{
+  border:12px solid #3b2519;
+  outline:2px solid #1e130e;
+  border-radius:5px;
+  grid-template-columns:1.13fr 1.62fr 1.13fr;
+  grid-template-rows:1.13fr 1.62fr 1.13fr;
+  background:
+    radial-gradient(circle at 18% 22%,rgba(91,59,29,.12) 0 1px,transparent 2px),
+    radial-gradient(circle at 72% 12%,rgba(91,59,29,.10) 0 1px,transparent 2px),
+    radial-gradient(circle at 82% 72%,rgba(91,59,29,.10) 0 1px,transparent 2px),
+    repeating-linear-gradient(12deg,rgba(70,45,24,.026) 0 1px,transparent 1px 5px),
+    linear-gradient(138deg,#ead7aa,#d5bb83 52%,#e3cc9c);
+  box-shadow:
+    0 0 0 3px #a77d3f,
+    0 0 0 7px #5a3a25,
+    0 0 0 9px rgba(31,18,11,.72),
+    inset 0 0 55px rgba(61,37,19,.26),
+    0 18px 35px rgba(18,10,5,.32);
+}
+
+.monopoly-shell .board::before{
+  z-index:20;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.05),transparent 20%,transparent 80%,rgba(39,21,11,.06)),
+    radial-gradient(ellipse at center,transparent 58%,rgba(59,35,18,.18) 100%);
+}
+
+.monopoly-shell .board::after{
+  z-index:21;
+  inset:7px;
+  border:1px solid rgba(81,53,30,.42);
+  box-shadow:inset 0 0 0 3px rgba(239,217,167,.12);
+}
+
+/* ---------- TILES ---------- */
+.monopoly-shell .tile{
+  overflow:hidden;
+  border:1px solid rgba(70,46,27,.68);
+  background:
+    radial-gradient(circle at 20% 18%,rgba(86,54,28,.075) 0 1px,transparent 2px),
+    repeating-linear-gradient(9deg,rgba(89,63,34,.022) 0 1px,transparent 1px 5px),
+    linear-gradient(150deg,rgba(245,229,191,.97),rgba(218,190,134,.96));
+  box-shadow:
+    inset 0 0 22px rgba(80,50,25,.12),
+    inset 0 1px 0 rgba(255,250,226,.72);
+  transition:filter .18s ease, box-shadow .18s ease;
+}
+
+.monopoly-shell .tile::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:7px;
+  z-index:2;
+  background:var(--board-sage);
+  box-shadow:2px 0 0 rgba(255,255,255,.18);
+}
+
+.monopoly-shell .tile.chance::before{background:var(--board-oxblood)}
+.monopoly-shell .tile.opportunity::before{background:var(--board-brass)}
+.monopoly-shell .tile.start::before{background:#4b3526}
+
+.monopoly-shell .tile::after{
+  inset:7px;
+  border:1px solid rgba(92,63,34,.19);
+  border-radius:2px;
+}
+
+.monopoly-shell .tile-inner{
+  inset:12px 11px 11px 15px;
+  justify-content:center;
+  gap:0;
+}
+
+.monopoly-shell .tile .icon{
+  margin-bottom:7px;
+  font-size:clamp(29px,3.2vw,44px);
+  filter:sepia(.32) saturate(.76) drop-shadow(0 2px 1px rgba(80,46,21,.12));
+}
+
+.monopoly-shell .tile-title{
+  max-width:94%;
+  font-size:clamp(11px,1.05vw,15px);
+  line-height:1.08;
+  letter-spacing:.065em;
+  color:#302016;
+  text-wrap:balance;
+}
+
+.monopoly-shell .tile-sub{
+  max-width:92%;
+  margin-top:5px;
+  font-size:clamp(8px,.72vw,10px);
+  line-height:1.18;
+  color:#725943;
+  text-wrap:balance;
+}
+
+.monopoly-shell .price-block{
+  width:66%;
+  margin-top:8px;
+  padding-top:5px;
+  border-top:1px solid rgba(79,53,29,.28);
+}
+
+.monopoly-shell .price-label{
+  font-size:8px;
+  color:#7c6242;
+  letter-spacing:.18em;
+}
+
+.monopoly-shell .price-value{
+  margin-top:1px;
+  font-size:clamp(18px,1.8vw,27px);
+  color:#3c291d;
+}
+
+/* ---------- OWNERSHIP ---------- */
+.monopoly-shell .ownership-marker{
+  top:9px;
+  left:auto;
+  right:9px;
+  width:auto;
+  max-width:calc(100% - 28px);
+  padding:4px 7px 3px;
+  border-radius:999px;
+  border:1px solid rgba(47,31,20,.26);
+  color:#fff9e9;
+  background:#5c4d3d;
+  box-shadow:0 2px 5px rgba(42,24,13,.18);
+  font-size:8px;
+  line-height:1;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.monopoly-shell .ownership-marker.owner-a{background:var(--board-blue)}
+.monopoly-shell .ownership-marker.owner-b{background:var(--board-purple)}
+.monopoly-shell .ownership-marker.owner-c{background:var(--board-green)}
+.monopoly-shell .tile.owned-tile{
+  box-shadow:inset 0 0 0 3px rgba(93,67,39,.11),inset 0 0 22px rgba(80,50,25,.12);
+}
+
+/* ---------- TOKENS ---------- */
+.monopoly-shell .token-zone{
+  left:12px;
+  bottom:10px;
+  max-width:94px;
+  gap:4px;
+}
+.monopoly-shell .token{
+  width:30px;
+  height:30px;
+  border:2px solid rgba(255,245,221,.82);
+  outline:2px solid rgba(55,34,20,.68);
+  box-shadow:0 3px 7px rgba(31,18,10,.25);
+  font-size:13px;
+  letter-spacing:0;
+}
+.monopoly-shell .token.a{background:linear-gradient(145deg,#5a83a5,#365a78)}
+.monopoly-shell .token.b{background:linear-gradient(145deg,#8a68a0,#624577)}
+.monopoly-shell .token.c{background:linear-gradient(145deg,#698b69,#466549)}
+.monopoly-shell .token.walking{animation:grandTourHop .34s ease}
+@keyframes grandTourHop{
+  0%{transform:translateY(0) scale(1)}
+  45%{transform:translateY(-10px) scale(1.10)}
+  100%{transform:translateY(0) scale(1)}
+}
+
+/* ---------- CENTRE PANEL ---------- */
+.monopoly-shell .center{
+  margin:13px;
+  overflow:hidden;
+  border:3px double rgba(79,52,29,.70);
+  background:
+    radial-gradient(circle at 50% 49%,rgba(250,237,202,.92),rgba(217,191,138,.86) 72%),
+    linear-gradient(145deg,#f0dfb7,#cfad72);
+  box-shadow:
+    inset 0 0 42px rgba(91,58,28,.18),
+    0 6px 12px rgba(78,47,24,.11);
+}
+.monopoly-shell .center::before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border:1px solid rgba(91,61,33,.25);
+  pointer-events:none;
+}
+.monopoly-shell .center svg{opacity:.13;transform:scale(1.08)}
+.monopoly-shell .center-content{padding:15px 8px}
+.monopoly-shell .crest{
+  margin-bottom:8px;
+  color:#997133;
+  font-size:14px;
+  letter-spacing:.28em;
+}
+.monopoly-shell .main-title{
+  font-size:clamp(19px,2.25vw,31px);
+  color:#3f2b1e;
+  letter-spacing:.025em;
+  text-shadow:0 1px 0 rgba(255,246,221,.7);
+}
+.monopoly-shell .era{
+  margin-top:8px;
+  color:#793f34;
+  font-size:clamp(9px,.9vw,12px);
+  letter-spacing:.18em;
+  font-weight:700;
+}
+.monopoly-shell .rule{
+  width:56%;
+  margin:10px auto 9px;
+  background:linear-gradient(90deg,transparent,#9b773e,transparent);
+}
+.monopoly-shell .tagline{
+  color:#604b37;
+  font-size:clamp(8px,.72vw,10px);
+  letter-spacing:.12em;
+}
+.monopoly-shell .stamp{
+  margin-top:10px;
+  padding:4px 7px 3px;
+  border:1px solid rgba(123,64,49,.58);
+  color:#7b4034;
+  font-size:8px;
+  letter-spacing:.10em;
+  background:rgba(248,230,187,.20);
+}
+
+/* ---------- SIDEBAR ---------- */
+.monopoly-shell .sidebar{
+  height:100%;
+  gap:10px;
+  padding:0;
+}
+
+.monopoly-shell .sidebar > div:first-child{
+  min-height:42px;
+  margin:0 !important;
+  padding:6px;
+  align-items:center;
+  gap:6px;
+  border:1px solid rgba(210,173,105,.34);
+  border-radius:12px;
+  background:rgba(43,26,17,.60);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.monopoly-shell .sidebar > div:first-child::before{
+  content:"GRAND TOUR · EUROPE 1825";
+  margin-right:auto;
+  padding-left:5px;
+  color:#dfc792;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  white-space:nowrap;
+}
+
+.monopoly-shell .board-top-action,
+.monopoly-shell .tech-shock-trigger{
+  min-width:34px;
+  min-height:30px !important;
+  padding:5px 9px !important;
+  margin:0 !important;
+  border-width:1px !important;
+  border-radius:8px !important;
+  font-size:10px !important;
+}
+.monopoly-shell .tech-shock-trigger{
+  width:34px;
+  font-size:17px !important;
+  color:#ffe7a1 !important;
+  background:linear-gradient(145deg,#864a2f,#663522) !important;
+  border-color:#b0803d !important;
+  box-shadow:0 0 0 1px rgba(247,213,138,.08),0 4px 9px rgba(24,12,7,.18);
+}
+
+.monopoly-shell .roll-panel,
+.monopoly-shell .player-panel{
+  border:1px solid rgba(78,46,27,.62);
+  border-radius:13px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,238,191,.10),
+    0 6px 14px rgba(32,17,10,.18);
+}
+
+.monopoly-shell .roll-panel{
+  padding:13px;
+  background:
+    radial-gradient(circle at 86% 15%,rgba(255,242,194,.28),transparent 24%),
+    linear-gradient(145deg,#d8ba7b,#bd9250);
+}
+.monopoly-shell .turn-badge{
+  padding:9px 10px 8px;
+  border:1px solid rgba(80,51,29,.42);
+  border-radius:8px;
+  background:linear-gradient(180deg,#f5e8c5,#ead6a5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+  color:#3c281b;
+  font-size:13px;
+  letter-spacing:.09em;
+}
+.monopoly-shell .roll-text{
+  margin-top:9px;
+  color:#38261a;
+  font-size:14px;
+  line-height:1.22;
+}
+.monopoly-shell .roll-sub{
+  margin-top:5px;
+  color:#6d5034;
+  font-size:10px;
+}
+.monopoly-shell #boardError{
+  min-height:0;
+  margin:5px 0 0;
+  color:#6f2119;
+}
+.monopoly-shell .button-stack{
+  gap:7px;
+  margin-top:10px;
+}
+.monopoly-shell .game-btn{
+  min-height:42px;
+  border:1px solid rgba(69,40,24,.80);
+  border-radius:9px;
+  color:#fff7e9;
+  background:linear-gradient(145deg,#815037,#613721);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 3px 7px rgba(44,24,13,.12);
+  transition:transform .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+.monopoly-shell .game-btn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 5px 10px rgba(44,24,13,.16);
+}
+.monopoly-shell .game-btn:active:not(:disabled){transform:translateY(1px)}
+.monopoly-shell .game-btn.secondary{
+  color:#402b1c;
+  background:linear-gradient(145deg,#eadab5,#caae7c);
+  border-color:rgba(100,68,40,.50);
+}
+.monopoly-shell #rollBtn{
+  min-height:48px;
+  font-size:16px;
+  letter-spacing:.045em;
+  background:linear-gradient(145deg,#824631,#64301f);
+  border-color:#8f623a;
+}
+.monopoly-shell #rollBtn:not(:disabled){
+  box-shadow:0 5px 11px rgba(53,27,14,.20),inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+/* ---------- PLAYER CARDS ---------- */
+.monopoly-shell .player-panel{
+  flex:1 1 auto;
+  padding:11px;
+  overflow:auto;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(179,119,62,.15),transparent 34%),
+    linear-gradient(160deg,#69402b,#47291d 72%);
+  scrollbar-width:thin;
+  scrollbar-color:#b68b4e transparent;
+}
+.monopoly-shell .panel-title{
+  margin:1px 0 9px;
+  color:#f0d8a6;
+  font-size:13px;
+  letter-spacing:.18em;
+  font-weight:700;
+}
+.monopoly-shell .player-card{
+  position:relative;
+  margin-bottom:9px;
+  padding:10px;
+  border:1px solid rgba(240,207,142,.18);
+  border-radius:11px;
+  color:#f8e9c7;
+  background:linear-gradient(145deg,rgba(139,85,49,.88),rgba(92,50,31,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 4px 9px rgba(25,12,7,.12);
+}
+.monopoly-shell .player-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:8px;
+  bottom:8px;
+  width:4px;
+  border-radius:0 4px 4px 0;
+  background:#856546;
+}
+.monopoly-shell .player-card:nth-child(1)::before{background:var(--board-blue)}
+.monopoly-shell .player-card:nth-child(2)::before{background:var(--board-purple)}
+.monopoly-shell .player-card:nth-child(3)::before{background:var(--board-green)}
+.monopoly-shell .player-card.active{
+  outline:2px solid #e6bd61;
+  outline-offset:1px;
+  box-shadow:0 0 0 3px rgba(225,184,91,.12),0 5px 11px rgba(22,12,7,.17);
+}
+.monopoly-shell .player-head{
+  grid-template-columns:42px 1fr 29px;
+  gap:8px;
+}
+.monopoly-shell .avatar{
+  width:42px;
+  height:42px;
+  border-radius:9px;
+  border:1px solid rgba(82,51,28,.62);
+  background:linear-gradient(145deg,#f1daa6,#cfa766);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+  font-size:21px;
+}
+.monopoly-shell .player-info .team{
+  font-size:13px;
+  letter-spacing:.02em;
+}
+.monopoly-shell .player-info .identity{
+  margin-top:3px;
+  color:#f2d6a7;
+  font-size:9px;
+  line-height:1.2;
+}
+.monopoly-shell .pawn{
+  width:27px;
+  height:27px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  border:1px solid rgba(255,242,210,.56);
+  background:rgba(40,24,16,.22);
+  color:#fff3d1;
+  font-size:12px;
+  font-weight:800;
+}
+.monopoly-shell .player-metrics{
+  margin-top:8px;
+  padding-top:7px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  border-top:1px solid rgba(240,208,147,.15);
+}
+.monopoly-shell .player-metrics span{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  color:#d9be8d;
+  font-size:8px;
+  letter-spacing:.08em;
+}
+.monopoly-shell .player-metrics strong{
+  color:#fff0c7;
+  font-size:17px;
+  letter-spacing:0;
+}
+.monopoly-shell .portfolio-assets{
+  margin:7px 0 0 !important;
+  padding:6px 0 0 !important;
+  list-style:none;
+  border-top:1px dashed rgba(236,202,139,.14);
+}
+.monopoly-shell .portfolio-assets li{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:2px 0;
+  color:#ebd2a5;
+  font-size:9px;
+  line-height:1.25;
+}
+.monopoly-shell .portfolio-assets strong{color:#f6dfae}
+
+/* ---------- DICE ---------- */
+.monopoly-shell .dice-overlay{
+  z-index:45;
+  background:rgba(45,28,17,.26);
+  backdrop-filter:blur(1.5px);
+}
+.monopoly-shell .dice-card{
+  gap:9px;
+  padding:16px 20px 14px;
+  border:2px solid rgba(74,45,26,.68);
+  border-radius:16px;
+  background:linear-gradient(145deg,rgba(247,233,197,.98),rgba(218,191,136,.98));
+  box-shadow:0 16px 32px rgba(34,18,10,.30),inset 0 1px 0 rgba(255,255,255,.62);
+}
+.monopoly-shell .die{
+  width:100px;
+  height:100px;
+  border:2px solid rgba(77,49,29,.62);
+  border-radius:17px;
+  background:linear-gradient(145deg,#fffaf0,#e4cf9f);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 5px 12px rgba(53,30,16,.15);
+  color:#3f2b1f;
+}
+.monopoly-shell .roll-caption{
+  color:#4b3222;
+  font-size:13px;
+  letter-spacing:.08em;
+}
+
+/* ---------- POPUPS ---------- */
+.monopoly-shell .landing-modal{
+  z-index:50;
+  background:rgba(39,23,14,.35);
+  backdrop-filter:blur(2px);
+}
+.monopoly-shell .landing-card{
+  width:min(430px,74%);
+  border:5px double #4a3323;
+  border-radius:5px;
+  background:
+    radial-gradient(circle at 15% 20%,rgba(85,57,31,.07) 0 1px,transparent 2px),
+    repeating-linear-gradient(10deg,rgba(91,68,39,.022) 0 1px,transparent 1px 5px),
+    linear-gradient(145deg,#f2e3bd,#d5b777);
+  box-shadow:0 18px 38px rgba(31,16,8,.34),inset 0 0 24px rgba(82,53,27,.14);
+}
+
+/* ---------- RESPONSIVE SAFETY ---------- */
+@media (max-width:1180px){
+  .monopoly-shell{padding:10px;gap:12px}
+  .monopoly-shell .board-column{height:min(calc(100vh - 20px),calc(100vw - 330px))}
+  .monopoly-shell .side-column{width:300px;min-width:280px;height:min(calc(100vh - 20px),calc(100vw - 330px))}
+  .monopoly-shell .sidebar > div:first-child::before{display:none}
+  .monopoly-shell .tile .icon{font-size:clamp(24px,3vw,36px)}
+  .monopoly-shell .player-card{padding:8px}
+}
+
+@media (max-height:720px){
+  .monopoly-shell{padding:8px 10px;gap:12px}
+  .monopoly-shell .board-column,
+  .monopoly-shell .side-column{height:calc(100vh - 16px)}
+  .monopoly-shell .sidebar{gap:7px}
+  .monopoly-shell .roll-panel{padding:9px}
+  .monopoly-shell .turn-badge{padding:6px 8px}
+  .monopoly-shell .roll-text{margin-top:6px;font-size:12px}
+  .monopoly-shell .roll-sub{font-size:9px}
+  .monopoly-shell .game-btn{min-height:36px}
+  .monopoly-shell #rollBtn{min-height:42px}
+  .monopoly-shell .player-card{margin-bottom:6px;padding:7px 8px}
+  .monopoly-shell .avatar{width:36px;height:36px;font-size:18px}
+  .monopoly-shell .player-head{grid-template-columns:36px 1fr 26px}
+  .monopoly-shell .player-metrics{margin-top:5px;padding-top:5px}
+  .monopoly-shell .player-metrics strong{font-size:15px}
+  .monopoly-shell .portfolio-assets{margin-top:5px !important;padding-top:4px !important}
+}
