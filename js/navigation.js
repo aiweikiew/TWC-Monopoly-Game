@@ -12,6 +12,11 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/bo
   reviewScript.src = "js/board-review-v3.js";
   document.head.appendChild(reviewScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/debt-settlement-v4.js"]')){
+  const debtScript = document.createElement("script");
+  debtScript.src = "js/debt-settlement-v4.js";
+  document.head.appendChild(debtScript);
+}
 
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
