@@ -83,6 +83,17 @@
 
 .fit-event-footer{min-height:38px!important}
 .fit-event-footer .game-btn{min-height:36px!important;font-size:9px!important}
+.fit-event-footer .fit-crisis-icon-btn{
+  min-width:58px!important;
+  width:58px!important;
+  height:42px!important;
+  padding:0!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  font-size:23px!important;
+  line-height:1!important;
+  border-radius:12px!important;
+}
 
 /* Digital checkpoint is now only a presentation handoff — no repeated portfolios/results. */
 .digital-handoff-screen{
@@ -143,6 +154,7 @@
   .fit-strain-list span{padding:5px 3px;font-size:7.5px}
   .fit-team-metrics>div{padding:6px 7px}
   .fit-team-metrics strong{font-size:15px}
+  .fit-event-footer .fit-crisis-icon-btn{width:52px!important;min-width:52px!important;height:38px!important;font-size:21px!important}
 
   .digital-handoff-wrap{padding:26px 34px;width:min(820px,84vw)}
   .digital-handoff-icon{width:50px;height:50px;font-size:28px;margin-bottom:8px}
