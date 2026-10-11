@@ -365,7 +365,10 @@
       const element = document.querySelector(selector);
       if(!element || element.hidden || element.disabled) return false;
       const style = window.getComputedStyle(element);
-      return style.display !== "none" && style.visibility !== "hidden";
+      if(style.display === "none" || style.visibility === "hidden") return false;
+      // A child of a hidden screen can still report display:block. Rects tell us whether
+      // the button is actually rendered in the current viewport/layout.
+      return element.getClientRects().length > 0;
     });
   }
 
@@ -402,7 +405,6 @@
       return originalNavigateBack();
     };
 
-    // Grand Tour -> first Tech Shock is also a committed full-screen transition.
     if(typeof triggerTechShock === "function" && !triggerTechShock.__flowHistoryWrapped){
       const originalTrigger = triggerTechShock;
       triggerTechShock = function(...args){
@@ -422,7 +424,6 @@
       window.setTimeout(syncGlobalBack,0);
     };
 
-    // Route every screen-specific Back button through the same game-flow navigator.
     document.addEventListener("click",event => {
       const selector = localBackSelectors.join(",");
       const button = event.target.closest(selector);
