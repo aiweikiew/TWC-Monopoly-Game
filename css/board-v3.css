@@ -107,6 +107,33 @@
   padding:5px;
 }
 
+/* Give the centre crest more breathing room and guarantee TOURISMOPOLY fits. */
+.monopoly-shell .center{
+  margin:6px;
+}
+.monopoly-shell .center::before{
+  inset:9px;
+}
+.monopoly-shell .center-content{
+  width:100%;
+  max-width:100%;
+  padding:12px 5px;
+  box-sizing:border-box;
+}
+.monopoly-shell .main-title{
+  width:100%;
+  max-width:100%;
+  font-size:clamp(18px,1.95vw,29px);
+  line-height:1;
+  letter-spacing:0;
+  white-space:nowrap;
+  text-align:center;
+}
+.monopoly-shell .crest{margin-bottom:6px;}
+.monopoly-shell .era{margin-top:6px;}
+.monopoly-shell .rule{margin:8px auto 7px;}
+.monopoly-shell .stamp{margin-top:8px;}
+
 @media (max-height:820px){
   .monopoly-shell .roll-panel{padding:7px 8px 8px;}
   .monopoly-shell #rollBtn{min-height:38px;font-size:14px;}
@@ -115,4 +142,6 @@
   .monopoly-shell #boardPlayers .avatar{width:34px;height:34px;font-size:17px;}
   .monopoly-shell #boardPlayers .player-head{grid-template-columns:34px minmax(0,1fr) 24px;}
   .monopoly-shell #boardPlayers .portfolio-assets li{font-size:7.5px;}
+  .monopoly-shell .center{margin:5px;}
+  .monopoly-shell .main-title{font-size:clamp(17px,1.85vw,27px);}
 }
