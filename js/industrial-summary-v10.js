@@ -19,6 +19,26 @@
     return delta > 0 ? "gain" : delta < 0 ? "loss" : "flat";
   }
 
+  function isMarketSummary(){
+    return gameState.mode === "strategy" && gameState.uiStage === "revaluation" &&
+      ["steam","jet"].includes(gameState.phase);
+  }
+
+  function phaseCopy(){
+    if(gameState.phase === "jet"){
+      return {
+        title:"The Jet Age rewrites long-distance travel",
+        lede:"Faster international air travel redistributes value across the tourism market.",
+        continueLabel:"LOCK JET VALUES & COMPLETE PAST ERA"
+      };
+    }
+    return {
+      title:"The Industrial Revolution reshapes the market",
+      lede:"Steam power and rail connectivity redistribute value across existing tourism businesses.",
+      continueLabel:"CONTINUE TO TEAM DECISIONS"
+    };
+  }
+
   function assetRowsForTeam(team){
     const remaining = gameState.revaluationLog
       .filter(row => row.team === team.name)
@@ -75,7 +95,7 @@
       ${inDebt ? `<div class="industrial-debt-alert">
         <span>⚠ IN DEBT</span>
         <strong>${money(team.cash)} CASH</strong>
-        <small>Must sell a business during Team Decisions</small>
+        <small>${gameState.phase === "steam" ? "Must sell a business during Team Decisions" : "Liquidity remains below zero"}</small>
       </div>` : ""}
 
       <div class="industrial-worth-panel ${cls}">
@@ -95,23 +115,30 @@
     </article>`;
   }
 
-  function renderIndustrialSummary(){
+  function renderMarketSummary(){
+    const copy = phaseCopy();
     const summaries = gameState.teams.map(teamSummary);
     const strongest = summaries.reduce((best,item) => item.assetDelta > best.assetDelta ? item : best,summaries[0]);
     const weakest = summaries.reduce((worst,item) => item.assetDelta < worst.assetDelta ? item : worst,summaries[0]);
+    const jet = gameState.phase === "jet";
 
-    return `<section class="industrial-summary-screen">
+    return `<section class="industrial-summary-screen ${jet ? "jet-summary" : "steam-summary"}">
       <div class="industrial-summary-topline">
         <div>
           <div class="screen-kicker">TECHNOLOGY IMPACT · MARKET REVALUATION</div>
-          <h2>The Industrial Revolution reshapes the market</h2>
-          <p>Steam power and rail connectivity redistribute value across existing tourism businesses.</p>
+          <h2>${copy.title}</h2>
+          <p>${copy.lede}</p>
         </div>
         <div class="industrial-market-callout">
           <span>MARKET SHIFT</span>
           <strong>${escapeHTML(strongest.team.name)} ${deltaLabel(strongest.assetDelta)}</strong>
           ${weakest !== strongest ? `<small>${escapeHTML(weakest.team.name)} ${deltaLabel(weakest.assetDelta)}</small>` : ""}
         </div>
+        ${jet ? `<div class="jet-teaching-strip">
+          <span>TEACHING EXAMPLE</span>
+          <strong>Passenger Shipping</strong>
+          <b>Pre-Industrial $4 → Steam $6 → Jet $3</b>
+        </div>` : ""}
       </div>
 
       <div class="industrial-team-grid">
@@ -121,7 +148,7 @@
       <div class="industrial-summary-actions">
         <button class="game-btn secondary" id="revaluationShockBackBtn" type="button">← Back</button>
         <button class="game-btn secondary" id="industrialResetBtn" type="button">Reset Game</button>
-        <button class="game-btn" data-flow-action="continue" type="button">CONTINUE TO TEAM DECISIONS</button>
+        <button class="game-btn" data-flow-action="continue" type="button">${copy.continueLabel}</button>
       </div>
     </section>`;
   }
@@ -141,14 +168,14 @@
 
     const originalRenderRevaluation = renderRevaluation;
     renderRevaluation = function(){
-      if(gameState.phase === "steam" && gameState.uiStage === "revaluation") return renderIndustrialSummary();
+      if(isMarketSummary()) return renderMarketSummary();
       return originalRenderRevaluation();
     };
 
     const originalRenderGame = renderGame;
     renderGame = function(){
       originalRenderGame();
-      setSummaryMode(gameState.phase === "steam" && gameState.uiStage === "revaluation" && gameState.mode === "strategy");
+      setSummaryMode(isMarketSummary());
     };
 
     document.addEventListener("click", event => {
