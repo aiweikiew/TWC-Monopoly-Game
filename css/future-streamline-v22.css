@@ -1,0 +1,42 @@
+/* Future outcomes: presentation-scale typography and tighter use of space */
+.future-results-v18{
+  grid-template-rows:auto auto auto auto!important;
+  align-content:start!important;
+  gap:14px!important;
+}
+.future-results-v18 .strategy-modern-header h2{font-size:clamp(40px,3.8vw,56px)!important}
+.future-results-v18 .strategy-modern-header p{font-size:16px!important;line-height:1.35!important}
+.future-results-v18 .future-objective-bar{padding:11px 18px!important}
+.future-results-v18 .future-objective-bar strong{font-size:11px!important}
+.future-results-v18 .future-objective-bar span{font-size:17px!important}
+.future-results-v18 .future-result-grid{align-items:start!important}
+.future-results-v18 .future-result-card{
+  min-height:0!important;
+  padding:20px!important;
+  gap:13px!important;
+}
+.future-results-v18 .future-result-card header strong{font-size:25px!important}
+.future-results-v18 .future-result-card header span{font-size:13px!important}
+.future-results-v18 .future-result-core span{font-size:11px!important}
+.future-results-v18 .future-result-core strong{font-size:34px!important}
+.future-results-v18 .future-result-scores span{font-size:12px!important;padding:10px!important}
+.future-results-v18 .future-result-scores b{font-size:15px!important}
+.future-results-v18 .future-result-strategy{
+  margin-top:0!important;
+  padding:12px!important;
+  font-size:13px!important;
+}
+.future-results-v18 .future-v18-footer{margin-top:2px!important}
+.future-results-v18 .future-v18-footer .game-btn{font-size:13px!important;min-height:44px!important}
+
+@media(max-height:850px){
+  .future-results-v18 .strategy-modern-header h2{font-size:38px!important}
+  .future-results-v18 .strategy-modern-header p{font-size:13px!important}
+  .future-results-v18 .future-result-card{padding:15px!important;gap:9px!important}
+  .future-results-v18 .future-result-card header strong{font-size:21px!important}
+  .future-results-v18 .future-result-card header span{font-size:11px!important}
+  .future-results-v18 .future-result-core span{font-size:9px!important}
+  .future-results-v18 .future-result-core strong{font-size:28px!important}
+  .future-results-v18 .future-result-scores span{font-size:10px!important;padding:8px!important}
+  .future-results-v18 .future-result-strategy{font-size:11px!important;padding:9px!important}
+}
