@@ -1,8 +1,6 @@
 "use strict";
 
 (function(){
-  let revisitActive = false;
-
   function loadStyles(){
     if(document.querySelector('link[href="css/revaluation-back-v9.css"]')) return;
     const link = document.createElement("link");
@@ -11,59 +9,31 @@
     document.head.appendChild(link);
   }
 
-  function shockTitleForPhase(){
-    if(gameState.phase === "steam") return "INDUSTRIAL REVOLUTION";
-    if(gameState.phase === "jet") return "JET AGE";
-    if(gameState.phase === "digital") return "DIGITAL TRANSFORMATION";
-    return null;
-  }
-
   function isRevaluationScreen(){
-    return gameState.mode === "strategy" && gameState.uiStage === "revaluation" && Boolean(shockTitleForPhase());
+    return gameState.mode === "strategy" && gameState.uiStage === "revaluation" &&
+      ["steam","jet","digital"].includes(gameState.phase);
   }
 
   function ensureBackButton(){
     if(!isRevaluationScreen()) return;
+    // Full-width Market Shift screens already render their own button with this id.
+    if(document.getElementById("revaluationShockBackBtn")) return;
     const host = document.querySelector("#phaseContent .revaluation-screen");
-    if(!host || host.querySelector("#revaluationShockBackBtn")) return;
+    if(!host) return;
 
     const button = document.createElement("button");
     button.id = "revaluationShockBackBtn";
     button.type = "button";
     button.className = "revaluation-shock-back";
     button.textContent = "← Back";
-    button.title = "Back to Tech Shock";
-    button.setAttribute("aria-label","Back to Tech Shock reveal");
+    button.title = "Back to previous game screen";
+    button.setAttribute("aria-label","Back to previous game screen");
     host.prepend(button);
   }
 
-  function showPreviousShock(){
+  function goBack(){
     if(!isRevaluationScreen()) return;
-    const title = shockTitleForPhase();
-    const shockScreen = document.getElementById("industrialShockScreen");
-    const gameScreenEl = document.getElementById("gameScreen");
-    const setupScreenEl = document.getElementById("setupScreen");
-    const monopolyScreenEl = document.getElementById("monopolyScreen");
-    if(!title || !shockScreen || !gameScreenEl) return;
-
-    revisitActive = true;
-    if(typeof configureShockScreen === "function") configureShockScreen(title);
-
-    gameScreenEl.hidden = true;
-    if(setupScreenEl) setupScreenEl.classList.add("hidden");
-    if(monopolyScreenEl) monopolyScreenEl.hidden = true;
-    shockScreen.hidden = false;
-    shockScreen.dataset.revisit = "true";
-  }
-
-  function returnToRevaluation(){
-    if(!revisitActive) return;
-    revisitActive = false;
-    const shockScreen = document.getElementById("industrialShockScreen");
-    if(shockScreen){
-      shockScreen.hidden = true;
-      delete shockScreen.dataset.revisit;
-    }
+    if(typeof navigateBack !== "function" || !navigateBack()) return;
     if(typeof renderGame === "function") renderGame();
   }
 
@@ -77,27 +47,16 @@
     const originalRenderGame = renderGame;
     renderGame = function(){
       originalRenderGame();
-      if(!revisitActive) ensureBackButton();
+      ensureBackButton();
     };
 
-    document.addEventListener("click", event => {
-      const backToShock = event.target.closest("#revaluationShockBackBtn");
-      if(backToShock){
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        showPreviousShock();
-        return;
-      }
-
-      if(!revisitActive) return;
-      const shockContinue = event.target.closest("#applyIndustrialBtn");
-      const shockBack = event.target.closest("#shockBackBtn");
-      if(shockContinue || shockBack){
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        returnToRevaluation();
-      }
-    }, true);
+    document.addEventListener("click",event => {
+      const back = event.target.closest("#revaluationShockBackBtn");
+      if(!back) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      goBack();
+    },true);
 
     ensureBackButton();
     return true;
