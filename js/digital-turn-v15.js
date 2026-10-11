@@ -4,7 +4,11 @@
 // The Digital era itself now lives in the free-form v19 portfolio system.
 (function(){
   if(typeof document === "undefined") return;
-  const queue = ["js/digital-freeform-v19.js","js/digital-v19-compat.js"];
+  const queue = [
+    "js/digital-freeform-v19.js",
+    "js/digital-v19-compat.js",
+    "js/digital-builder-polish-v20.js"
+  ];
   for(const src of queue){
     if(document.querySelector(`script[src="${src}"]`)) continue;
     const script = document.createElement("script");
