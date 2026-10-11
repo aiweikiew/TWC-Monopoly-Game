@@ -29,7 +29,7 @@
       return {
         title:"The Jet Age rewrites long-distance travel",
         lede:"Faster international air travel redistributes value across the tourism market.",
-        continueLabel:"LOCK JET VALUES & COMPLETE PAST ERA"
+        continueLabel:"CONTINUE"
       };
     }
     return {
@@ -129,15 +129,10 @@
           <h2>${copy.title}</h2>
           <p>${copy.lede}</p>
         </div>
-        <div class="industrial-market-callout">
+        ${!jet ? `<div class="industrial-market-callout">
           <span>MARKET SHIFT</span>
           <strong>${escapeHTML(strongest.team.name)} ${deltaLabel(strongest.assetDelta)}</strong>
           ${weakest !== strongest ? `<small>${escapeHTML(weakest.team.name)} ${deltaLabel(weakest.assetDelta)}</small>` : ""}
-        </div>
-        ${jet ? `<div class="jet-teaching-strip">
-          <span>TEACHING EXAMPLE</span>
-          <strong>Passenger Shipping</strong>
-          <b>Pre-Industrial $4 → Steam $6 → Jet $3</b>
         </div>` : ""}
       </div>
 
