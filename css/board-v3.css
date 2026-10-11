@@ -211,6 +211,11 @@
   letter-spacing:.11em;
 }
 
+/* Property popup: remove redundant instruction footer. */
+.monopoly-shell #landingModal .modal-note{
+  display:none !important;
+}
+
 @media (max-height:820px){
   .monopoly-shell .side-column{width:390px;min-width:370px;}
   .monopoly-shell .roll-panel{padding:6px 8px 7px;}
