@@ -154,7 +154,7 @@
   padding:4px 5px;
 }
 
-/* Centre crest: size the title from the centre cell itself, not the browser width. */
+/* Centre crest: remove the repeated game title and use the square as a period marker. */
 .monopoly-shell .center{
   margin:6px;
   container-type:inline-size;
@@ -163,37 +163,47 @@
   inset:9px;
 }
 .monopoly-shell .center-content{
-  width:calc(100% - 16px);
-  max-width:calc(100% - 16px);
-  padding:11px 4px;
+  width:calc(100% - 18px);
+  height:100%;
+  max-width:calc(100% - 18px);
+  margin:0 auto;
+  padding:18px 8px;
   box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   overflow:visible;
 }
 .monopoly-shell .main-title{
-  display:block;
-  width:100%;
-  max-width:100%;
-  margin:0 auto;
-  font-size:clamp(20px,9.4cqw,30px);
-  line-height:1;
-  letter-spacing:-.035em;
-  white-space:nowrap;
-  text-align:center;
-  overflow:visible;
+  display:none !important;
 }
 .monopoly-shell .crest{
-  margin-bottom:6px;
-  font-size:13px;
+  margin:0 0 13px;
+  font-size:17px;
+  letter-spacing:.30em;
 }
 .monopoly-shell .era{
-  margin-top:7px;
-  font-size:11px;
+  margin:0;
+  font-size:clamp(15px,5.4cqw,19px);
+  line-height:1;
+  letter-spacing:.20em;
+  font-weight:800;
 }
-.monopoly-shell .rule{margin:8px auto 7px;}
-.monopoly-shell .tagline{font-size:10px;}
+.monopoly-shell .rule{
+  width:58%;
+  margin:14px auto 12px;
+}
+.monopoly-shell .tagline{
+  font-size:clamp(10px,3.7cqw,13px);
+  line-height:1.2;
+  letter-spacing:.10em;
+}
 .monopoly-shell .stamp{
-  margin-top:8px;
-  font-size:8px;
+  margin-top:14px;
+  padding:5px 8px 4px;
+  font-size:9px;
+  letter-spacing:.11em;
 }
 
 @media (max-height:820px){
@@ -212,5 +222,10 @@
   .monopoly-shell #boardPlayers .portfolio-assets li,
   .monopoly-shell #boardPlayers .portfolio-assets li strong{font-size:9.5px;}
   .monopoly-shell .center{margin:5px;}
-  .monopoly-shell .main-title{font-size:clamp(19px,9.1cqw,28px);}
+  .monopoly-shell .center-content{padding:14px 7px;}
+  .monopoly-shell .crest{font-size:15px;margin-bottom:10px;}
+  .monopoly-shell .era{font-size:clamp(14px,5.2cqw,18px);}
+  .monopoly-shell .rule{margin:12px auto 10px;}
+  .monopoly-shell .tagline{font-size:clamp(9px,3.5cqw,12px);}
+  .monopoly-shell .stamp{margin-top:11px;font-size:8px;}
 }
