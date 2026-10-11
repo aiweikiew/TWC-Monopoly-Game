@@ -36,7 +36,9 @@ const markets = {
 };
 const revaluations = {
   steam:{estate:1,legacyShipping:6,legacyCoach:2,legacyInn:6,legacyPublishing:4,horse:1,inn:4,shipping:6,guide:3},
-  jet:{rail:5,tour:6,hotel:7,transfer:4,steamShipping:3,shipping:3,legacyShipping:3},
+  // Jet Age mainly redistributes long-distance tourism value rather than making every transport asset richer.
+  // Rail/transfer stay useful but flat; accommodation gets a modest lift; organised tours gain most; passenger shipping declines.
+  jet:{rail:4,tour:6,hotel:5,transfer:4,steamShipping:3,shipping:3,legacyShipping:3},
   digital:{tour:4,legacyPublishing:2,guide:2,guidebook:2}
 };
 const adaptations = {
