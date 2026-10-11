@@ -34,6 +34,16 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/go
   goPassiveScript.async = false;
   document.head.appendChild(goPassiveScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/industrial-summary-v10.js"]')){
+  const industrialSummaryScript = document.createElement("script");
+  industrialSummaryScript.src = "js/industrial-summary-v10.js";
+  document.head.appendChild(industrialSummaryScript);
+}
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/revaluation-back-v9.js"]')){
+  const revaluationBackScript = document.createElement("script");
+  revaluationBackScript.src = "js/revaluation-back-v9.js";
+  document.head.appendChild(revaluationBackScript);
+}
 
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
