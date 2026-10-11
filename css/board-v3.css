@@ -1,0 +1,118 @@
+/* Tourismopoly · Grand Tour board v3
+   Compact sidebar so all three teams remain visible without scrolling. */
+
+/* Keep only the useful turn cue + actions in the dice panel. */
+.monopoly-shell .roll-panel{
+  padding:9px 10px 10px;
+}
+.monopoly-shell .roll-text,
+.monopoly-shell .roll-sub{
+  display:none !important;
+}
+.monopoly-shell .roll-panel .button-stack{
+  margin-top:8px;
+  gap:6px;
+}
+.monopoly-shell #rollBtn{
+  min-height:42px;
+  font-size:15px;
+}
+.monopoly-shell #nextBtn,
+.monopoly-shell #resolveLandingBtn{
+  min-height:36px;
+  font-size:12px;
+}
+.monopoly-shell .turn-badge{
+  padding:8px 9px 7px;
+  font-size:12px;
+}
+
+/* The player area should never need an internal scrollbar in presentation mode. */
+.monopoly-shell .player-panel{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  padding:8px;
+  overflow:hidden;
+  scrollbar-width:none;
+}
+.monopoly-shell .player-panel::-webkit-scrollbar{display:none}
+.monopoly-shell .panel-title{
+  flex:0 0 auto;
+  margin:0 0 6px;
+  font-size:12px;
+}
+.monopoly-shell #boardPlayers{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.monopoly-shell #boardPlayers .player-card{
+  min-height:0;
+  margin:0;
+  padding:8px 9px;
+  overflow:hidden;
+}
+.monopoly-shell #boardPlayers .player-head{
+  grid-template-columns:38px minmax(0,1fr) 26px;
+  gap:7px;
+}
+.monopoly-shell #boardPlayers .avatar{
+  width:38px;
+  height:38px;
+  font-size:19px;
+}
+.monopoly-shell #boardPlayers .player-info .team{
+  font-size:12px;
+}
+.monopoly-shell #boardPlayers .player-info .identity{
+  margin-top:2px;
+  font-size:8.5px;
+}
+.monopoly-shell #boardPlayers .pawn{
+  width:25px;
+  height:25px;
+  font-size:11px;
+}
+.monopoly-shell #boardPlayers .player-metrics{
+  margin-top:6px;
+  padding-top:5px;
+  gap:6px;
+}
+.monopoly-shell #boardPlayers .player-metrics span{
+  padding:0;
+  font-size:7px;
+}
+.monopoly-shell #boardPlayers .player-metrics strong{
+  font-size:15px;
+}
+.monopoly-shell #boardPlayers .portfolio-assets{
+  margin:5px 0 0 !important;
+  padding:4px 0 0 !important;
+}
+.monopoly-shell #boardPlayers .portfolio-assets li{
+  padding:1px 0;
+  font-size:8px;
+  line-height:1.15;
+}
+
+/* Slightly tighten the whole sidebar spacing as well. */
+.monopoly-shell .sidebar{
+  gap:8px;
+}
+.monopoly-shell .sidebar > div:first-child{
+  min-height:38px;
+  padding:5px;
+}
+
+@media (max-height:820px){
+  .monopoly-shell .roll-panel{padding:7px 8px 8px;}
+  .monopoly-shell #rollBtn{min-height:38px;font-size:14px;}
+  .monopoly-shell #nextBtn,.monopoly-shell #resolveLandingBtn{min-height:32px;}
+  .monopoly-shell #boardPlayers .player-card{padding:7px 8px;}
+  .monopoly-shell #boardPlayers .avatar{width:34px;height:34px;font-size:17px;}
+  .monopoly-shell #boardPlayers .player-head{grid-template-columns:34px minmax(0,1fr) 24px;}
+  .monopoly-shell #boardPlayers .portfolio-assets li{font-size:7.5px;}
+}
