@@ -85,7 +85,7 @@
       </section>
 
       <div class="industrial-review-controls">
-        <button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>UNDO LAST DECISION</button>
+        <button class="game-btn secondary" data-flow-action="undo" ${!gameState.lastDecision ? "disabled" : ""}>← BACK</button>
         <button class="game-btn secondary" id="industrialReviewResetBtn" type="button">RESET GAME</button>
         <button class="game-btn" data-flow-action="lock" type="button">LOCK INDUSTRIAL PORTFOLIOS</button>
       </div>
