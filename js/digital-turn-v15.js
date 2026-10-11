@@ -7,7 +7,8 @@
   const queue = [
     "js/digital-freeform-v19.js",
     "js/digital-v19-compat.js",
-    "js/digital-builder-polish-v20.js"
+    "js/digital-builder-polish-v20.js",
+    "js/winner-podium-v22.js"
   ];
   for(const src of queue){
     if(document.querySelector(`script[src="${src}"]`)) continue;
