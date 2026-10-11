@@ -28,11 +28,25 @@ function evaluateChanceCard(teamIndex, card){
 
 function getTeamSectors(teamIndex){
   const team = gameState.teams[teamIndex];
-  const owned = team.assets.filter(a => a.boardTile !== undefined)
-    .map(a => boardProperties[a.boardTile].sector);
-  if(owned.length) return [...new Set(owned)];
-  const sectors = team.assets.map(a => legacySectors[a.type]).filter(Boolean);
-  return sectors.length ? [...new Set(sectors)] : ["none"];
+
+  // Situation Cards react to the team's FULL current tourism portfolio:
+  // legacy tourism businesses + every board business bought during the Grand Tour.
+  // Non-tourism assets such as the Aristocratic Household's Estate contribute no sector.
+  const sectors = [];
+
+  for(const asset of team.assets){
+    if(asset.boardTile !== undefined){
+      const property = boardProperties[asset.boardTile];
+      if(property?.sector) sectors.push(property.sector);
+      continue;
+    }
+
+    const legacySector = legacySectors[asset.type];
+    if(legacySector) sectors.push(legacySector);
+  }
+
+  const uniqueSectors = [...new Set(sectors)];
+  return uniqueSectors.length ? uniqueSectors : ["none"];
 }
 function requireMonopoly(status){
   requireRule(gameState.mode === "monopoly" && gameState.phase === "starting" && !gameState.phaseComplete,
