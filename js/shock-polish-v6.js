@@ -53,7 +53,7 @@
     return button;
   }
 
-  function returnFromShock(){
+  function manualShockFallback(){
     if(gameState.phase === "industrialShockRevealed"){
       gameState.phase = "starting";
       gameState.mode = "monopoly";
@@ -65,16 +65,33 @@
       gameState.board.lastRoll = null;
       gameState.board.history = [];
       gameState.message = "Ready to roll.";
-    } else if(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock"){
+      return true;
+    }
+    if(gameState.mode === "strategy" && gameState.phase === "steam" && gameState.uiStage === "jetShock"){
       gameState.uiStage = "pause";
       gameState.phaseComplete = true;
       gameState.message = "Industrial portfolios remain locked. Trigger the Jet Age when ready.";
-    } else if(gameState.mode === "strategy" && gameState.phase === "jet" && gameState.uiStage === "digitalShock"){
+      return true;
+    }
+    if(gameState.mode === "strategy" && gameState.phase === "jet" && gameState.uiStage === "digitalShock"){
       gameState.uiStage = "pause";
       gameState.phaseComplete = true;
       gameState.message = "Jet Age values remain locked. Trigger Digital Transformation when ready.";
-    } else return;
+      return true;
+    }
+    return false;
+  }
 
+  function returnFromShock(){
+    // Prefer the shared game-flow history. This means Back keeps moving backwards through
+    // the sequence instead of bouncing to whichever screen happened to open the shock.
+    if(typeof navigateBack === "function" && typeof canNavigateBack === "function" && canNavigateBack()){
+      if(navigateBack() && typeof renderGame === "function") renderGame();
+      return;
+    }
+
+    // Industrial Shock can be entered directly from the board before strategy history exists.
+    if(!manualShockFallback()) return;
     if(typeof saveGameState === "function") saveGameState();
     if(typeof renderGame === "function") renderGame();
   }
