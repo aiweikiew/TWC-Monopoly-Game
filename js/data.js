@@ -36,7 +36,7 @@ const markets = {
 };
 const revaluations = {
   steam:{estate:1,legacyShipping:6,legacyCoach:2,legacyInn:6,legacyPublishing:4,horse:1,inn:4,shipping:6,guide:3},
-  // Jet Age mainly redistributes long-distance tourism value rather than making every transport asset richer.
+  // Jet Age redistributes long-distance tourism value rather than making every transport asset richer.
   // Rail/transfer stay useful but flat; accommodation gets a modest lift; organised tours gain most; passenger shipping declines.
   jet:{rail:4,tour:6,hotel:5,transfer:4,steamShipping:3,shipping:3,legacyShipping:3},
   digital:{tour:4,legacyPublishing:2,guide:2,guidebook:2}
@@ -59,3 +59,44 @@ const phaseInfo = {
   future:{title:"2035 TOURISM CRISIS",slides:"After slides 13–15",complete:"FUTURE ERA COMPLETE",returnTo:"Tourism Timeline Recap",next:"Show Money Winner"},
   winner:{title:"TOURISMOPOLY WINNER",slides:"After slide 16",returnTo:"But Did You Actually Win?"}
 };
+
+// Compatibility repair for saved classroom/test sessions created before the realistic Jet values.
+// It only touches the Jet revaluation screen; normal fresh progression already uses revaluations.jet above.
+function repairLegacyJetRevaluation(){
+  if(typeof gameState === "undefined" || gameState.mode !== "strategy" ||
+     gameState.phase !== "jet" || gameState.uiStage !== "revaluation" || !Array.isArray(gameState.teams)) return false;
+
+  const beforeJet = {rail:4,tour:3,hotel:4,transfer:4,steamShipping:6,shipping:6,legacyShipping:6};
+  const rows = [];
+  let changed = false;
+
+  for(const team of gameState.teams){
+    for(const asset of team.assets || []){
+      if(!Object.hasOwn(revaluations.jet,asset.type)) continue;
+      const oldValue = Object.hasOwn(beforeJet,asset.type) ? beforeJet[asset.type] : asset.currentValue;
+      const newValue = revaluations.jet[asset.type];
+      if(asset.currentValue !== newValue) changed = true;
+      asset.currentValue = newValue;
+      rows.push({team:team.name,name:asset.name,oldValue,newValue});
+    }
+  }
+
+  const oldLog = Array.isArray(gameState.revaluationLog) ? gameState.revaluationLog : [];
+  if(oldLog.length !== rows.length || oldLog.some((row,index) =>
+    !rows[index] || row.team !== rows[index].team || row.name !== rows[index].name ||
+    row.oldValue !== rows[index].oldValue || row.newValue !== rows[index].newValue)) changed = true;
+
+  if(!changed) return false;
+  gameState.revaluationLog = rows;
+  if(typeof saveGameState === "function") saveGameState();
+  return true;
+}
+
+if(typeof document !== "undefined"){
+  const repairAndRender = () => {
+    if(repairLegacyJetRevaluation() && typeof renderGame === "function") renderGame();
+  };
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded",() => window.setTimeout(repairAndRender,0),{once:true});
+  else window.setTimeout(repairAndRender,0);
+  document.addEventListener("click",() => window.setTimeout(repairAndRender,0),true);
+}
