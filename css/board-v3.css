@@ -216,6 +216,53 @@
   display:none !important;
 }
 
+/* Situation Cards: event first, then one concise portfolio-specific impact block. */
+.monopoly-shell #chanceModal .modal-note{
+  display:none !important;
+}
+.monopoly-shell #chanceModal .chance-card-ui{
+  padding-top:15px;
+  padding-bottom:15px;
+}
+.monopoly-shell #chanceModal .chance-heading{
+  margin-bottom:5px;
+}
+.monopoly-shell #chanceModal .chance-title{
+  margin-top:2px;
+  line-height:1.08;
+}
+.monopoly-shell #chanceModal .chance-story{
+  margin-top:7px;
+  line-height:1.3;
+}
+.monopoly-shell #chanceModal .chance-effect-box{
+  margin-top:13px;
+  padding:12px 14px 13px;
+}
+.monopoly-shell #chanceModal .chance-effect-label{
+  font-size:10px;
+  letter-spacing:.12em;
+}
+.monopoly-shell #chanceModal .chance-business{
+  margin-top:6px;
+  font-size:15px;
+  line-height:1.18;
+  font-weight:800;
+}
+.monopoly-shell #chanceModal .chance-sector{
+  margin-top:6px;
+  font-size:11px;
+  line-height:1.32;
+}
+.monopoly-shell #chanceModal .chance-effect{
+  margin-top:9px;
+  font-size:32px;
+  line-height:1;
+}
+.monopoly-shell #chanceModal .landing-actions{
+  margin-top:12px;
+}
+
 @media (max-height:820px){
   .monopoly-shell .side-column{width:390px;min-width:370px;}
   .monopoly-shell .roll-panel{padding:6px 8px 7px;}
@@ -238,4 +285,8 @@
   .monopoly-shell .rule{margin:12px auto 10px;}
   .monopoly-shell .tagline{font-size:clamp(9px,3.5cqw,12px);}
   .monopoly-shell .stamp{margin-top:11px;font-size:8px;}
+  .monopoly-shell #chanceModal .chance-effect-box{margin-top:10px;padding:10px 12px;}
+  .monopoly-shell #chanceModal .chance-business{font-size:14px;}
+  .monopoly-shell #chanceModal .chance-sector{font-size:10.5px;}
+  .monopoly-shell #chanceModal .chance-effect{font-size:28px;}
 }
