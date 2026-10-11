@@ -1,67 +1,8 @@
 "use strict";
 
-// Board review enhancements are isolated so gameplay/navigation state stays untouched.
-if(typeof document !== "undefined" && !document.querySelector('link[href="css/board-v3.css"]')){
-  const boardCompactStyles = document.createElement("link");
-  boardCompactStyles.rel = "stylesheet";
-  boardCompactStyles.href = "css/board-v3.css";
-  document.head.appendChild(boardCompactStyles);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/board-review-v3.js"]')){
-  const reviewScript = document.createElement("script");
-  reviewScript.src = "js/board-review-v3.js";
-  document.head.appendChild(reviewScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/chance-sum-v5.js"]')){
-  const chanceScript = document.createElement("script");
-  chanceScript.src = "js/chance-sum-v5.js";
-  chanceScript.async = false;
-  document.head.appendChild(chanceScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/debt-settlement-v4.js"]')){
-  const debtScript = document.createElement("script");
-  debtScript.src = "js/debt-settlement-v4.js";
-  document.head.appendChild(debtScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/shock-polish-v6.js"]')){
-  const shockPolishScript = document.createElement("script");
-  shockPolishScript.src = "js/shock-polish-v6.js";
-  document.head.appendChild(shockPolishScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/go-passive-v8.js"]')){
-  const goPassiveScript = document.createElement("script");
-  goPassiveScript.src = "js/go-passive-v8.js";
-  goPassiveScript.async = false;
-  document.head.appendChild(goPassiveScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/industrial-summary-v10.js"]')){
-  const industrialSummaryScript = document.createElement("script");
-  industrialSummaryScript.src = "js/industrial-summary-v10.js";
-  document.head.appendChild(industrialSummaryScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/revaluation-back-v9.js"]')){
-  const revaluationBackScript = document.createElement("script");
-  revaluationBackScript.src = "js/revaluation-back-v9.js";
-  document.head.appendChild(revaluationBackScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/industrial-decisions-v11.js"]')){
-  const industrialDecisionsScript = document.createElement("script");
-  industrialDecisionsScript.src = "js/industrial-decisions-v11.js";
-  document.head.appendChild(industrialDecisionsScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/industrial-review-v12.js"]')){
-  const industrialReviewScript = document.createElement("script");
-  industrialReviewScript.src = "js/industrial-review-v12.js";
-  document.head.appendChild(industrialReviewScript);
-}
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/flow-back-v13.js"]')){
-  const flowBackScript = document.createElement("script");
-  flowBackScript.src = "js/flow-back-v13.js";
-  document.head.appendChild(flowBackScript);
-}
+// v25: extension loading is handled centrally by extensions-bootstrap-v25.js.
+// navigation.js now owns navigation only.
 
-// navigationState is only for transient UI drill-downs such as an unconfirmed decision.
-// Committed game screens use gameState.flowHistory so Back follows the actual game sequence.
 const navigationState = {
   currentView:null,previousViews:[],selection:null,sessionBoard:null,
   observedKey:null,revision:0
@@ -97,7 +38,6 @@ function replaceView(type){
   navigationState.currentView = makeView(type);
 }
 
-// Only transient, uncommitted drill-downs use previousViews.
 function visitView(type){
   if(navigationState.currentView) navigationState.previousViews.push(navigationState.currentView);
   navigationState.currentView = makeView(type);
@@ -182,37 +122,27 @@ function restoreFlowSnapshot(){
   return true;
 }
 
-// Compatibility for saves created before flowHistory existed.
+// Kept only for pre-v25 compatibility inside the current session. Published v25 saves
+// start clean, so normal Back navigation should use exact flow snapshots.
 function canUseLegacyFlowFallback(){
   if(gameState.mode !== "strategy") return false;
-  if(gameState.phase === "winner" && gameState.uiStage === "winner") return true;
   if(gameState.uiStage === "jetShock" || gameState.uiStage === "digitalShock") return true;
-  if(gameState.uiStage === "pause" && ["steam","jet","digital","future"].includes(gameState.phase)) return true;
-  if(gameState.uiStage === "results" && ["digital","future"].includes(gameState.phase)) return true;
-  if(gameState.uiStage === "event" && gameState.phase === "digital") return true;
-  if(gameState.uiStage === "review" && gameState.lastDecision) return true;
+  if(gameState.uiStage === "pause" && ["steam","jet"].includes(gameState.phase)) return true;
+  if(gameState.uiStage === "review" && gameState.phase === "steam" && gameState.lastDecision) return true;
   return false;
 }
 function useLegacyFlowFallback(){
   if(!canUseLegacyFlowFallback()) return false;
 
-  if(gameState.phase === "winner" && gameState.uiStage === "winner"){
-    gameState.phase = "future";
-    gameState.uiStage = "pause";
-    gameState.phaseComplete = true;
-  } else if(gameState.uiStage === "jetShock" && gameState.phase === "steam"){
+  if(gameState.uiStage === "jetShock" && gameState.phase === "steam"){
     gameState.uiStage = "pause";
   } else if(gameState.uiStage === "digitalShock" && gameState.phase === "jet"){
     gameState.uiStage = "pause";
-  } else if(gameState.uiStage === "pause"){
-    if(gameState.phase === "future" || gameState.phase === "digital") gameState.uiStage = "results";
-    else if(gameState.phase === "jet") gameState.uiStage = "revaluation";
-    else if(gameState.phase === "steam") gameState.uiStage = "review";
-  } else if(gameState.uiStage === "results"){
-    gameState.uiStage = gameState.phase === "digital" ? "event" : "review";
-  } else if(gameState.uiStage === "event" && gameState.phase === "digital"){
+  } else if(gameState.uiStage === "pause" && gameState.phase === "jet"){
+    gameState.uiStage = "revaluation";
+  } else if(gameState.uiStage === "pause" && gameState.phase === "steam"){
     gameState.uiStage = "review";
-  } else if(gameState.uiStage === "review" && gameState.lastDecision){
+  } else if(gameState.uiStage === "review" && gameState.phase === "steam" && gameState.lastDecision){
     const checkpoint = JSON.parse(JSON.stringify(gameState.lastDecision));
     Object.assign(gameState,checkpoint,{lastDecision:null});
   } else return false;
@@ -261,8 +191,6 @@ function openStrategySelection(teamId, action, selection, phase){
   return true;
 }
 
-// Record every committed strategy-screen transition at the rules layer. This keeps Back
-// correct even when different UI components trigger the same rule function.
 let flowTransitionDepth = 0;
 function withFlowHistory(original){
   return function(...args){
