@@ -1,5 +1,14 @@
 "use strict";
 
+// Dedicated visual layer for the Grand Tour board. Keeping it separate from the shared
+// flow styles lets us polish the board without affecting later-era screens.
+if(typeof document !== "undefined" && !document.querySelector('link[href="css/board-v2.css"]')){
+  const boardStyles = document.createElement("link");
+  boardStyles.rel = "stylesheet";
+  boardStyles.href = "css/board-v2.css";
+  document.head.appendChild(boardStyles);
+}
+
 // The legacy board renderer and animation engine adapted to the shared state.
 const monopolyScreen = document.getElementById("monopolyScreen");
 const tiles = [...monopolyScreen.querySelectorAll(".tile[data-index]")];
@@ -26,6 +35,10 @@ shockBtn.classList.add("tech-shock-trigger");
 presenterControls.hidden = true;
 const topControls = shockBtn.parentElement;
 topControls.insertBefore(undoTurnBtn, boardResetBtn);
+undoTurnBtn.textContent = "Undo";
+undoTurnBtn.title = "Undo last completed turn";
+boardResetBtn.textContent = "Reset";
+boardResetBtn.title = "Reset the game";
 undoTurnBtn.classList.add("board-top-action");
 boardResetBtn.classList.add("board-top-action");
 triggerShockBtn.hidden = true;
@@ -153,11 +166,25 @@ function renderBoard(){
   boardText("boardError","");
   hideBoardOverlays();
   tokens.forEach((_,i) => placeToken(i,board.positions[i]));
+
   tiles.forEach((tile,i) => {
     let marker = tile.querySelector(".ownership-marker");
-    if(!marker){marker = document.createElement("div");marker.className="ownership-marker";tile.appendChild(marker);}
-    marker.textContent = board.owners[i] === undefined ? "" : `Owned by Team ${board.owners[i]}`;
+    if(!marker){
+      marker = document.createElement("div");
+      marker.className = "ownership-marker";
+      tile.appendChild(marker);
+    }
+    const owner = board.owners[i];
+    marker.classList.remove("owner-a","owner-b","owner-c");
+    tile.classList.remove("owned-tile","current-team-tile");
+    marker.textContent = owner === undefined ? "" : `Team ${owner} · Owned`;
+    if(owner !== undefined){
+      marker.classList.add(`owner-${String(owner).toLowerCase()}`);
+      tile.classList.add("owned-tile");
+    }
+    if(board.positions[teamIndex] === i) tile.classList.add("current-team-tile");
   });
+
   rollBtn.disabled = board.status !== "ready";
   nextBtn.disabled = board.status !== "resolved";
   shockBtn.disabled = !canTriggerTechShock();
@@ -167,7 +194,13 @@ function renderBoard(){
   boardText("boardTurnBadge",`${gameState.teams[teamIndex].name.toUpperCase()}'S TURN`);
   boardText("boardStatusText",gameState.message);
   boardText("boardStatusSub",`Round ${gameState.roundNumber} · ${gameState.totalTurnCount} completed turns`);
-  renderPlayers(document.getElementById("boardPlayers"));
+
+  const playerTarget = document.getElementById("boardPlayers");
+  renderPlayers(playerTarget);
+  [...playerTarget.querySelectorAll(".player-card")].forEach((card,i) => {
+    card.classList.toggle("active",i === teamIndex);
+  });
+
   if(board.status === "landing" && !landingOverview){
     const landing = board.pendingLanding;
     if(landing.kind === "property") showPropertyPopup(teamIndex,landing.tile);
