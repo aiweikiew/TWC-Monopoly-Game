@@ -17,7 +17,6 @@
   function teamCard(team){
     const pressure = Number(team.destinationPressure || 0);
     const previousPressure = Math.max(0, pressure - 1);
-    const cashBonus = team.digitalReady ? 2 : 0;
     const status = team.digitalReady ? "DIGITAL READY" : "NOT DIGITAL READY";
     const outcomeClass = team.digitalReady ? "positive" : "neutral";
     const outcome = team.digitalReady ? "+$2 CASH" : "NO CASH BONUS";
@@ -29,7 +28,6 @@
       <header class="fit-team-head">
         <div class="fit-team-icon">${team.identity.icon}</div>
         <div><strong>${escapeHTML(team.name)}</strong><span>${escapeHTML(team.identity.name)}</span></div>
-        <b>${team.id}</b>
       </header>
 
       <div class="fit-readiness ${team.digitalReady ? "ready" : "not-ready"}">${status}</div>
@@ -62,9 +60,9 @@
     return `<section class="strategy-modern-screen digital-era event-modern-screen fit-event-screen">
       <header class="strategy-modern-header fit-event-header">
         <div class="strategy-event-icon">📱</div>
-        <div class="screen-kicker">SHARED MARKET EVENT</div>
-        <h2>Free Independent Travel Boom</h2>
-        <p>Search, comparison, booking and navigation give travellers more autonomy — demand expands beyond traditional packaged tours.</p>
+        <div class="screen-kicker">SHARED MARKET EVENT · FIT = FREE INDEPENDENT TRAVELLER</div>
+        <h2>FIT Boom</h2>
+        <p><strong>Free Independent Travellers</strong> plan and book their own trips instead of relying on traditional package tours. Search, OTAs, online booking and navigation give travellers more autonomy.</p>
       </header>
 
       <div class="fit-event-rules">
@@ -118,9 +116,7 @@
       enhance();
     };
 
-    window.setTimeout(() => {
-      enhance();
-    },0);
+    window.setTimeout(enhance,0);
     return true;
   }
 
