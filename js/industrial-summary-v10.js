@@ -59,7 +59,8 @@
     const {team,assets,assetDelta,beforeWorth,afterWorth} = summary;
     const cls = deltaClass(assetDelta);
     const direction = assetDelta > 0 ? "GAIN" : assetDelta < 0 ? "LOSS" : "UNCHANGED";
-    return `<article class="industrial-team-block team-${String.fromCharCode(97+index)} ${cls}">
+    const inDebt = team.cash < 0;
+    return `<article class="industrial-team-block team-${String.fromCharCode(97+index)} ${cls} ${inDebt ? "in-debt" : ""}">
       <header class="industrial-team-head">
         <div class="industrial-team-id">
           <div class="industrial-team-icon">${team.identity.icon}</div>
@@ -70,6 +71,12 @@
         </div>
         <div class="industrial-total-chip ${cls}"><span>${direction}</span><strong>${deltaLabel(assetDelta)}</strong></div>
       </header>
+
+      ${inDebt ? `<div class="industrial-debt-alert">
+        <span>⚠ IN DEBT</span>
+        <strong>${money(team.cash)} CASH</strong>
+        <small>Must sell a business during Team Decisions</small>
+      </div>` : ""}
 
       <div class="industrial-worth-panel ${cls}">
         <div class="industrial-worth-label">NET WORTH</div>
