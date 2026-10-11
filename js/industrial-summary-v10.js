@@ -1,5 +1,11 @@
 "use strict";
 
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/strategy-layout-v14.js"]')){
+  const strategyLayoutScript = document.createElement("script");
+  strategyLayoutScript.src = "js/strategy-layout-v14.js";
+  document.head.appendChild(strategyLayoutScript);
+}
+
 (function(){
   function loadStyles(){
     if(document.querySelector('link[href="css/industrial-summary-v10.css"]')) return;
