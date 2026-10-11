@@ -143,7 +143,6 @@
     const valid = draftIsValid(team,draft);
     const sellDisabled = team.assets.length === 0;
     const adaptDisabled = inDebt || !team.assets.some(asset => Object.hasOwn(adaptations,asset.type));
-    const hasCommitted = committedDecisionCount() > 0;
 
     return `<section class="industrial-turn-screen decision-screen ${inDebt ? "debt-turn" : ""}">
       <div class="industrial-turn-heading">
@@ -194,7 +193,7 @@
       ${!valid && cashAfter < 0 ? `<div class="industrial-turn-warning">Still in debt by ${money(Math.abs(cashAfter))}. Choose a higher-value business to sell.</div>` : ""}
 
       <div class="industrial-decision-controls">
-        <button type="button" class="game-btn secondary decision-back-btn" id="industrialDecisionBackBtn" ${hasCommitted ? "disabled" : ""}>← BACK</button>
+        <button type="button" class="game-btn secondary decision-back-btn" id="industrialDecisionBackBtn">← BACK</button>
         <button type="button" class="game-btn secondary decision-undo-btn" id="industrialUndoActionBtn" ${gameState.lastDecision ? "" : "disabled"}>UNDO LAST ACTION</button>
       </div>
     </section>`;
@@ -206,6 +205,7 @@
     const startedInDebt = team.cash < 0;
     const draft = ensureDraft();
     requireRule(draftIsValid(team,draft),startedInDebt ? "Sell a business that clears the debt first." : "Finish choosing a valid Industrial turn first.");
+    const flowBefore = typeof captureFlowSnapshot === "function" ? captureFlowSnapshot() : null;
 
     const checkpoint = JSON.parse(JSON.stringify({
       phase:gameState.phase,uiStage:gameState.uiStage,teams:gameState.teams,currentTeam:gameState.currentTeam,
@@ -262,6 +262,7 @@
       gameState.uiStage = "review";
     } else gameState.currentTeam = nextTeam;
 
+    if(flowBefore && typeof commitFlowSnapshot === "function") commitFlowSnapshot(flowBefore);
     resetDraft();
     navigationState.selection = null;
     navigationState.previousViews = [];
@@ -282,10 +283,20 @@
     renderGame();
   }
 
+  function goBackInIndustrialFlow(){
+    resetDraft();
+    if(typeof navigateBack === "function" && navigateBack()){
+      renderGame();
+      return;
+    }
+    backToRevaluation();
+  }
+
   function undoLatestIndustrialAction(){
     if(!isIndustrialDecisionScreen() || !gameState.lastDecision) return;
     const checkpoint = gameState.lastDecision;
     if(checkpoint.phase !== "steam") return;
+    if(Array.isArray(gameState.flowHistory) && gameState.flowHistory.length) gameState.flowHistory.pop();
     Object.assign(gameState,checkpoint,{lastDecision:null});
     resetDraft();
     navigationState.selection = null;
@@ -359,7 +370,7 @@
       if(event.target.closest("#industrialDecisionBackBtn")){
         event.preventDefault();
         event.stopImmediatePropagation();
-        backToRevaluation();
+        goBackInIndustrialFlow();
         return;
       }
 
