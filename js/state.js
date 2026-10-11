@@ -31,6 +31,14 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/st
   strategyLayoutScript.async = false;
   document.head.appendChild(strategyLayoutScript);
 }
+// FIT Boom uses a dedicated presentation treatment so the classroom sees what FIT means,
+// why destination pressure rises, and how that pressure carries into the 2035 crisis.
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/fit-event-v17.js"]')){
+  const fitEventScript = document.createElement("script");
+  fitEventScript.src = "js/fit-event-v17.js";
+  fitEventScript.async = false;
+  document.head.appendChild(fitEventScript);
+}
 
 const GAME_STORAGE_KEY = "tourismopoly:screen-flow-v2:v1";
 
