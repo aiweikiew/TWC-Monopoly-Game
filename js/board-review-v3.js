@@ -13,6 +13,12 @@
       document.head.appendChild(styles);
     }
 
+    if(!document.querySelector('script[src="js/debt-settlement-v4.js"]')){
+      const debtScript = document.createElement("script");
+      debtScript.src = "js/debt-settlement-v4.js";
+      document.head.appendChild(debtScript);
+    }
+
     const feeDescription = document.querySelector("#feeModal .landing-desc");
     if(feeDescription) feeDescription.textContent = "You landed on another team’s tourism business.";
 
