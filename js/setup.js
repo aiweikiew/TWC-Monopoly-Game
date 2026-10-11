@@ -41,6 +41,16 @@ function setupReset(){
   return true;
 }
 
+function decorateSetupTeamBadges(){
+  if(typeof document === "undefined") return;
+  const cards = [...document.querySelectorAll("#setupCards .setup-card")];
+  cards.forEach(card => card.classList.remove("team-a","team-b","team-c"));
+  gameState.setupSelected.forEach((entry, teamIndex) => {
+    const card = cards[entry.index];
+    if(card) card.classList.add(`team-${String.fromCharCode(97 + teamIndex)}`);
+  });
+}
+
 function applySetupFromDraw(){
   const selected = gameState.setupSelected;
   if(gameState.phase !== "setup" || setupDrawAnimating || selected.length !== 3 ||
@@ -97,24 +107,24 @@ async function animateIdentityDraw(){
   };
 
   try {
-    // Fast roulette for roughly 2.4 seconds.
+    // Fast roulette for about 1.35 seconds.
     let cursor = Math.floor(Math.random() * available.length);
     const start = performance.now();
-    while(performance.now() - start < 2380){
+    while(performance.now() - start < 1350){
       lightCard(available[cursor % available.length]);
       cursor += 1;
-      await setupWait(85);
+      await setupWait(75);
     }
 
-    // A short easing-out finish gives the class time to anticipate the landing.
-    for(const delay of [115,145,185,220]){
+    // Short easing-out finish keeps the whole draw close to two seconds.
+    for(const delay of [90,120,150]){
       lightCard(available[cursor % available.length]);
       cursor += 1;
       await setupWait(delay);
     }
 
     lightCard(targetIndex);
-    await setupWait(320);
+    await setupWait(230);
 
     if(activeIndex !== null && cards[activeIndex]) cards[activeIndex].classList.remove("is-draw-scan");
     cardsContainer.classList.remove("is-drawing");
@@ -128,6 +138,7 @@ async function animateIdentityDraw(){
 
     // Re-render the committed state, then give the winning card one final gold flare.
     renderGame();
+    decorateSetupTeamBadges();
     const freshCards = [...document.querySelectorAll("#setupCards .setup-card")];
     const winnerCard = freshCards[targetIndex];
     const freshContainer = document.getElementById("setupCards");
@@ -137,7 +148,7 @@ async function animateIdentityDraw(){
       window.setTimeout(() => {
         winnerCard.classList.remove("draw-winner");
         freshContainer.classList.remove("winner-reveal");
-      }, 1100);
+      }, 900);
     }
   } catch(error){
     setupDrawAnimating = false;
@@ -161,5 +172,13 @@ if(typeof document !== "undefined"){
       event.stopImmediatePropagation();
       animateIdentityDraw();
     }, true);
+  }
+
+  const cardsRoot = document.getElementById("setupCards");
+  if(cardsRoot && !cardsRoot.dataset.teamColourObserver){
+    cardsRoot.dataset.teamColourObserver = "true";
+    const observer = new MutationObserver(() => decorateSetupTeamBadges());
+    observer.observe(cardsRoot,{childList:true,subtree:true});
+    decorateSetupTeamBadges();
   }
 }
