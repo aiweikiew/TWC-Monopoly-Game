@@ -16,7 +16,6 @@
   padding:0 !important;
 }
 
-/* Revaluation already contains the full team summary, so the normal sidebar is redundant. */
 #gameScreen.industrial-summary-mode .phase-sidebar{
   display:none !important;
 }
@@ -32,7 +31,6 @@
   overflow:hidden;
 }
 
-/* Central presentation header rather than a left-anchored dashboard heading. */
 .industrial-summary-topline{
   display:flex;
   flex-direction:column;
@@ -63,7 +61,6 @@
   color:#695644;
 }
 
-/* Compact market-wide takeaway stays in the main composition, not in a sidebar. */
 .industrial-market-callout{
   width:auto;
   min-width:260px;
@@ -112,7 +109,7 @@
   background:rgba(255,255,255,.28);
   box-shadow:0 12px 24px rgba(72,51,32,.07);
   display:grid;
-  grid-template-rows:auto auto auto minmax(0,1fr);
+  grid-template-rows:auto auto auto auto minmax(0,1fr);
   gap:12px;
   overflow:hidden;
 }
@@ -125,6 +122,10 @@
   border:2px solid rgba(154,63,52,.60);
   background:linear-gradient(180deg,rgba(180,83,70,.15),rgba(255,255,255,.25) 34%);
   box-shadow:inset 0 7px 0 #9a3f34,0 12px 24px rgba(143,61,51,.10);
+}
+.industrial-team-block.in-debt{
+  outline:3px solid rgba(166,53,44,.30);
+  outline-offset:-6px;
 }
 
 .industrial-team-head{
@@ -193,6 +194,38 @@
   background:#9a3f34;
   border-color:#7f3129;
   box-shadow:0 4px 10px rgba(154,63,52,.18);
+}
+
+/* Debt is a liquidity warning, separate from whether revaluation gained or lost value. */
+.industrial-debt-alert{
+  display:grid;
+  grid-template-columns:auto auto 1fr;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border:2px solid #a33f34;
+  border-radius:9px;
+  background:linear-gradient(90deg,#9a3f34,#b55243);
+  color:#fff7e8;
+  box-shadow:0 5px 12px rgba(145,55,46,.16);
+}
+.industrial-debt-alert span{
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.12em;
+  white-space:nowrap;
+}
+.industrial-debt-alert strong{
+  font-size:16px;
+  line-height:1;
+  white-space:nowrap;
+}
+.industrial-debt-alert small{
+  justify-self:end;
+  font-size:8px;
+  font-weight:800;
+  text-align:right;
+  color:#ffe4d8;
 }
 
 .industrial-worth-panel{
@@ -355,7 +388,6 @@
   color:#756557;
 }
 
-/* One centered control bar: Back · Reset · Continue. */
 .industrial-summary-actions{
   display:flex;
   justify-content:center;
@@ -386,6 +418,9 @@
   .industrial-team-name{font-size:17px}
   .industrial-team-identity{font-size:9.5px}
   .industrial-total-chip strong{font-size:19px}
+  .industrial-debt-alert{padding:6px 8px;gap:6px}
+  .industrial-debt-alert strong{font-size:14px}
+  .industrial-debt-alert small{font-size:7px}
   .industrial-worth-panel{padding:10px 11px}
   .industrial-worth-flow span{font-size:20px}
   .industrial-worth-flow strong{font-size:32px}
@@ -402,6 +437,8 @@
   .industrial-team-block{padding:11px}
   .industrial-team-name{font-size:16px}
   .industrial-worth-flow strong{font-size:31px}
+  .industrial-debt-alert{grid-template-columns:auto auto}
+  .industrial-debt-alert small{grid-column:1/-1;justify-self:start;text-align:left}
   .industrial-asset-row{grid-template-columns:minmax(0,1fr) auto}
   .industrial-asset-delta{grid-column:2;justify-self:end}
 }
