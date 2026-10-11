@@ -15,6 +15,14 @@ if(typeof document !== "undefined" && !document.querySelector('link[href="css/la
   landingStyles.href = "css/landing.css";
   document.head.appendChild(landingStyles);
 }
+// Keep era colours in one final visual layer so every strategy screen follows the same
+// Industrial / Jet / Digital / Future palette while the Grand Tour board stays untouched.
+if(typeof document !== "undefined" && !document.querySelector('link[href="css/era-theme-v14.css"]')){
+  const eraThemeStyles = document.createElement("link");
+  eraThemeStyles.rel = "stylesheet";
+  eraThemeStyles.href = "css/era-theme-v14.css";
+  document.head.appendChild(eraThemeStyles);
+}
 
 const GAME_STORAGE_KEY = "tourismopoly:screen-flow-v2:v1";
 
