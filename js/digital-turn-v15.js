@@ -133,6 +133,19 @@
     </div>`;
   }
 
+  function renderDigitiseOptions(current,draft,candidates,spendable){
+    if(!candidates.length) return '<div class="digital-digitise-empty">No eligible non-digital tourism business remains.</div>';
+    if(spendable < 2) return '<div class="digital-digitise-empty">Need $2 cash to digitise a business.</div>';
+    return `<div class="digital-digitise-options">${candidates.map(asset => {
+      const selected = draft.digitalAction === "digitise" && draft.digitalSelection === asset.id;
+      return `<button type="button" class="digital-digitise-option ${selected ? "selected" : ""}" data-digital-move="digitise" data-digital-selection="${asset.id}">
+        <span>${selected ? "✓ SELECTED" : "DIGITISE"}</span>
+        <strong>${escapeHTML(asset.name)}</strong>
+        <b>${money(asset.currentValue)}</b>
+      </button>`;
+    }).join("")}</div>`;
+  }
+
   function renderDigitalChoices(current,draft){
     const spendable = cashAfterSale(current,draft);
     const candidates = digitiseCandidates(current,draft);
@@ -147,10 +160,7 @@
       }).join("")}
       <article class="digital-move-card digitise ${draft.digitalAction === "digitise" ? "selected" : ""}">
         <span>TRANSFORM EXISTING BUSINESS</span><strong>Digitise one business</strong><b>$2</b>
-        <select id="digitalTurnDigitiseSelect" ${!candidates.length || spendable < 2 ? "disabled" : ""}>
-          ${candidates.length ? candidates.map(asset => `<option value="${asset.id}" ${draft.digitalAction === "digitise" && draft.digitalSelection === asset.id ? "selected" : ""}>${escapeHTML(asset.name)} · ${money(asset.currentValue)}</option>`).join("") : '<option value="">No eligible business</option>'}
-        </select>
-        <button type="button" class="game-btn digital-draft-button" data-digital-move="digitise" ${!candidates.length || spendable < 2 ? "disabled" : ""}>${spendable < 2 ? "INSUFFICIENT CASH" : draft.digitalAction === "digitise" ? "✓ DIGITISE SELECTED" : "DIGITISE · $2"}</button>
+        ${renderDigitiseOptions(current,draft,candidates,spendable)}
       </article>
       <button type="button" class="digital-move-card hold ${draft.digitalAction === "hold" ? "selected" : ""}" data-digital-move="hold">
         <span>NO DIGITAL SPEND</span><strong>Hold</strong><b>$0</b><small>${draft.digitalAction === "hold" ? "✓ Selected" : "Keep remaining cash"}</small>
@@ -308,11 +318,8 @@
         if(move.disabled) return;
         const draft = ensureDraft();
         draft.digitalAction = move.dataset.digitalMove;
-        if(draft.digitalAction === "invest") draft.digitalSelection = move.dataset.digitalSelection;
-        else if(draft.digitalAction === "digitise"){
-          const select = document.getElementById("digitalTurnDigitiseSelect");
-          draft.digitalSelection = select?.value || null;
-        } else draft.digitalSelection = null;
+        if(draft.digitalAction === "invest" || draft.digitalAction === "digitise") draft.digitalSelection = move.dataset.digitalSelection || null;
+        else draft.digitalSelection = null;
         rerender();
         return;
       }
