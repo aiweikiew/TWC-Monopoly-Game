@@ -75,9 +75,12 @@
 
   // For an old save with no exact snapshot, rebuild the immediately previous Future screen:
   // Team C's decision. The crisis baseline is deterministic, so its strategy effects can be
-  // reversed without touching Teams A/B.
+  // reversed without touching Teams A/B. We also save the review screen as the previous
+  // flow snapshot so Back remains available on the reconstructed decision screen.
   function restoreLegacyPreviousFutureDecision(){
     if(!isLegacyFutureReview()) return false;
+    const reviewSnapshot = typeof captureFlowSnapshot === "function" ? captureFlowSnapshot() : null;
+
     let index = -1;
     for(let i = gameState.teams.length - 1; i >= 0; i--){
       if(gameState.teams[i].futureStrategy){ index = i; break; }
@@ -108,6 +111,8 @@
     navigationState.previousViews = [];
     navigationState.observedKey = null;
     navigationState.currentView = null;
+
+    if(reviewSnapshot && typeof commitFlowSnapshot === "function") commitFlowSnapshot(reviewSnapshot);
     if(typeof saveGameState === "function") saveGameState();
     return true;
   }
