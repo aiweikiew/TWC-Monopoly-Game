@@ -1,0 +1,279 @@
+/* Industrial Revolution review · actions on top, new portfolios below */
+#gameScreen.industrial-review-mode{
+  grid-template-columns:minmax(0,1fr) !important;
+  gap:0 !important;
+  padding:10px !important;
+}
+#gameScreen.industrial-review-mode .phase-panel{
+  grid-template-rows:minmax(0,1fr) !important;
+  width:100%;
+}
+#gameScreen.industrial-review-mode .phase-panel > header,
+#gameScreen.industrial-review-mode .phase-sidebar{
+  display:none !important;
+}
+#gameScreen.industrial-review-mode #phaseContent{
+  padding:0 !important;
+}
+
+.industrial-review-screen{
+  height:100%;
+  min-height:0;
+  padding:18px 22px 16px;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+  gap:12px;
+  overflow:hidden;
+  color:#38271d;
+}
+
+.industrial-review-header{
+  text-align:center;
+}
+.industrial-review-header .screen-kicker{
+  margin-bottom:3px;
+  font-size:9px;
+  letter-spacing:.15em;
+  color:#765b3d;
+}
+.industrial-review-header h2{
+  margin:0;
+  font-size:clamp(29px,2.4vw,42px);
+  line-height:1;
+}
+.industrial-review-header p{
+  margin:5px 0 0;
+  font-size:11px;
+  color:#705c49;
+}
+
+.industrial-review-section{
+  min-width:0;
+}
+.industrial-review-section-title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:7px;
+}
+.industrial-review-section-title > span{
+  width:27px;
+  height:27px;
+  flex:0 0 27px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#70543a;
+  color:#fff4db;
+  font-size:12px;
+  font-weight:900;
+}
+.industrial-review-section-title div{display:grid;gap:1px}
+.industrial-review-section-title strong{font-size:13px}
+.industrial-review-section-title small{font-size:8.5px;color:#765f4a}
+
+.industrial-review-action-grid,
+.industrial-review-portfolio-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:11px;
+}
+
+.industrial-review-action-card{
+  min-width:0;
+  padding:10px 12px;
+  border:1px solid rgba(75,56,40,.20);
+  border-radius:11px;
+  background:rgba(255,255,255,.30);
+  display:grid;
+  gap:8px;
+}
+.industrial-review-action-head,
+.industrial-review-team-id{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.industrial-review-team-icon{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:rgba(92,68,45,.10);
+  border:1px solid rgba(92,68,45,.18);
+  font-size:20px;
+}
+.industrial-review-action-head div:last-child,
+.industrial-review-team-id div:last-child{min-width:0;display:grid;gap:2px}
+.industrial-review-action-head strong,
+.industrial-review-team-id strong{font-size:14px;line-height:1}
+.industrial-review-action-head span,
+.industrial-review-team-id span{font-size:8.5px;color:#765f4a}
+.industrial-review-action-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.industrial-review-action-pill{
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:8.5px;
+  line-height:1.1;
+  font-weight:900;
+  border:1px solid transparent;
+}
+.industrial-review-action-pill.buy{color:#f4ffff;background:#477985;border-color:#37636c}
+.industrial-review-action-pill.sell{color:#fff4ed;background:#a95440;border-color:#8c4333}
+.industrial-review-action-pill.adapt{color:#f4fff0;background:#63815a;border-color:#4f7048}
+.industrial-review-action-pill.hold{color:#fff7de;background:#96753e;border-color:#7d6030}
+.industrial-review-action-pill.skip{color:#665845;background:#e5d8b6;border-color:#baa982}
+.industrial-review-action-pill.neutral{color:#665845;background:#eee3c8;border-color:#cbbd9b}
+
+.industrial-review-portfolios-section{
+  min-height:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+}
+.industrial-review-portfolio-grid{
+  min-height:0;
+  align-items:stretch;
+}
+.industrial-review-portfolio-card{
+  min-width:0;
+  min-height:0;
+  padding:13px;
+  border:1px solid rgba(75,56,40,.22);
+  border-radius:13px;
+  background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.20));
+  display:grid;
+  grid-template-rows:auto auto auto minmax(0,1fr);
+  gap:9px;
+  box-shadow:0 8px 18px rgba(69,48,31,.06);
+  overflow:hidden;
+}
+.industrial-review-portfolio-card.team-a{box-shadow:inset 0 5px 0 #496f8f,0 8px 18px rgba(69,48,31,.06)}
+.industrial-review-portfolio-card.team-b{box-shadow:inset 0 5px 0 #7a568c,0 8px 18px rgba(69,48,31,.06)}
+.industrial-review-portfolio-card.team-c{box-shadow:inset 0 5px 0 #557855,0 8px 18px rgba(69,48,31,.06)}
+.industrial-review-portfolio-card.in-debt{border:2px solid #9a3f34}
+.industrial-review-portfolio-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.industrial-review-debt-chip{
+  padding:4px 7px;
+  border-radius:999px;
+  background:#9a3f34;
+  color:#fff7e8;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+.industrial-review-metrics{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.industrial-review-metrics > div{
+  padding:8px 10px;
+  border-radius:9px;
+  background:rgba(91,67,45,.075);
+  border:1px solid rgba(91,67,45,.12);
+}
+.industrial-review-metrics span{
+  display:block;
+  font-size:7px;
+  letter-spacing:.12em;
+  font-weight:900;
+  color:#765f4a;
+}
+.industrial-review-metrics strong{
+  display:block;
+  margin-top:2px;
+  font-size:24px;
+  line-height:1;
+}
+.industrial-review-metrics .debt{
+  background:rgba(169,71,58,.10);
+  border-color:rgba(154,63,52,.28);
+}
+.industrial-review-metrics .debt span,
+.industrial-review-metrics .debt strong{color:#91392f}
+.industrial-review-assets-title{
+  font-size:7.5px;
+  letter-spacing:.13em;
+  font-weight:900;
+  color:#755e49;
+}
+.industrial-review-assets{
+  min-height:0;
+  overflow:hidden;
+  display:grid;
+  align-content:start;
+  gap:6px;
+}
+.industrial-review-asset-row{
+  min-width:0;
+  padding:7px 9px;
+  border-radius:8px;
+  background:rgba(255,255,255,.36);
+  border:1px solid rgba(80,60,43,.12);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+}
+.industrial-review-asset-row span{
+  min-width:0;
+  font-size:10.5px;
+  line-height:1.15;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+.industrial-review-asset-row strong{
+  font-size:13px;
+  white-space:nowrap;
+}
+.industrial-review-no-assets{
+  padding:12px;
+  border:1px dashed rgba(90,68,49,.20);
+  border-radius:8px;
+  font-size:9px;
+  color:#776655;
+}
+
+.industrial-review-controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+.industrial-review-controls .game-btn{
+  min-height:40px;
+  padding:8px 18px;
+  font-size:10.5px;
+}
+.industrial-review-controls .game-btn:not(.secondary){min-width:240px}
+
+@media(max-height:800px){
+  .industrial-review-screen{padding:12px 16px 11px;gap:8px}
+  .industrial-review-header h2{font-size:30px}
+  .industrial-review-header p{font-size:9.5px}
+  .industrial-review-section-title{margin-bottom:5px}
+  .industrial-review-action-card{padding:7px 9px;gap:5px}
+  .industrial-review-team-icon{width:32px;height:32px;flex-basis:32px;font-size:17px}
+  .industrial-review-action-head strong,.industrial-review-team-id strong{font-size:12px}
+  .industrial-review-action-pill{padding:4px 6px;font-size:7.5px}
+  .industrial-review-portfolio-card{padding:9px;gap:6px}
+  .industrial-review-metrics > div{padding:6px 8px}
+  .industrial-review-metrics strong{font-size:20px}
+  .industrial-review-asset-row{padding:5px 7px}
+  .industrial-review-asset-row span{font-size:9px}
+  .industrial-review-asset-row strong{font-size:11px}
+  .industrial-review-controls .game-btn{min-height:35px;padding:6px 14px;font-size:9.5px}
+}
