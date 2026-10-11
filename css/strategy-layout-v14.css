@@ -1,0 +1,231 @@
+/* Unified Digital / Future / Winner presentation layouts */
+body.strategy-modern-active #backBtn{display:none!important}
+
+#gameScreen.strategy-modern-mode{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+  padding:10px!important;
+}
+#gameScreen.strategy-modern-mode .phase-panel{
+  width:100%;
+  grid-template-rows:minmax(0,1fr)!important;
+}
+#gameScreen.strategy-modern-mode .phase-panel>header,
+#gameScreen.strategy-modern-mode .phase-sidebar{display:none!important}
+#gameScreen.strategy-modern-mode #phaseContent{padding:0!important;overflow:hidden!important}
+
+.strategy-modern-screen{
+  --era-a:#0ea5c6;
+  --era-b:#7047cf;
+  --era-deep:#21345f;
+  --era-soft:#e8f6fb;
+  --era-line:rgba(43,91,151,.24);
+  height:100%;
+  min-height:0;
+  box-sizing:border-box;
+  padding:20px 24px 16px;
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+  gap:12px;
+  overflow:hidden;
+  color:#231c19;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(36,211,238,.10),transparent 26%),
+    radial-gradient(circle at 87% 8%,rgba(125,78,230,.10),transparent 25%),
+    linear-gradient(135deg,#edfaff 0%,#e6eefb 52%,#eee9ff 100%);
+  border:1px solid rgba(68,99,154,.18);
+  border-radius:18px;
+}
+.strategy-modern-screen.future-era{
+  --era-a:#25c7e8;
+  --era-b:#7b3fe4;
+  --era-deep:#281b64;
+  --era-soft:#f0efff;
+  --era-line:rgba(93,65,181,.24);
+  background:
+    radial-gradient(circle at 12% 8%,rgba(26,205,235,.12),transparent 28%),
+    radial-gradient(circle at 88% 10%,rgba(132,67,229,.14),transparent 27%),
+    linear-gradient(135deg,#edf9ff 0%,#ececff 48%,#f4eaff 100%);
+}
+
+.strategy-modern-header{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.strategy-modern-header .screen-kicker{font-size:10px;letter-spacing:.15em;font-weight:900;color:var(--era-a)}
+.strategy-modern-header h2{margin:0;font-size:clamp(28px,2.5vw,42px);line-height:1.02;letter-spacing:-.015em}
+.strategy-modern-header p{margin:3px 0 0;max-width:850px;font-size:12px;color:#596176}
+.strategy-event-icon{font-size:34px;line-height:1;margin-bottom:2px}
+
+.strategy-team-status-grid,
+.strategy-team-block-grid,
+.strategy-ranking-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:0}
+.strategy-team-status{
+  padding:10px 12px;
+  border-radius:13px;
+  border:1px solid var(--era-line);
+  background:rgba(255,255,255,.52);
+  box-shadow:0 8px 22px rgba(35,51,92,.06);
+  min-width:0;
+}
+.strategy-team-status.active{
+  border:2px solid var(--era-a);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--era-a) 13%,transparent),0 10px 25px rgba(38,72,133,.10);
+}
+.strategy-team-status.done{background:rgba(255,255,255,.67)}
+.strategy-team-head,.strategy-team-block-head{display:flex;align-items:center;gap:9px;min-width:0}
+.strategy-team-head>div:nth-child(2),.strategy-team-block-head>div:nth-child(2){min-width:0;flex:1}
+.strategy-team-head strong,.strategy-team-block-head strong{display:block;font-size:16px;font-weight:900}
+.strategy-team-head span,.strategy-team-block-head span{display:block;margin-top:2px;font-size:9px;color:#626b7d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strategy-team-head>b,.strategy-team-block-head>b{font-size:18px;color:var(--era-b)}
+.strategy-team-icon{width:38px;height:38px;flex:0 0 38px;border-radius:10px;display:grid;place-items:center;font-size:21px;background:linear-gradient(145deg,rgba(57,205,231,.20),rgba(124,71,207,.16));border:1px solid var(--era-line)}
+.strategy-team-money{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.strategy-team-money span,.strategy-team-flags span{padding:5px 7px;border-radius:7px;background:rgba(37,49,80,.055);font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.strategy-team-money strong{font-size:13px;color:#222b52;margin-left:4px}
+.strategy-team-flags{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}
+.digital-era .strategy-team-flags{grid-template-columns:1fr 1fr}
+.strategy-team-flags b{color:var(--era-deep)}
+.strategy-team-state{margin-top:6px;padding:5px 7px;border-radius:7px;text-align:center;font-size:8px;font-weight:900;letter-spacing:.08em;color:#fff;background:linear-gradient(90deg,var(--era-a),var(--era-b))}
+.strategy-team-status:not(.active):not(.done) .strategy-team-state{color:#687087;background:rgba(45,57,88,.06)}
+
+.strategy-quest{justify-self:center;padding:6px 14px;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.12em;border:1px solid color-mix(in srgb,var(--era-a) 44%,transparent);background:rgba(255,255,255,.42);color:var(--era-deep)}
+.strategy-choice-grid{display:grid;gap:10px;min-height:0}
+.strategy-choice-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.strategy-choice-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.decision-modern-screen{grid-template-rows:auto auto auto minmax(0,1fr) auto auto}
+.strategy-choice-card{
+  min-width:0;
+  padding:13px 14px;
+  border-radius:13px;
+  border:1px solid var(--era-line);
+  background:rgba(255,255,255,.54);
+  box-shadow:0 8px 20px rgba(47,61,111,.055);
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.strategy-choice-card>span{font-size:8px;font-weight:900;letter-spacing:.14em;color:var(--era-b)}
+.strategy-choice-card h3{margin:0;font-size:19px;line-height:1.08}
+.strategy-choice-card p{margin:0;font-size:10px;line-height:1.35;color:#61697a;flex:1}
+.strategy-choice-price{font-size:24px;line-height:1;font-weight:900;color:var(--era-a)}
+.strategy-choice-card select{width:100%;min-height:36px;padding:7px 9px;border-radius:8px;border:1px solid var(--era-line);background:rgba(255,255,255,.75);font-family:inherit;color:#29243b}
+.strategy-choice-card small{font-size:8px;color:#a64745;font-weight:800}
+.strategy-action-btn,.strategy-modern-screen .strategy-footer .game-btn:not(.secondary),.strategy-confirm-card>#confirmDecisionBtn{
+  color:#fff!important;
+  background:linear-gradient(100deg,var(--era-a),var(--era-b))!important;
+  border-color:color-mix(in srgb,var(--era-b) 70%,#24325a)!important;
+  box-shadow:0 5px 13px color-mix(in srgb,var(--era-b) 18%,transparent)!important;
+}
+.strategy-action-btn:disabled{opacity:.45!important;filter:saturate(.55);box-shadow:none!important}
+.lower-actions{align-items:stretch}
+.hold-card{justify-content:center}
+.future-choice-grid .strategy-choice-card{padding:18px 20px}
+.future-strategy-card h3{font-size:26px}
+.strategy-impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:3px 0 7px}
+.strategy-impact-grid span{padding:8px 9px;border-radius:8px;background:rgba(67,55,137,.07);font-size:9px;font-weight:800}
+.strategy-impact-grid b{float:right;color:var(--era-b);font-size:13px}
+
+.strategy-footer{display:flex;justify-content:center;align-items:center;gap:10px;min-height:42px}
+.strategy-footer .game-btn{min-height:40px;padding:8px 16px;font-size:10px}
+.strategy-footer .game-btn:not(.secondary){min-width:230px}
+.strategy-footer .secondary{color:var(--era-deep)!important;background:rgba(255,255,255,.62)!important;border-color:var(--era-line)!important}
+.strategy-back-btn{min-width:90px}
+
+.confirm-modern-screen{grid-template-rows:minmax(0,1fr) auto;place-items:center}
+.strategy-confirm-card{align-self:center;width:min(620px,80vw);padding:28px 32px;border-radius:20px;text-align:center;border:1px solid var(--era-line);background:rgba(255,255,255,.66);box-shadow:0 22px 55px rgba(53,64,121,.12)}
+.strategy-confirm-card .strategy-team-icon{margin:10px auto 7px;width:54px;height:54px;font-size:27px}
+.strategy-confirm-card h2{margin:0;font-size:30px}
+.strategy-confirm-card h3{margin:9px 0 5px;font-size:24px}
+.strategy-confirm-card p{margin:5px auto;max-width:480px;font-size:11px;color:#626a7b}
+.strategy-confirm-action{display:inline-block;margin-top:9px;padding:5px 10px;border-radius:999px;background:linear-gradient(90deg,var(--era-a),var(--era-b));color:#fff;font-size:9px;font-weight:900;letter-spacing:.12em}
+.strategy-confirm-note{margin:13px 0 15px;padding:8px;border-radius:8px;background:rgba(56,72,126,.06);font-size:9px;font-weight:800;color:#5c657a}
+
+.review-modern-screen,.results-modern-screen,.checkpoint-modern-screen,.winner-modern-screen,.event-modern-screen,.crisis-modern-screen{grid-template-rows:auto minmax(0,1fr) auto}
+.review-modern-screen .strategy-team-block-grid,.results-modern-screen .strategy-team-block-grid,.checkpoint-modern-screen .strategy-team-block-grid{height:100%;align-items:stretch}
+.strategy-team-block{
+  min-width:0;min-height:0;padding:14px;border-radius:15px;border:1px solid var(--era-line);background:rgba(255,255,255,.54);box-shadow:0 10px 26px rgba(43,56,104,.07);display:flex;flex-direction:column;gap:9px;overflow:hidden
+}
+.strategy-team-block.in-debt{outline:2px solid rgba(165,55,54,.48);outline-offset:-4px}
+.strategy-metric-pair{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.strategy-metric-pair>div{padding:8px 9px;border-radius:9px;background:rgba(41,54,91,.055)}
+.strategy-metric-pair span{display:block;font-size:7px;font-weight:900;letter-spacing:.11em;color:#646d81}
+.strategy-metric-pair strong{display:block;margin-top:2px;font-size:20px;color:#22294b}
+.strategy-portfolio-title{font-size:8px;font-weight:900;letter-spacing:.13em;color:#667085}
+.strategy-portfolio-list{display:grid;gap:5px;min-height:0;overflow:auto}
+.strategy-portfolio-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:rgba(255,255,255,.54);font-size:9px}
+.strategy-portfolio-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strategy-portfolio-row small{margin-left:5px;padding:1px 4px;border-radius:4px;background:linear-gradient(90deg,rgba(31,197,225,.15),rgba(122,63,228,.15));font-size:6px;font-weight:900;color:var(--era-b)}
+.strategy-portfolio-row strong{font-size:11px}
+.strategy-empty{font-size:9px;color:#72798a;padding:8px}
+.strategy-score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.strategy-score-grid.digital{grid-template-columns:1fr 1fr}
+.strategy-score-grid span{padding:6px;border-radius:7px;background:rgba(72,57,145,.06);font-size:7.5px;font-weight:800}
+.strategy-score-grid b{float:right;color:var(--era-deep)}
+.strategy-decision-pill{margin-top:auto;padding:7px 8px;border-radius:8px;text-align:center;font-size:8px;font-weight:900;color:#fff;background:linear-gradient(90deg,var(--era-a),var(--era-b))}
+
+.event-modern-screen,.crisis-modern-screen{grid-template-rows:auto auto minmax(0,1fr) auto}
+.strategy-impact-banner{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.strategy-impact-banner span{padding:7px 13px;border-radius:999px;background:linear-gradient(90deg,var(--era-a),var(--era-b));color:#fff;font-size:9px;font-weight:900;letter-spacing:.07em}
+.strategy-impact-banner.danger span{background:linear-gradient(90deg,#a63f45,#cc5d5d)}
+.event-team{justify-content:center}
+.strategy-event-result{padding:16px;border-radius:12px;text-align:center;background:rgba(58,70,113,.06)}
+.strategy-event-result strong{display:block;font-size:22px}
+.strategy-event-result span{display:block;margin-top:4px;font-size:9px;color:#646d7f}
+.strategy-event-result.positive{border:1px solid rgba(44,132,77,.34);background:rgba(71,153,91,.10)}
+.strategy-event-result.positive strong{color:#2e7b43}
+.strategy-crisis-tags{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.strategy-crisis-tags span{padding:8px;text-align:center;border-radius:8px;border:1px solid rgba(119,70,180,.18);background:rgba(255,255,255,.48);font-size:8px;font-weight:800}
+
+.strategy-checkpoint-card{justify-self:center;width:min(680px,80%);padding:14px 18px;text-align:center;border-radius:13px;border:1px solid var(--era-line);background:rgba(255,255,255,.60)}
+.strategy-checkpoint-card span{display:block;font-size:8px;font-weight:900;letter-spacing:.15em;color:var(--era-a)}
+.strategy-checkpoint-card strong{display:block;margin-top:4px;font-size:22px;color:var(--era-deep)}
+.strategy-checkpoint-card p{margin:4px 0 0;font-size:9px;color:#656d80}
+.checkpoint-modern-screen{grid-template-rows:auto auto minmax(0,1fr) auto}
+.checkpoint-teams .strategy-team-block{padding:11px}
+
+.strategy-winner-worth{margin-top:5px;font-size:62px;line-height:1;font-weight:900;color:var(--era-deep);text-shadow:0 0 22px rgba(65,199,235,.12)}
+.strategy-ranking-grid{align-items:center}
+.strategy-rank-card{position:relative;padding:22px 16px;border-radius:16px;text-align:center;border:1px solid var(--era-line);background:rgba(255,255,255,.56)}
+.strategy-rank-card>span{position:absolute;top:9px;left:10px;font-size:10px;font-weight:900;color:var(--era-b)}
+.strategy-rank-card .strategy-team-icon{margin:0 auto 7px;width:48px;height:48px;font-size:25px}
+.strategy-rank-card h3{margin:0;font-size:20px}
+.strategy-rank-card>strong{display:block;margin:8px 0 3px;font-size:32px;color:var(--era-deep)}
+.strategy-rank-card small{font-size:9px;color:#687084}
+.strategy-rank-card.winner{border:2px solid #d7a93c;background:linear-gradient(180deg,rgba(255,221,111,.23),rgba(255,255,255,.6));box-shadow:0 0 0 4px rgba(215,169,60,.10),0 15px 34px rgba(77,60,120,.10)}
+.strategy-winner-handoff{justify-self:center;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.55);font-size:11px;color:#5a6277}
+.strategy-winner-handoff strong{color:var(--era-deep)}
+
+@media(max-height:820px){
+  .strategy-modern-screen{padding:13px 16px 10px;gap:8px}
+  .strategy-modern-header h2{font-size:30px}
+  .strategy-modern-header p{font-size:9.5px}
+  .strategy-team-status{padding:7px 9px}
+  .strategy-team-icon{width:32px;height:32px;flex-basis:32px;font-size:18px}
+  .strategy-team-head strong,.strategy-team-block-head strong{font-size:13px}
+  .strategy-team-money{margin-top:5px}
+  .strategy-team-money span,.strategy-team-flags span{padding:4px 5px;font-size:6.8px}
+  .strategy-team-state{margin-top:4px;padding:4px;font-size:7px}
+  .strategy-choice-card{padding:9px 10px;gap:5px}
+  .strategy-choice-card h3{font-size:16px}
+  .strategy-choice-card p{font-size:8.5px}
+  .strategy-choice-price{font-size:20px}
+  .strategy-choice-card select{min-height:31px;padding:5px 7px}
+  .strategy-footer{min-height:35px}
+  .strategy-footer .game-btn{min-height:34px;padding:6px 12px;font-size:9px}
+  .strategy-team-block{padding:10px;gap:6px}
+  .strategy-metric-pair strong{font-size:16px}
+  .strategy-portfolio-row{padding:4px 6px;font-size:8px}
+  .strategy-score-grid span{padding:4px;font-size:6.8px}
+  .strategy-decision-pill{padding:5px;font-size:7px}
+  .strategy-crisis-tags span{padding:6px;font-size:7px}
+  .strategy-checkpoint-card{padding:10px 14px}
+  .strategy-checkpoint-card strong{font-size:18px}
+  .strategy-winner-worth{font-size:48px}
+  .strategy-rank-card{padding:15px 12px}
+  .strategy-rank-card>strong{font-size:25px}
+}
+
+@media(max-width:1350px){
+  .strategy-modern-screen{padding-left:14px;padding-right:14px}
+  .strategy-team-status-grid,.strategy-team-block-grid,.strategy-ranking-grid{gap:8px}
+  .strategy-choice-grid{gap:8px}
+  .strategy-team-status,.strategy-team-block{padding:9px}
+  .strategy-crisis-tags{grid-template-columns:repeat(3,1fr)}
+}
