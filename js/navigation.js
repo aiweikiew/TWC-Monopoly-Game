@@ -28,6 +28,12 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/sh
   shockPolishScript.src = "js/shock-polish-v6.js";
   document.head.appendChild(shockPolishScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/go-passive-v8.js"]')){
+  const goPassiveScript = document.createElement("script");
+  goPassiveScript.src = "js/go-passive-v8.js";
+  goPassiveScript.async = false;
+  document.head.appendChild(goPassiveScript);
+}
 
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
