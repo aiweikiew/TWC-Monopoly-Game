@@ -9,7 +9,8 @@
     "js/digital-v19-compat.js",
     "js/digital-builder-polish-v20.js",
     "js/future-streamline-v22.js",
-    "js/winner-podium-v22.js"
+    "js/winner-podium-v22.js",
+    "js/presentation-type-v23.js"
   ];
   for(const src of queue){
     if(document.querySelector(`script[src="${src}"]`)) continue;
