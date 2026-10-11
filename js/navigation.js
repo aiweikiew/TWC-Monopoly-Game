@@ -1,6 +1,12 @@
 "use strict";
 
 // Board review enhancements are isolated so gameplay/navigation state stays untouched.
+if(typeof document !== "undefined" && !document.querySelector('link[href="css/board-v3.css"]')){
+  const boardCompactStyles = document.createElement("link");
+  boardCompactStyles.rel = "stylesheet";
+  boardCompactStyles.href = "css/board-v3.css";
+  document.head.appendChild(boardCompactStyles);
+}
 if(typeof document !== "undefined" && !document.querySelector('script[src="js/board-review-v3.js"]')){
   const reviewScript = document.createElement("script");
   reviewScript.src = "js/board-review-v3.js";
