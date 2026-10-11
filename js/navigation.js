@@ -44,6 +44,11 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/re
   revaluationBackScript.src = "js/revaluation-back-v9.js";
   document.head.appendChild(revaluationBackScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/industrial-decisions-v11.js"]')){
+  const industrialDecisionsScript = document.createElement("script");
+  industrialDecisionsScript.src = "js/industrial-decisions-v11.js";
+  document.head.appendChild(industrialDecisionsScript);
+}
 
 // Navigation is for the CURRENT game screen only.
 // Back never walks through old turns/eras and never restores gameplay snapshots.
