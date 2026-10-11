@@ -223,6 +223,13 @@
       }
     },true);
 
+    if(!document.querySelector('script[src="js/digital-turn-v15.js"]')){
+      const digitalTurnScript = document.createElement("script");
+      digitalTurnScript.src = "js/digital-turn-v15.js";
+      digitalTurnScript.async = false;
+      document.head.appendChild(digitalTurnScript);
+    }
+
     renderGame();
     return true;
   }
