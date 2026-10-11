@@ -1,6 +1,6 @@
 "use strict";
 
-// v25: one deterministic bootstrap for every gameplay extension.
+// v25: one deterministic bootstrap for every active gameplay extension.
 // This file may be injected before ui.js finishes; it waits for the base UI and then
 // loads each extension strictly in order so GitHub Pages and localhost behave the same.
 (function(){
@@ -19,8 +19,7 @@
     "js/industrial-decisions-v11.js",
     "js/industrial-review-v12.js",
     "js/flow-back-v13.js",
-    "js/strategy-layout-v14.js",
-    "js/fit-event-v17.js"
+    "js/strategy-layout-v14.js"
   ];
 
   function baseReady(){
@@ -51,7 +50,6 @@
         if(existing.dataset.loaded === "true" || existing.readyState === "complete") return resolve();
         existing.addEventListener("load",resolve,{once:true});
         existing.addEventListener("error",()=>reject(new Error(`Failed to load ${src}`)),{once:true});
-        // Existing deferred scripts may already have executed before this listener was attached.
         window.setTimeout(resolve,0);
         return;
       }
