@@ -1,38 +1,56 @@
 /* Tourismopoly · Grand Tour board v3
-   Compact sidebar so all three teams remain visible without scrolling. */
+   Readable one-screen layout: compact controls, larger player text, no scrolling. */
+
+/* Give the sidebar a little more width so portfolio text stays readable. */
+.monopoly-shell .side-column{
+  width:400px;
+  min-width:380px;
+  max-width:410px;
+  height:min(calc(100vh - 32px),calc(100vw - 455px));
+}
+.monopoly-shell .board-column{
+  height:min(calc(100vh - 32px),calc(100vw - 455px));
+}
 
 /* Keep only the useful turn cue + actions in the dice panel. */
 .monopoly-shell .roll-panel{
-  padding:9px 10px 10px;
+  padding:8px 9px 9px;
 }
 .monopoly-shell .roll-text,
 .monopoly-shell .roll-sub{
   display:none !important;
 }
 .monopoly-shell .roll-panel .button-stack{
-  margin-top:8px;
-  gap:6px;
+  margin-top:7px;
+  gap:5px;
 }
 .monopoly-shell #rollBtn{
-  min-height:42px;
+  min-height:40px;
   font-size:15px;
 }
 .monopoly-shell #nextBtn,
 .monopoly-shell #resolveLandingBtn{
-  min-height:36px;
+  min-height:34px;
   font-size:12px;
+}
+/* Don't waste vertical space on an unusable Next Team button. */
+.monopoly-shell #nextBtn:disabled{
+  display:none;
 }
 .monopoly-shell .turn-badge{
-  padding:8px 9px 7px;
+  padding:7px 9px 6px;
   font-size:12px;
 }
+.monopoly-shell #boardError:empty{
+  display:none;
+}
 
-/* The player area should never need an internal scrollbar in presentation mode. */
+/* Player area: all three cards visible, but readable rather than microscopic. */
 .monopoly-shell .player-panel{
   display:flex;
   flex-direction:column;
   min-height:0;
-  padding:8px;
+  padding:9px;
   overflow:hidden;
   scrollbar-width:none;
 }
@@ -40,7 +58,8 @@
 .monopoly-shell .panel-title{
   flex:0 0 auto;
   margin:0 0 6px;
-  font-size:12px;
+  font-size:13px;
+  line-height:1;
 }
 .monopoly-shell #boardPlayers{
   flex:1 1 auto;
@@ -52,62 +71,89 @@
 .monopoly-shell #boardPlayers .player-card{
   min-height:0;
   margin:0;
-  padding:8px 9px;
+  padding:9px 10px;
   overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 .monopoly-shell #boardPlayers .player-head{
-  grid-template-columns:38px minmax(0,1fr) 26px;
-  gap:7px;
+  grid-template-columns:40px minmax(0,1fr) 27px;
+  gap:8px;
+  flex:0 0 auto;
 }
 .monopoly-shell #boardPlayers .avatar{
-  width:38px;
-  height:38px;
-  font-size:19px;
+  width:40px;
+  height:40px;
+  font-size:20px;
+}
+.monopoly-shell #boardPlayers .player-info{
+  min-width:0;
 }
 .monopoly-shell #boardPlayers .player-info .team{
-  font-size:12px;
+  font-size:13px;
+  line-height:1.05;
 }
 .monopoly-shell #boardPlayers .player-info .identity{
-  margin-top:2px;
-  font-size:8.5px;
+  margin-top:3px;
+  font-size:10px;
+  line-height:1.15;
+  white-space:normal;
+  overflow:visible;
 }
 .monopoly-shell #boardPlayers .pawn{
-  width:25px;
-  height:25px;
+  width:26px;
+  height:26px;
   font-size:11px;
 }
 .monopoly-shell #boardPlayers .player-metrics{
   margin-top:6px;
   padding-top:5px;
-  gap:6px;
+  gap:7px;
+  flex:0 0 auto;
 }
 .monopoly-shell #boardPlayers .player-metrics span{
   padding:0;
-  font-size:7px;
+  font-size:8.5px;
+  line-height:1.05;
 }
 .monopoly-shell #boardPlayers .player-metrics strong{
-  font-size:15px;
+  margin-top:2px;
+  font-size:17px;
+  line-height:1;
 }
 .monopoly-shell #boardPlayers .portfolio-assets{
-  margin:5px 0 0 !important;
-  padding:4px 0 0 !important;
+  margin:6px 0 0 !important;
+  padding:5px 0 0 !important;
+  flex:0 0 auto;
 }
 .monopoly-shell #boardPlayers .portfolio-assets li{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:8px;
   padding:1px 0;
-  font-size:8px;
-  line-height:1.15;
+  font-size:10px;
+  line-height:1.18;
+  white-space:normal;
+  overflow:visible;
+  overflow-wrap:normal;
+}
+.monopoly-shell #boardPlayers .portfolio-assets li strong{
+  flex:0 0 auto;
+  font-size:10px;
+  line-height:1.18;
 }
 
 /* Slightly tighten the whole sidebar spacing as well. */
 .monopoly-shell .sidebar{
-  gap:8px;
+  gap:7px;
 }
 .monopoly-shell .sidebar > div:first-child{
-  min-height:38px;
-  padding:5px;
+  min-height:36px;
+  padding:4px 5px;
 }
 
-/* Give the centre crest more breathing room and guarantee TOURISMOPOLY fits. */
+/* Centre crest: use more of the cell, but guarantee the full title fits. */
 .monopoly-shell .center{
   margin:6px;
 }
@@ -117,31 +163,51 @@
 .monopoly-shell .center-content{
   width:100%;
   max-width:100%;
-  padding:12px 5px;
+  padding:11px 4px;
   box-sizing:border-box;
+  overflow:hidden;
 }
 .monopoly-shell .main-title{
+  display:block;
   width:100%;
   max-width:100%;
-  font-size:clamp(18px,1.95vw,29px);
+  margin:0 auto;
+  font-size:clamp(20px,1.6vw,25px);
   line-height:1;
-  letter-spacing:0;
+  letter-spacing:-.025em;
   white-space:nowrap;
   text-align:center;
+  overflow:visible;
 }
-.monopoly-shell .crest{margin-bottom:6px;}
-.monopoly-shell .era{margin-top:6px;}
+.monopoly-shell .crest{
+  margin-bottom:6px;
+  font-size:13px;
+}
+.monopoly-shell .era{
+  margin-top:7px;
+  font-size:11px;
+}
 .monopoly-shell .rule{margin:8px auto 7px;}
-.monopoly-shell .stamp{margin-top:8px;}
+.monopoly-shell .tagline{font-size:10px;}
+.monopoly-shell .stamp{
+  margin-top:8px;
+  font-size:8px;
+}
 
 @media (max-height:820px){
-  .monopoly-shell .roll-panel{padding:7px 8px 8px;}
-  .monopoly-shell #rollBtn{min-height:38px;font-size:14px;}
-  .monopoly-shell #nextBtn,.monopoly-shell #resolveLandingBtn{min-height:32px;}
-  .monopoly-shell #boardPlayers .player-card{padding:7px 8px;}
-  .monopoly-shell #boardPlayers .avatar{width:34px;height:34px;font-size:17px;}
-  .monopoly-shell #boardPlayers .player-head{grid-template-columns:34px minmax(0,1fr) 24px;}
-  .monopoly-shell #boardPlayers .portfolio-assets li{font-size:7.5px;}
+  .monopoly-shell .side-column{width:390px;min-width:370px;}
+  .monopoly-shell .roll-panel{padding:6px 8px 7px;}
+  .monopoly-shell #rollBtn{min-height:36px;font-size:14px;}
+  .monopoly-shell #nextBtn,.monopoly-shell #resolveLandingBtn{min-height:30px;}
+  .monopoly-shell #boardPlayers .player-card{padding:8px 9px;}
+  .monopoly-shell #boardPlayers .avatar{width:36px;height:36px;font-size:18px;}
+  .monopoly-shell #boardPlayers .player-head{grid-template-columns:36px minmax(0,1fr) 25px;}
+  .monopoly-shell #boardPlayers .player-info .team{font-size:12px;}
+  .monopoly-shell #boardPlayers .player-info .identity{font-size:9.5px;}
+  .monopoly-shell #boardPlayers .player-metrics span{font-size:8px;}
+  .monopoly-shell #boardPlayers .player-metrics strong{font-size:16px;}
+  .monopoly-shell #boardPlayers .portfolio-assets li,
+  .monopoly-shell #boardPlayers .portfolio-assets li strong{font-size:9.5px;}
   .monopoly-shell .center{margin:5px;}
-  .monopoly-shell .main-title{font-size:clamp(17px,1.85vw,27px);}
+  .monopoly-shell .main-title{font-size:clamp(19px,1.55vw,24px);}
 }
