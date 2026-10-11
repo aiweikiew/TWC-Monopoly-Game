@@ -1,0 +1,356 @@
+/* Industrial Revolution revaluation · team-first presentation summary */
+#gameScreen.industrial-summary-mode{
+  grid-template-columns:minmax(0,1fr) 230px !important;
+  gap:10px !important;
+  padding:10px !important;
+}
+
+#gameScreen.industrial-summary-mode .phase-panel{
+  grid-template-rows:minmax(0,1fr) !important;
+}
+#gameScreen.industrial-summary-mode .phase-panel > header{
+  display:none !important;
+}
+#gameScreen.industrial-summary-mode #phaseContent{
+  padding:0 !important;
+}
+
+/* Keep the right side present but visually secondary on this one key summary screen. */
+#gameScreen.industrial-summary-mode .phase-sidebar{
+  grid-template-rows:auto !important;
+  align-content:start;
+}
+#gameScreen.industrial-summary-mode .phase-sidebar .player-panel{
+  display:none !important;
+}
+#gameScreen.industrial-summary-mode .phase-sidebar .roll-panel{
+  padding:10px !important;
+  opacity:.86;
+}
+#gameScreen.industrial-summary-mode .phase-sidebar #statusText,
+#gameScreen.industrial-summary-mode .phase-sidebar #actionError,
+#gameScreen.industrial-summary-mode .phase-sidebar #undoDecisionBtn{
+  display:none !important;
+}
+#gameScreen.industrial-summary-mode .phase-sidebar .turn-badge{
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.14em;
+}
+#gameScreen.industrial-summary-mode .phase-sidebar .moderator-tools{
+  margin-top:8px;
+}
+
+.industrial-summary-screen{
+  height:100%;
+  min-height:0;
+  padding:26px 28px 22px;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  gap:16px;
+  overflow:hidden;
+}
+
+.industrial-summary-topline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:24px;
+}
+.industrial-summary-topline .screen-kicker{
+  margin-bottom:6px;
+  font-size:10px;
+}
+.industrial-summary-topline h2{
+  margin:0;
+  font-size:clamp(27px,2.45vw,42px);
+  line-height:1.02;
+  letter-spacing:-.015em;
+}
+.industrial-summary-topline p{
+  margin:7px 0 0;
+  max-width:780px;
+  font-size:12px;
+  color:#695644;
+}
+.industrial-market-callout{
+  flex:0 0 auto;
+  min-width:180px;
+  padding:10px 13px;
+  border:1px solid rgba(77,58,39,.22);
+  border-radius:10px;
+  background:rgba(255,255,255,.24);
+  display:grid;
+  gap:2px;
+  text-align:right;
+}
+.industrial-market-callout span{
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.14em;
+  color:#78624f;
+}
+.industrial-market-callout strong{
+  font-size:16px;
+  color:#496c49;
+}
+.industrial-market-callout small{
+  font-size:10px;
+  color:#8d463b;
+  font-weight:800;
+}
+
+.industrial-team-grid{
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.industrial-team-block{
+  min-width:0;
+  min-height:0;
+  padding:15px;
+  border:1px solid rgba(72,53,36,.25);
+  border-radius:14px;
+  background:rgba(255,255,255,.26);
+  box-shadow:0 10px 22px rgba(72,51,32,.06);
+  display:grid;
+  grid-template-rows:auto auto auto minmax(0,1fr);
+  gap:11px;
+  overflow:hidden;
+}
+.industrial-team-block.gain{
+  box-shadow:inset 0 4px 0 rgba(72,111,73,.58),0 10px 22px rgba(72,51,32,.06);
+}
+.industrial-team-block.loss{
+  box-shadow:inset 0 4px 0 rgba(148,70,57,.58),0 10px 22px rgba(72,51,32,.06);
+}
+
+.industrial-team-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.industrial-team-id{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.industrial-team-icon{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:rgba(92,68,45,.10);
+  border:1px solid rgba(92,68,45,.18);
+  font-size:23px;
+}
+.industrial-team-name{
+  font-size:18px;
+  line-height:1;
+  font-weight:900;
+}
+.industrial-team-identity{
+  margin-top:4px;
+  font-size:10px;
+  color:#765f4a;
+  line-height:1.15;
+}
+.industrial-total-chip{
+  flex:0 0 auto;
+  min-width:72px;
+  padding:6px 8px;
+  border-radius:8px;
+  text-align:center;
+  border:1px solid rgba(74,58,43,.16);
+  background:rgba(255,255,255,.38);
+}
+.industrial-total-chip span{
+  display:block;
+  font-size:7px;
+  letter-spacing:.12em;
+  font-weight:900;
+}
+.industrial-total-chip strong{
+  display:block;
+  margin-top:1px;
+  font-size:18px;
+  line-height:1;
+}
+.industrial-total-chip.gain{color:#3f6b45;background:rgba(83,128,88,.09)}
+.industrial-total-chip.loss{color:#8a4138;background:rgba(155,75,64,.09)}
+
+.industrial-worth-panel{
+  padding:13px 14px 12px;
+  border-radius:11px;
+  border:1px solid rgba(72,53,36,.16);
+  background:rgba(77,57,39,.075);
+  position:relative;
+}
+.industrial-worth-panel.gain{background:rgba(79,126,83,.09);border-color:rgba(67,112,71,.22)}
+.industrial-worth-panel.loss{background:rgba(151,73,62,.08);border-color:rgba(143,68,58,.20)}
+.industrial-worth-label{
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.14em;
+  color:#745f4b;
+}
+.industrial-worth-flow{
+  margin-top:5px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.industrial-worth-flow span{
+  font-size:24px;
+  color:#7a6857;
+  text-decoration:line-through;
+  text-decoration-thickness:1px;
+}
+.industrial-worth-flow b{
+  font-size:18px;
+  color:#856a4d;
+}
+.industrial-worth-flow strong{
+  font-size:34px;
+  line-height:1;
+  color:#2e241d;
+}
+.industrial-worth-change{
+  position:absolute;
+  right:12px;
+  top:12px;
+  padding:4px 7px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:900;
+}
+.industrial-worth-change.gain{color:#3e6d45;background:rgba(77,123,82,.12)}
+.industrial-worth-change.loss{color:#8b4038;background:rgba(157,75,65,.11)}
+.industrial-worth-change.flat{color:#74685d;background:rgba(80,70,62,.08)}
+
+.industrial-assets-label{
+  font-size:8px;
+  letter-spacing:.14em;
+  font-weight:900;
+  color:#75604d;
+}
+.industrial-assets-list{
+  min-height:0;
+  overflow:hidden;
+  display:grid;
+  align-content:start;
+  gap:7px;
+}
+.industrial-asset-row{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:9px;
+  padding:9px 10px;
+  border-radius:8px;
+  border:1px solid rgba(76,57,41,.13);
+  background:rgba(255,255,255,.31);
+}
+.industrial-asset-row.gain{border-left:4px solid rgba(64,112,70,.72)}
+.industrial-asset-row.loss{border-left:4px solid rgba(148,65,54,.72)}
+.industrial-asset-row.flat{border-left:4px solid rgba(111,99,87,.32)}
+.industrial-asset-name{
+  min-width:0;
+  font-size:11px;
+  line-height:1.18;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+.industrial-digital-tag{
+  margin-left:5px;
+  padding:1px 4px;
+  border-radius:4px;
+  font-size:6px;
+  letter-spacing:.08em;
+  background:rgba(52,101,100,.10);
+}
+.industrial-value-flow{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  white-space:nowrap;
+}
+.industrial-old{
+  font-size:12px;
+  color:#796b5f;
+}
+.industrial-arrow{
+  font-size:10px;
+  color:#8a765f;
+}
+.industrial-new{
+  font-size:17px;
+  color:#32261e;
+}
+.industrial-asset-delta{
+  min-width:47px;
+  text-align:right;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.industrial-asset-delta span{margin-right:2px}
+.industrial-asset-delta.gain{color:#3d6e43}
+.industrial-asset-delta.loss{color:#8d3d34}
+.industrial-asset-delta.flat{color:#74695e}
+.industrial-no-assets{
+  padding:15px;
+  border:1px dashed rgba(80,61,43,.22);
+  border-radius:8px;
+  font-size:11px;
+  color:#756557;
+}
+
+.industrial-summary-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.industrial-summary-actions .game-btn{
+  min-height:42px;
+  padding:8px 18px;
+  font-size:12px;
+}
+.industrial-summary-actions .game-btn:not(.secondary){
+  min-width:250px;
+}
+
+@media(max-height:820px){
+  .industrial-summary-screen{padding:18px 20px 16px;gap:11px}
+  .industrial-summary-topline h2{font-size:30px}
+  .industrial-summary-topline p{font-size:10.5px;margin-top:5px}
+  .industrial-team-grid{gap:9px}
+  .industrial-team-block{padding:11px;gap:8px}
+  .industrial-team-icon{width:38px;height:38px;flex-basis:38px;font-size:20px}
+  .industrial-team-name{font-size:16px}
+  .industrial-worth-panel{padding:10px 11px}
+  .industrial-worth-flow span{font-size:20px}
+  .industrial-worth-flow strong{font-size:29px}
+  .industrial-asset-row{padding:7px 8px;gap:7px}
+  .industrial-asset-name{font-size:10px}
+  .industrial-new{font-size:15px}
+}
+
+@media(max-width:1350px){
+  #gameScreen.industrial-summary-mode{grid-template-columns:minmax(0,1fr) 205px !important}
+  .industrial-summary-screen{padding-left:18px;padding-right:18px}
+  .industrial-team-block{padding:11px}
+  .industrial-team-name{font-size:16px}
+  .industrial-worth-flow strong{font-size:29px}
+  .industrial-asset-row{grid-template-columns:minmax(0,1fr) auto}
+  .industrial-asset-delta{grid-column:2;justify-self:end}
+}
