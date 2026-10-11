@@ -125,18 +125,19 @@ function repairLegacyDigitalRevaluation(){
     }
   }
 
-  // If the new two-step Digital turn already sold an information asset under the old table,
-  // correct the released cash so the saved test run remains economically consistent.
+  // If a saved test turn sold an information asset using the old value, repair its cash once.
+  if(!gameState.events.digitalValueRepair) gameState.events.digitalValueRepair = {};
   const saleCorrections = {
     "Legacy Publishing Business":1,
     "Travel Guide & Information":2
   };
   for(const team of gameState.teams){
+    if(gameState.events.digitalValueRepair[team.id]) continue;
     const decision = gameState.decisions?.[team.id] || "";
     for(const [name,correction] of Object.entries(saleCorrections)){
-      if(decision.includes(`SELL: ${name}`) && !decision.includes("[DIGITAL VALUE REPAIRED]")){
+      if(decision.includes(`SELL: ${name}`)){
         team.cash -= correction;
-        gameState.decisions[team.id] = `${decision} [DIGITAL VALUE REPAIRED]`;
+        gameState.events.digitalValueRepair[team.id] = true;
         changed = true;
         break;
       }
