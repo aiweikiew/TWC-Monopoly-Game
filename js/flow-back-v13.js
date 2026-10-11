@@ -161,6 +161,49 @@
     return true;
   }
 
+  // Old saves can also reach the 2035 Crisis with no exact flow snapshot. The immediately
+  // previous screen in the real game sequence is the Digital-era presentation checkpoint.
+  function isLegacyFutureCrisis(){
+    return gameState.mode === "strategy" &&
+      gameState.phase === "future" &&
+      gameState.uiStage === "crisis" &&
+      (!Array.isArray(gameState.flowHistory) || gameState.flowHistory.length === 0) &&
+      typeof navigationState !== "undefined" &&
+      navigationState.previousViews.length === 0;
+  }
+
+  function restoreLegacyDigitalCheckpoint(){
+    if(!isLegacyFutureCrisis()) return false;
+
+    // Reverse applyFutureCrisis(). Destination pressure and Digital readiness belong to
+    // the completed Digital era, so they remain untouched.
+    for(const team of gameState.teams){
+      team.cash += 2;
+      team.visitorExperience = null;
+      team.residentWellbeing = null;
+      team.environmentalHealth = null;
+      team.futureStrategy = null;
+      team.futureInnovationCredit = 0;
+    }
+
+    if(gameState.events) gameState.events.crisis = false;
+    gameState.phase = "digital";
+    gameState.uiStage = "pause";
+    gameState.phaseComplete = true;
+    gameState.currentTeam = 0;
+    gameState.decisions = {};
+    gameState.lastDecision = null;
+    gameState.revaluationLog = [];
+    gameState.message = "Present era complete. Continue to the Future when ready.";
+
+    navigationState.selection = null;
+    navigationState.previousViews = [];
+    navigationState.observedKey = null;
+    navigationState.currentView = null;
+    if(typeof saveGameState === "function") saveGameState();
+    return true;
+  }
+
   function visibleLocalBack(){
     return localBackSelectors.some(selector => {
       const element = document.querySelector(selector);
@@ -191,7 +234,7 @@
 
     const originalCanNavigateBack = canNavigateBack;
     canNavigateBack = function(){
-      if(isLegacyFutureReview() || isLegacyFutureDecision()) return true;
+      if(isLegacyFutureReview() || isLegacyFutureDecision() || isLegacyFutureCrisis()) return true;
       return originalCanNavigateBack();
     };
 
@@ -199,6 +242,7 @@
     navigateBack = function(){
       if(isLegacyFutureReview()) return restoreLegacyPreviousFutureDecision();
       if(isLegacyFutureDecision()) return restoreLegacyPreviousFutureStep();
+      if(isLegacyFutureCrisis()) return restoreLegacyDigitalCheckpoint();
       return originalNavigateBack();
     };
 
