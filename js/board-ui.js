@@ -136,13 +136,46 @@ function showPropertyPopup(teamIndex, tileIndex){
   document.getElementById("buyBtn").disabled = gameState.teams[teamIndex].cash < p.price;
   showBoardModal("landingModal");
 }
+function ensureChanceImpactLayout(){
+  const box = document.querySelector("#chanceModal .chance-effect-box");
+  const label = box?.querySelector(".chance-effect-label");
+  const effect = document.getElementById("chanceEffect");
+  const reason = document.getElementById("chanceSector");
+  if(!box || !label || !effect || !reason) return null;
+
+  let business = document.getElementById("chanceBusiness");
+  if(!business){
+    business = document.createElement("div");
+    business.id = "chanceBusiness";
+    business.className = "chance-business";
+    label.insertAdjacentElement("afterend",business);
+  }
+
+  // Keep the visual reading order: impact label → business → why → money effect.
+  box.appendChild(effect);
+  return {box,label,business,effect,reason};
+}
 function showChancePopup(){
   const landing = gameState.board.pendingLanding;
   const card = chanceCards[landing.cardIndex];
+  const team = gameState.teams[gameState.currentTeam];
+  const impact = ensureChanceImpactLayout();
+
   boardText("chanceTitle",card.title);
   boardText("chanceStory",card.story);
   boardText("chanceEffect",landing.effect > 0 ? "+$1" : money(landing.effect));
   boardText("chanceSector",landing.reason);
+
+  if(impact){
+    impact.label.textContent = `${team.name.toUpperCase()} · YOUR IMPACT`;
+    impact.business.textContent = landing.impactBusinesses?.length
+      ? landing.impactBusinesses.join(" · ")
+      : "No Direct Exposure";
+    impact.box.classList.toggle("positive",landing.effect > 0);
+    impact.box.classList.toggle("negative",landing.effect < 0);
+    impact.box.classList.toggle("neutral",landing.effect === 0);
+  }
+
   showBoardModal("chanceModal");
 }
 function showOwnedPropertyPopup(teamIndex, tileIndex){
