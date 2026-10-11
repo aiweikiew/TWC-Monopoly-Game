@@ -10,7 +10,8 @@
     "js/digital-builder-polish-v20.js",
     "js/future-streamline-v22.js",
     "js/winner-podium-v22.js",
-    "js/presentation-type-v23.js"
+    "js/presentation-type-v23.js",
+    "js/late-flow-polish-v24.js"
   ];
   for(const src of queue){
     if(document.querySelector(`script[src="${src}"]`)) continue;
