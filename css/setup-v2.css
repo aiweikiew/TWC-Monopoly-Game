@@ -1,0 +1,650 @@
+/* Tourismopoly · Identity Draw screen
+   Visual-only layer for Phase 0. Existing random draw / undo / reset logic is unchanged. */
+
+:root{
+  --setup-ink:#332116;
+  --setup-cream:#f4e7c7;
+  --setup-paper:#ead4a5;
+  --setup-paper-deep:#cfaa6e;
+  --setup-walnut:#4b2d1f;
+  --setup-walnut-dark:#2e1a12;
+  --setup-brass:#b98942;
+  --setup-brass-light:#dfbe76;
+  --setup-oxblood:#7b4337;
+  --setup-sage:#65705b;
+}
+
+/* ---------- FULL SCREEN STAGE ---------- */
+#setupScreen{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  padding:18px 22px 20px;
+  display:grid;
+  grid-template-rows:112px minmax(0,1fr);
+  gap:14px;
+  overflow:hidden;
+  color:var(--setup-ink);
+  background:
+    radial-gradient(circle at 14% 12%,rgba(227,184,108,.15),transparent 27%),
+    radial-gradient(circle at 84% 18%,rgba(116,63,48,.18),transparent 30%),
+    repeating-linear-gradient(12deg,rgba(255,255,255,.014) 0 1px,transparent 1px 6px),
+    linear-gradient(145deg,#56351f 0%,#3c2418 56%,#291810 100%);
+}
+
+#setupScreen::before{
+  content:"";
+  position:absolute;
+  inset:9px;
+  border:1px solid rgba(216,177,106,.22);
+  border-radius:22px;
+  pointer-events:none;
+}
+
+#setupScreen::after{
+  content:"GRAND TOUR · EUROPE c.1825";
+  position:absolute;
+  right:40px;
+  bottom:7px;
+  color:rgba(235,211,164,.38);
+  font:700 9px/1 Georgia,"Times New Roman",serif;
+  letter-spacing:.18em;
+  pointer-events:none;
+}
+
+#setupScreen.hidden{display:none}
+
+/* ---------- HEADER ---------- */
+#setupScreen .setup-topbar{
+  min-height:0;
+  padding:16px 22px 15px 178px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+  border:1px solid rgba(218,180,111,.40);
+  border-radius:19px;
+  background:
+    radial-gradient(circle at 84% 18%,rgba(220,178,101,.11),transparent 25%),
+    linear-gradient(145deg,rgba(92,52,34,.96),rgba(58,31,22,.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255,242,208,.08),
+    0 12px 28px rgba(20,10,6,.19);
+}
+
+#setupScreen .setup-kicker{
+  color:#ddb96f;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+#setupScreen .setup-title{
+  margin-top:3px;
+  color:#f5e5c1;
+  font-size:clamp(27px,2.25vw,39px);
+  line-height:1;
+  font-weight:700;
+  letter-spacing:.018em;
+  text-shadow:0 2px 0 rgba(32,17,10,.24);
+}
+
+#setupScreen .setup-subtitle{
+  margin-top:7px;
+  color:#ddc69c;
+  font-size:12px;
+  line-height:1.2;
+  font-style:normal;
+}
+
+#setupScreen .setup-quest{
+  width:min(420px,31vw);
+  max-width:none;
+  padding:12px 15px 11px;
+  border:1px solid rgba(222,186,116,.42);
+  border-radius:13px;
+  background:rgba(42,23,16,.32);
+  text-align:left;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+#setupScreen .setup-quest strong{
+  color:#e7c77f;
+  font-size:12px;
+  letter-spacing:.07em;
+}
+
+#setupScreen .setup-quest span{
+  margin-top:5px;
+  color:#e7d5b1;
+  font-size:10px;
+  line-height:1.3;
+}
+
+/* Back to Landing is part of this screen, not a floating foreign control. */
+#landingReturnBtn{
+  top:43px !important;
+  left:40px !important;
+  z-index:9998 !important;
+  min-width:122px !important;
+  padding:9px 13px !important;
+  border:1px solid rgba(218,180,111,.50) !important;
+  border-radius:999px !important;
+  background:rgba(45,25,17,.72) !important;
+  color:#ead4a5 !important;
+  font:700 12px/1.1 Georgia,"Times New Roman",serif !important;
+  box-shadow:0 5px 14px rgba(16,8,5,.18) !important;
+  backdrop-filter:blur(5px);
+  transition:transform .15s ease,background .15s ease !important;
+}
+#landingReturnBtn:hover{
+  transform:translateY(-1px);
+  background:rgba(76,43,28,.90) !important;
+}
+
+/* ---------- MAIN LAYOUT ---------- */
+#setupScreen .setup-main{
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 382px;
+  gap:14px;
+}
+
+#setupScreen .setup-pool,
+#setupScreen .setup-side{
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  border-radius:20px;
+  box-shadow:0 14px 30px rgba(20,10,6,.18);
+}
+
+#setupScreen .setup-pool{
+  display:grid;
+  grid-template-rows:48px 48px minmax(0,1fr);
+  border:1px solid rgba(113,77,43,.55);
+  background:
+    radial-gradient(circle at 22% 12%,rgba(117,75,39,.075) 0 1px,transparent 2px),
+    repeating-linear-gradient(9deg,rgba(88,58,32,.022) 0 1px,transparent 1px 6px),
+    linear-gradient(145deg,#f0dfb8,#d7b97e);
+}
+
+#setupScreen .setup-side{
+  display:grid;
+  grid-template-rows:48px minmax(0,1fr) auto;
+  border:1px solid rgba(219,179,108,.34);
+  background:
+    radial-gradient(circle at 80% 10%,rgba(225,188,116,.10),transparent 27%),
+    linear-gradient(145deg,#73432d,#4d2b1e 62%,#3a2118);
+  color:#f5e2ba;
+}
+
+/* ---------- SECTION HEADERS ---------- */
+#setupScreen .setup-head{
+  min-height:0;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid rgba(81,55,34,.18);
+}
+
+#setupScreen .setup-head h2{
+  margin:0;
+  color:#4b3322;
+  font-size:13px;
+  letter-spacing:.16em;
+  font-weight:800;
+}
+
+#setupScreen .setup-head span{
+  padding:5px 9px;
+  border:1px solid rgba(86,58,34,.25);
+  border-radius:999px;
+  color:#74583b;
+  background:rgba(246,229,186,.35);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+
+#setupScreen .setup-side .setup-head{
+  border-bottom-color:rgba(244,219,173,.14);
+}
+#setupScreen .setup-side .setup-head h2{color:#f0d9ac}
+#setupScreen .setup-side .setup-head span{
+  color:#ecd09a;
+  border-color:rgba(235,203,143,.22);
+  background:rgba(43,23,16,.20);
+}
+
+/* ---------- DRAW BANNER ---------- */
+#setupScreen .setup-banner{
+  margin:7px 12px 0;
+  padding:8px 12px 7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(116,77,39,.28);
+  border-radius:10px;
+  background:rgba(250,237,203,.50);
+  color:#4e3422;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.02em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.44);
+}
+
+#setupScreen .setup-banner::before,
+#setupScreen .setup-banner::after{
+  content:"✦";
+  margin:0 11px;
+  color:#a87637;
+  font-size:9px;
+}
+
+/* ---------- IDENTITY CARDS ---------- */
+#setupScreen .setup-cards{
+  min-height:0;
+  padding:13px;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:minmax(0,1fr);
+  gap:10px;
+}
+
+#setupScreen .setup-card{
+  --identity-accent:#7c4a34;
+  position:relative;
+  min-width:0;
+  min-height:0;
+  padding:18px 13px 14px;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:auto auto minmax(58px,1fr) auto;
+  align-content:start;
+  border:1px solid rgba(91,60,33,.46);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(255,252,236,.76),transparent 34%),
+    repeating-linear-gradient(11deg,rgba(91,63,35,.018) 0 1px,transparent 1px 5px),
+    linear-gradient(155deg,#f7e9c8,#ddc18c);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.65),
+    0 7px 15px rgba(65,39,21,.10);
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+
+#setupScreen .setup-card:nth-child(1){--identity-accent:#7a4b38}
+#setupScreen .setup-card:nth-child(2){--identity-accent:#526d7d}
+#setupScreen .setup-card:nth-child(3){--identity-accent:#697055}
+#setupScreen .setup-card:nth-child(4){--identity-accent:#8a6239}
+#setupScreen .setup-card:nth-child(5){--identity-accent:#704f79}
+
+#setupScreen .setup-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:7px;
+  background:var(--identity-accent);
+  box-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+
+#setupScreen .setup-card:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.70),
+    0 12px 22px rgba(60,35,19,.16);
+}
+
+#setupScreen .setup-icon{
+  width:68px;
+  height:68px;
+  margin:3px auto 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(85,56,31,.28);
+  border-radius:50%;
+  background:linear-gradient(145deg,rgba(255,246,219,.92),rgba(219,188,129,.86));
+  box-shadow:inset 0 0 0 4px rgba(255,246,216,.26),0 4px 9px rgba(75,47,25,.10);
+  font-size:33px;
+  line-height:1;
+  filter:sepia(.12) saturate(.92);
+}
+
+#setupScreen .setup-role{
+  min-height:42px;
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#39261a;
+  font-size:clamp(13px,1vw,17px);
+  line-height:1.12;
+  font-weight:800;
+  text-align:center;
+  text-wrap:balance;
+}
+
+#setupScreen .setup-desc{
+  margin:8px 2px 0;
+  color:#6a513a;
+  font-size:10px;
+  line-height:1.35;
+  text-align:center;
+}
+
+#setupScreen .setup-stats{
+  margin-top:12px;
+  padding-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  border-top:1px solid rgba(91,62,36,.22);
+}
+
+#setupScreen .setup-stat{
+  min-width:0;
+  padding:7px 6px 6px;
+  border:1px solid rgba(94,62,34,.18);
+  border-radius:9px;
+  background:rgba(249,236,202,.40);
+  text-align:center;
+}
+
+#setupScreen .setup-stat label{
+  display:block;
+  color:#7e603f;
+  font-size:7px;
+  letter-spacing:.14em;
+  font-weight:800;
+}
+
+#setupScreen .setup-stat strong{
+  display:block;
+  margin-top:2px;
+  color:#3d2a1d;
+  font-size:20px;
+  line-height:1;
+}
+
+#setupScreen .setup-legacy{
+  grid-column:1/-1;
+  padding:8px 8px 7px;
+  border:1px solid rgba(94,62,34,.18);
+  border-radius:9px;
+  color:#4f3927;
+  background:rgba(229,205,155,.40);
+  font-size:10px;
+  line-height:1.2;
+  text-align:center;
+}
+
+#setupScreen .setup-legacy::before{
+  content:"LEGACY ASSET";
+  display:block;
+  margin-bottom:3px;
+  color:#846543;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.13em;
+}
+
+#setupScreen .setup-tag{
+  top:12px;
+  right:11px;
+  width:35px;
+  height:35px;
+  z-index:3;
+  border:2px solid rgba(255,244,213,.78);
+  outline:2px solid rgba(54,33,20,.42);
+  border-radius:50%;
+  background:var(--identity-accent);
+  color:#fff6df;
+  box-shadow:0 3px 8px rgba(48,27,15,.20);
+  font-size:13px;
+  font-weight:900;
+}
+
+#setupScreen .setup-card.selected{
+  outline:none;
+  border-color:var(--identity-accent);
+  box-shadow:
+    inset 0 0 0 3px color-mix(in srgb,var(--identity-accent) 38%,transparent),
+    0 8px 18px rgba(55,32,18,.15);
+  animation:identityReveal .42s cubic-bezier(.2,.8,.2,1);
+}
+
+#setupScreen .setup-card.selected::after{
+  content:"ASSIGNED";
+  position:absolute;
+  left:50%;
+  bottom:9px;
+  transform:translateX(-50%);
+  padding:3px 8px 2px;
+  border-radius:999px;
+  color:#fff8e7;
+  background:var(--identity-accent);
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.14em;
+  opacity:.92;
+}
+
+@keyframes identityReveal{
+  0%{transform:scale(.96);filter:brightness(1.15)}
+  65%{transform:scale(1.018)}
+  100%{transform:scale(1)}
+}
+
+/* ---------- TEAM ASSIGNMENTS ---------- */
+#setupScreen .setup-selected{
+  min-height:0;
+  padding:10px 10px 7px;
+  display:grid;
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+#setupScreen .setup-slot{
+  position:relative;
+  min-height:0;
+  padding:10px 10px 10px 12px;
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  overflow:hidden;
+  border:1px solid rgba(243,215,160,.20);
+  border-radius:12px;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.035),transparent 40%),
+    rgba(125,75,46,.48);
+  color:#f8e8c7;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+#setupScreen .setup-slot::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  background:#9d7443;
+}
+#setupScreen .setup-slot:nth-child(1)::before{background:#527897}
+#setupScreen .setup-slot:nth-child(2)::before{background:#806093}
+#setupScreen .setup-slot:nth-child(3)::before{background:#668068}
+
+#setupScreen .setup-slot.empty{
+  border-style:dashed;
+  border-color:rgba(239,209,153,.21);
+  background:rgba(60,32,22,.22);
+  color:#dcbf8c;
+}
+
+#setupScreen .setup-slot-icon{
+  width:48px;
+  height:48px;
+  border:1px solid rgba(79,48,28,.48);
+  border-radius:50%;
+  background:linear-gradient(145deg,#efd59a,#c89c5b);
+  color:#3e291b;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.43);
+  font-size:22px;
+}
+
+#setupScreen .setup-slot-name{
+  color:#fff0cf;
+  font-size:14px;
+  line-height:1.1;
+  font-weight:800;
+}
+
+#setupScreen .setup-slot-role{
+  margin-top:4px;
+  color:#e5c69a;
+  font-size:9px;
+  line-height:1.28;
+}
+
+#setupScreen .setup-slot-worth{
+  min-width:62px;
+  text-align:right;
+}
+#setupScreen .setup-slot-worth label{
+  color:#dcbf89;
+  font-size:7px;
+  letter-spacing:.12em;
+}
+#setupScreen .setup-slot-worth strong{
+  margin-top:2px;
+  color:#f4d37e;
+  font-size:20px;
+}
+
+/* ---------- CONTROLS ---------- */
+#setupScreen .setup-controls{
+  padding:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  border-top:1px solid rgba(240,211,157,.14);
+  background:rgba(42,22,16,.20);
+}
+
+#setupScreen .setup-btn{
+  width:100%;
+  min-width:0;
+  min-height:39px;
+  padding:8px 10px;
+  border:1px solid rgba(76,45,25,.70);
+  border-radius:9px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:11px;
+  line-height:1.15;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+
+#setupScreen .setup-btn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+#setupScreen .setup-btn.primary{
+  color:#fff7e5;
+  background:linear-gradient(145deg,#8b5132,#62361f);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 3px 7px rgba(25,13,8,.13);
+}
+
+#setupScreen .setup-btn.secondary{
+  color:#412b1d;
+  background:linear-gradient(145deg,#ead6a8,#cfa96d);
+  border-color:rgba(177,134,72,.66);
+}
+
+#setupScreen .setup-btn.full{grid-column:1/-1}
+
+#setupDrawBtn{
+  min-height:49px !important;
+  color:#3d2918 !important;
+  border-color:#c19750 !important;
+  background:linear-gradient(180deg,#f4dda8,#d8af66) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 5px 12px rgba(27,13,7,.16) !important;
+  font-size:13px !important;
+  letter-spacing:.02em;
+}
+
+#setupDrawBtn::before{
+  content:"✦ ";
+  color:#8d622c;
+}
+
+#setupConfirmBtn:not(:disabled){
+  min-height:46px;
+  border-color:#9a783d !important;
+  background:linear-gradient(145deg,#786d46,#4f533b) !important;
+  box-shadow:0 4px 10px rgba(18,13,8,.17) !important;
+}
+
+#setupScreen .setup-btn:disabled{
+  opacity:.34;
+  cursor:not-allowed;
+  filter:saturate(.55);
+}
+
+#setupScreen .setup-status{
+  grid-column:1/-1;
+  min-height:18px;
+  padding-top:2px;
+  color:#dfc28f;
+  font-size:9px;
+  line-height:1.2;
+  text-align:center;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1500px){
+  #setupScreen{
+    grid-template-rows:104px minmax(0,1fr);
+    padding:14px 16px 16px;
+    gap:11px;
+  }
+  #setupScreen .setup-topbar{padding-left:160px}
+  #landingReturnBtn{top:35px !important;left:28px !important}
+  #setupScreen .setup-main{grid-template-columns:minmax(0,1fr) 340px;gap:11px}
+  #setupScreen .setup-cards{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(0,1fr));
+    gap:8px;
+    padding:10px;
+  }
+  #setupScreen .setup-card{padding:13px 10px 10px;grid-template-rows:auto auto minmax(35px,1fr) auto}
+  #setupScreen .setup-icon{width:48px;height:48px;margin-bottom:5px;font-size:25px}
+  #setupScreen .setup-role{min-height:28px;font-size:12px}
+  #setupScreen .setup-desc{margin-top:3px;font-size:8.5px;line-height:1.2}
+  #setupScreen .setup-stats{margin-top:5px;padding-top:5px;gap:4px}
+  #setupScreen .setup-stat{padding:4px}
+  #setupScreen .setup-stat strong{font-size:15px}
+  #setupScreen .setup-legacy{padding:5px;font-size:8px}
+}
+
+@media (max-height:760px){
+  #setupScreen{grid-template-rows:88px minmax(0,1fr)}
+  #setupScreen .setup-topbar{padding-top:10px;padding-bottom:9px}
+  #setupScreen .setup-title{font-size:25px}
+  #setupScreen .setup-subtitle{margin-top:4px;font-size:10px}
+  #setupScreen .setup-quest{padding:8px 11px}
+  #setupScreen .setup-selected{padding-top:7px;gap:6px}
+  #setupScreen .setup-slot{padding-top:7px;padding-bottom:7px}
+  #setupScreen .setup-controls{padding:7px}
+  #setupDrawBtn{min-height:42px !important}
+}
