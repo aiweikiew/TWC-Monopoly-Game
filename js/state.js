@@ -33,7 +33,10 @@ function resetGame(clearSaved = true){
     board:{positions:[0,0,0],owners:{},rolls:[0,0,0],
       status:"ready",pendingLanding:null,lastRoll:null,stepsRemaining:0,history:[]},
     setupSelected:[],currentTeam:0,nextAssetId:1,decisions:{},lastDecision:null,
-    revaluationLog:[],events:{fitBoom:false,crisis:false},message:"Team A draws first."
+    revaluationLog:[],events:{fitBoom:false,crisis:false},message:"Team A draws first.",
+    // Full-screen strategy navigation history. Entries are snapshots of the exact previous
+    // game screen and intentionally exclude flowHistory itself to avoid recursive saves.
+    flowHistory:[]
   });
   if(typeof window !== "undefined" && typeof window.syncLandingScreen === "function") window.syncLandingScreen();
 }
@@ -60,6 +63,8 @@ function restoreSavedGame(){
     if(typeof saved.landingSeen !== "boolean"){
       saved.landingSeen = saved.phase !== "setup" || saved.teams.length > 0 || (saved.setupSelected?.length || 0) > 0;
     }
+    // Older saves predate deterministic game-flow Back navigation.
+    if(!Array.isArray(saved.flowHistory)) saved.flowHistory = [];
     Object.keys(gameState).forEach(key => delete gameState[key]);
     Object.assign(gameState, saved);
     return true;
