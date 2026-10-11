@@ -24,59 +24,68 @@ const boardProperties = {
 const chanceCards = [
   {
     title:"Heavy Rain Damages Major Roads",
-    story:"Poor road conditions disrupt overland journeys and delay coaches across the region.",
+    story:"Heavy rain damages key roads and delays overland travel.",
     sectorEffects:{
-      road:{value:-1,reason:"Road damage slows coach travel and reduces demand."},
-      accommodation:{value:1,reason:"Delayed travellers need to stay overnight, increasing lodging demand."}
+      road:{value:-1,reason:"Poor road conditions delay {business} and reduce passenger activity."},
+      accommodation:{value:1,reason:"Delayed travellers need somewhere to stay, increasing demand for {business}."}
     },
-    neutralReason:"No change to your business."
+    groupPositive:"Delayed journeys increase demand for {businesses}.",
+    groupNegative:"Road disruption reduces activity for {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   },
   {
     title:"Storm Disrupts Sea Travel",
-    story:"Rough weather delays departures and interrupts passenger shipping at the ports.",
+    story:"Rough weather delays departures and disrupts passenger travel by sea.",
     sectorEffects:{
-      shipping:{value:-1,reason:"Rough seas delay passenger journeys and reduce shipping activity."},
-      accommodation:{value:1,reason:"Stranded travellers need extra nights of accommodation."}
+      shipping:{value:-1,reason:"Rough seas disrupt {business} and reduce passenger traffic."},
+      accommodation:{value:1,reason:"Stranded travellers stay longer, increasing demand for {business}."}
     },
-    neutralReason:"No change to your business."
+    groupPositive:"Stranded travellers increase demand for {businesses}.",
+    groupNegative:"Sea disruption reduces activity for {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   },
   {
     title:"Major Festival Attracts Visitors",
-    story:"A popular festival draws extra visitors and raises demand for travel-related services.",
+    story:"A major festival draws more visitors into the region.",
     sectorEffects:{
-      road:{value:1,reason:"More visitors need transport to and around the destination."},
-      accommodation:{value:1,reason:"More visitors increase demand for places to stay."},
-      shipping:{value:1,reason:"Visitors arriving by sea increase passenger traffic."},
-      information:{value:1,reason:"More travellers need maps, guides and local information."}
+      road:{value:1,reason:"More visitors need transport, increasing demand for {business}."},
+      accommodation:{value:1,reason:"More visitors need places to stay, increasing demand for {business}."},
+      shipping:{value:1,reason:"More visitors arrive by sea, boosting {business}."},
+      information:{value:1,reason:"More travellers need maps and guidance, increasing demand for {business}."}
     },
-    neutralReason:"No change to your business."
+    groupPositive:"The visitor surge increases demand across {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   },
   {
     title:"Improved Roads Speed Up Travel",
-    story:"Road improvements make overland travel faster and easier across major routes.",
+    story:"Better roads make journeys faster and easier.",
     sectorEffects:{
-      road:{value:1,reason:"Better roads make coach travel faster and more attractive."},
-      accommodation:{value:-1,reason:"Faster journeys reduce the need for overnight stops."},
-      shipping:{value:-1,reason:"Some travellers switch from sea routes to improved land routes."}
+      road:{value:1,reason:"Improved roads make {business} faster and more attractive."},
+      accommodation:{value:-1,reason:"Faster journeys reduce overnight stops, lowering demand for {business}."},
+      shipping:{value:-1,reason:"Some travellers switch to improved land routes, reducing demand for {business}."}
     },
-    neutralReason:"No change to your business."
+    groupPositive:"Better roads increase demand for {businesses}.",
+    groupNegative:"Faster land travel reduces demand for {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   },
   {
     title:"Port Expansion Boosts Passenger Traffic",
-    story:"Expanded port capacity allows more travellers to arrive and depart by sea.",
+    story:"Expanded port capacity brings more travellers through the region.",
     sectorEffects:{
-      shipping:{value:1,reason:"Greater port capacity brings more passenger traffic by sea."},
-      information:{value:1,reason:"More arrivals increase demand for maps and travel guidance."}
+      shipping:{value:1,reason:"More passengers travel by sea, boosting {business}."},
+      information:{value:1,reason:"More arrivals need maps and guidance, increasing demand for {business}."}
     },
-    neutralReason:"No change to your business."
+    groupPositive:"The increase in arrivals boosts {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   },
   {
     title:"Travel Information Becomes Outdated",
-    story:"Route details and printed travel information are no longer fully accurate.",
+    story:"Route details and printed travel information are no longer accurate.",
     sectorEffects:{
-      information:{value:-1,reason:"Outdated routes and details make your guides less useful to travellers."}
+      information:{value:-1,reason:"Travellers can no longer rely on {business}, reducing its usefulness."}
     },
-    neutralReason:"No change to your business."
+    groupNegative:"Outdated information reduces demand for {businesses}.",
+    neutralReason:"None of your current businesses are directly affected."
   }
 ];
 
