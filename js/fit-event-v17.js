@@ -59,7 +59,7 @@
   function renderFITEvent(){
     return `<section class="strategy-modern-screen digital-era event-modern-screen fit-event-screen">
       <header class="strategy-modern-header fit-event-header">
-        <div class="strategy-event-icon">📱</div>
+        <div class="strategy-event-icon">🚨</div>
         <div class="screen-kicker">SHARED MARKET EVENT · FIT = FREE INDEPENDENT TRAVELLER</div>
         <h2>FIT Boom</h2>
         <p><strong>Free Independent Travellers</strong> plan and book their own trips instead of relying on traditional package tours. Search, OTAs, online booking and navigation give travellers more autonomy.</p>
