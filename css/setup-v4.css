@@ -47,6 +47,28 @@
   letter-spacing:.01em;
 }
 
+/* Remove the redundant pool helper chip. */
+#setupScreen .setup-pool .setup-head > span{
+  display:none !important;
+}
+
+/* Fixed team colours for assigned A / B / C badges. */
+#setupScreen .setup-card.team-a .setup-tag{
+  background:#496f8f !important;
+  border-color:#dceaf3 !important;
+  box-shadow:0 0 0 2px rgba(73,111,143,.24),0 3px 8px rgba(48,27,15,.20) !important;
+}
+#setupScreen .setup-card.team-b .setup-tag{
+  background:#7a568c !important;
+  border-color:#eee2f4 !important;
+  box-shadow:0 0 0 2px rgba(122,86,140,.24),0 3px 8px rgba(48,27,15,.20) !important;
+}
+#setupScreen .setup-card.team-c .setup-tag{
+  background:#557855 !important;
+  border-color:#e2efe2 !important;
+  box-shadow:0 0 0 2px rgba(85,120,85,.24),0 3px 8px rgba(48,27,15,.20) !important;
+}
+
 @media (max-width:1000px){
   #setupScreen .setup-topbar{padding:0 118px;}
   #setupScreen .setup-title{font-size:clamp(29px,4vw,40px);}
