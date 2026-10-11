@@ -1,52 +1,45 @@
 "use strict";
 
-// Load the dedicated screen-flow layer without disturbing the original board stylesheet.
+// Core visual layers can load immediately; gameplay extensions are bootstrapped separately
+// in a strict order after the base UI is ready.
 if(typeof document !== "undefined" && !document.querySelector('link[href="css/flow.css"]')){
   const flowStyles = document.createElement("link");
   flowStyles.rel = "stylesheet";
   flowStyles.href = "css/flow.css";
   document.head.appendChild(flowStyles);
 }
-// The landing screen is a visual shell over the existing setup screen. It is only shown
-// at the start of a fresh game and never interrupts a restored mid-game vetting session.
 if(typeof document !== "undefined" && !document.querySelector('link[href="css/landing.css"]')){
   const landingStyles = document.createElement("link");
   landingStyles.rel = "stylesheet";
   landingStyles.href = "css/landing.css";
   document.head.appendChild(landingStyles);
 }
-// Keep era colours in one final visual layer so every strategy screen follows the same
-// Industrial / Jet / Digital / Future palette while the Grand Tour board stays untouched.
 if(typeof document !== "undefined" && !document.querySelector('link[href="css/era-theme-v14.css"]')){
   const eraThemeStyles = document.createElement("link");
   eraThemeStyles.rel = "stylesheet";
   eraThemeStyles.href = "css/era-theme-v14.css";
   document.head.appendChild(eraThemeStyles);
 }
-// Always bootstrap the unified Digital/Future presentation layout. It waits until the
-// base UI functions exist, then loads its Digital two-step turn extension.
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/strategy-layout-v14.js"]')){
-  const strategyLayoutScript = document.createElement("script");
-  strategyLayoutScript.src = "js/strategy-layout-v14.js";
-  strategyLayoutScript.async = false;
-  document.head.appendChild(strategyLayoutScript);
-}
-// FIT Boom uses a dedicated presentation treatment so the classroom sees what FIT means,
-// why destination pressure rises, and how that pressure carries into the 2035 crisis.
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/fit-event-v17.js"]')){
-  const fitEventScript = document.createElement("script");
-  fitEventScript.src = "js/fit-event-v17.js";
-  fitEventScript.async = false;
-  document.head.appendChild(fitEventScript);
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/extensions-bootstrap-v25.js"]')){
+  const extensions = document.createElement("script");
+  extensions.src = "js/extensions-bootstrap-v25.js";
+  extensions.async = false;
+  document.head.appendChild(extensions);
 }
 
-const GAME_STORAGE_KEY = "tourismopoly:screen-flow-v2:v1";
+// v25 intentionally starts from a clean save schema. Old v1 testing sessions are ignored
+// so removed screens/stages cannot leak into the published game.
+const GAME_STORAGE_KEY = "tourismopoly:screen-flow-v2:v25";
+const LEGACY_GAME_STORAGE_KEYS = ["tourismopoly:screen-flow-v2:v1"];
 
 // All mutable gameplay data lives here. Net Worth is always derived.
 const gameState = {};
 function clearSavedGame(){
   if(typeof localStorage === "undefined") return;
-  try { localStorage.removeItem(GAME_STORAGE_KEY); } catch(_) {}
+  try {
+    localStorage.removeItem(GAME_STORAGE_KEY);
+    for(const key of LEGACY_GAME_STORAGE_KEYS) localStorage.removeItem(key);
+  } catch(_) {}
 }
 function resetGame(clearSaved = true){
   if(clearSaved) clearSavedGame();
@@ -83,11 +76,9 @@ function restoreSavedGame(){
     if(!raw) return false;
     const saved = JSON.parse(raw);
     if(!saved || typeof saved !== "object" || !saved.board || !Array.isArray(saved.teams) || !saved.phase || !saved.mode) return false;
-    // Older saved sessions predate the landing screen. Treat any progressed game as already entered.
     if(typeof saved.landingSeen !== "boolean"){
       saved.landingSeen = saved.phase !== "setup" || saved.teams.length > 0 || (saved.setupSelected?.length || 0) > 0;
     }
-    // Older saves predate deterministic game-flow Back navigation.
     if(!Array.isArray(saved.flowHistory)) saved.flowHistory = [];
     Object.keys(gameState).forEach(key => delete gameState[key]);
     Object.assign(gameState, saved);
@@ -183,7 +174,6 @@ function mountLandingScreen(){
   if(!returnBtn.dataset.landingBound){
     returnBtn.dataset.landingBound = "true";
     returnBtn.addEventListener("click", () => {
-      // This is only navigation: do not reset identity draws or any setup progress.
       gameState.landingSeen = false;
       saveGameState();
       landing.classList.remove("leaving");
@@ -203,7 +193,7 @@ function mountLandingScreen(){
   window.syncLandingScreen();
 }
 
-// Start clean only when there is no saved classroom/testing session.
+// Start clean only when there is no current v25 classroom/testing session.
 resetGame(false);
 restoreSavedGame();
 if(typeof document !== "undefined"){
