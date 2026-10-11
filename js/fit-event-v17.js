@@ -82,7 +82,7 @@
       <div class="strategy-footer fit-event-footer">
         <button class="game-btn secondary strategy-back-btn" id="strategyFlowBackBtn" type="button">← Back</button>
         <button class="game-btn secondary" id="strategyResetBtn" type="button">Reset Game</button>
-        <button class="game-btn" data-flow-action="continue" type="button">CONTINUE → 2035 CRISIS</button>
+        <button class="game-btn fit-crisis-icon-btn" data-flow-action="continue" type="button" aria-label="Continue to 2035 Crisis" title="Continue to 2035 Crisis">🚨</button>
       </div>
     </section>`;
   }
