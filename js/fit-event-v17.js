@@ -65,11 +65,6 @@
         <p><strong>Free Independent Travellers</strong> plan and book their own trips instead of relying on traditional package tours. Search, OTAs, online booking and navigation give travellers more autonomy.</p>
       </header>
 
-      <div class="fit-event-rules">
-        <div class="fit-rule-chip"><span>ALL TEAMS</span><strong>Destination Pressure +1</strong></div>
-        <div class="fit-rule-chip reward"><span>DIGITAL READY</span><strong>Cash +$2</strong></div>
-      </div>
-
       <aside class="fit-pressure-explainer">
         <div class="fit-pressure-icon">⚠</div>
         <div class="fit-pressure-copy">
