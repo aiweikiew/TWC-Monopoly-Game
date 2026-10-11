@@ -23,6 +23,14 @@ if(typeof document !== "undefined" && !document.querySelector('link[href="css/er
   eraThemeStyles.href = "css/era-theme-v14.css";
   document.head.appendChild(eraThemeStyles);
 }
+// Always bootstrap the unified Digital/Future presentation layout. It waits until the
+// base UI functions exist, then loads its Digital two-step turn extension.
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/strategy-layout-v14.js"]')){
+  const strategyLayoutScript = document.createElement("script");
+  strategyLayoutScript.src = "js/strategy-layout-v14.js";
+  strategyLayoutScript.async = false;
+  document.head.appendChild(strategyLayoutScript);
+}
 
 const GAME_STORAGE_KEY = "tourismopoly:screen-flow-v2:v1";
 
