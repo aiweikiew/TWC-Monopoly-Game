@@ -159,6 +159,20 @@
   padding:4px 5px;
 }
 
+/* Keep the icon-only Tech Shock button optically centred. */
+.monopoly-shell #presenterBtn.tech-shock-trigger{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  min-height:42px;
+  padding:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  line-height:1 !important;
+  text-align:center !important;
+  font-size:18px;
+}
+
 /* Centre crest: remove the repeated game title and use the square as a period marker. */
 .monopoly-shell .center{
   margin:6px;
