@@ -43,7 +43,10 @@ const revaluations = {
     steamShipping:3,shipping:3,legacyShipping:3,
     legacyCoach:0,horse:0,legacyInn:3,inn:2,legacyPublishing:2,guide:1
   },
-  digital:{tour:4,legacyPublishing:2,guide:2,guidebook:2}
+  // Digital Transformation primarily disrupts information and intermediation rather than physical tourism infrastructure.
+  // Traditional tour packaging loses some value as travellers self-search/book; print information loses more sharply.
+  // Rail, transfer, hotels and shipping keep their Jet-era values here; teams can then sell/reallocate or digitise during the Digital turn.
+  digital:{tour:4,legacyPublishing:1,guide:0,guidebook:2}
 };
 const adaptations = {
   legacyCoach:"transfer",horse:"transfer",legacyInn:"hotel",inn:"hotel",
@@ -100,9 +103,64 @@ function repairLegacyJetRevaluation(){
   return true;
 }
 
+// Compatibility repair for Digital saves made with the earlier, less realistic table.
+// Safe for revaluation and decision screens; digital-native investments are never touched.
+function repairLegacyDigitalRevaluation(){
+  if(typeof gameState === "undefined" || gameState.mode !== "strategy" ||
+     gameState.phase !== "digital" || !Array.isArray(gameState.teams)) return false;
+  if(!["revaluation","decisions","review","event","results","pause"].includes(gameState.uiStage)) return false;
+
+  const beforeDigital = {tour:6,legacyPublishing:2,guide:1,guidebook:4};
+  const rows = [];
+  let changed = false;
+
+  for(const team of gameState.teams){
+    for(const asset of team.assets || []){
+      if(!Object.hasOwn(revaluations.digital,asset.type)) continue;
+      const oldValue = beforeDigital[asset.type];
+      const newValue = revaluations.digital[asset.type];
+      if(asset.currentValue !== newValue) changed = true;
+      asset.currentValue = newValue;
+      rows.push({team:team.name,name:asset.name,oldValue,newValue});
+    }
+  }
+
+  // If the new two-step Digital turn already sold an information asset under the old table,
+  // correct the released cash so the saved test run remains economically consistent.
+  const saleCorrections = {
+    "Legacy Publishing Business":1,
+    "Travel Guide & Information":2
+  };
+  for(const team of gameState.teams){
+    const decision = gameState.decisions?.[team.id] || "";
+    for(const [name,correction] of Object.entries(saleCorrections)){
+      if(decision.includes(`SELL: ${name}`) && !decision.includes("[DIGITAL VALUE REPAIRED]")){
+        team.cash -= correction;
+        gameState.decisions[team.id] = `${decision} [DIGITAL VALUE REPAIRED]`;
+        changed = true;
+        break;
+      }
+    }
+  }
+
+  if(gameState.uiStage === "revaluation"){
+    const oldLog = Array.isArray(gameState.revaluationLog) ? gameState.revaluationLog : [];
+    if(oldLog.length !== rows.length || oldLog.some((row,index) =>
+      !rows[index] || row.team !== rows[index].team || row.name !== rows[index].name ||
+      row.oldValue !== rows[index].oldValue || row.newValue !== rows[index].newValue)) changed = true;
+    gameState.revaluationLog = rows;
+  }
+
+  if(!changed) return false;
+  if(typeof saveGameState === "function") saveGameState();
+  return true;
+}
+
 if(typeof document !== "undefined"){
   const repairAndRender = () => {
-    if(repairLegacyJetRevaluation() && typeof renderGame === "function") renderGame();
+    const repairedJet = repairLegacyJetRevaluation();
+    const repairedDigital = repairLegacyDigitalRevaluation();
+    if((repairedJet || repairedDigital) && typeof renderGame === "function") renderGame();
   };
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded",() => window.setTimeout(repairAndRender,0),{once:true});
   else window.setTimeout(repairAndRender,0);
