@@ -1,0 +1,133 @@
+/* Tourismopoly · debt settlement and negative-cash treatment */
+
+.player-card.in-debt{
+  outline:2px solid rgba(173,73,55,.78) !important;
+  outline-offset:0;
+}
+.player-card .cash-debt{
+  background:rgba(143,47,37,.22) !important;
+  color:#ffd6c8 !important;
+}
+.player-card .cash-debt strong{
+  color:#ffd6c8 !important;
+}
+
+.debt-screen{
+  justify-content:flex-start;
+  padding:18px 4% 16px;
+}
+.debt-screen h2{
+  margin-bottom:7px;
+}
+.debt-summary{
+  width:min(620px,100%);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:8px 0 12px;
+}
+.debt-summary>div{
+  padding:11px 13px;
+  border:1px solid var(--flow-line);
+  border-radius:10px;
+  background:rgba(255,255,255,.29);
+}
+.debt-summary span{
+  display:block;
+  margin-bottom:3px;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.11em;
+  color:#715f50;
+}
+.debt-summary strong{
+  font-size:24px;
+  line-height:1;
+}
+.debt-summary .debt-negative{
+  color:#8b3429;
+}
+.debt-fallback-note,
+.debt-rule{
+  width:min(760px,100%);
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:10px;
+  line-height:1.35;
+}
+.debt-fallback-note{
+  margin-bottom:9px;
+  border:1px solid rgba(132,88,55,.3);
+  background:rgba(159,105,61,.08);
+  color:#664b37;
+}
+.debt-asset-grid{
+  width:min(760px,100%);
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  max-height:43vh;
+  overflow:auto;
+  padding-right:2px;
+}
+.debt-asset-card{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:11px 12px;
+  border:1px solid var(--flow-line);
+  border-radius:10px;
+  background:rgba(255,255,255,.29);
+}
+.debt-asset-card>div{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+.debt-asset-card span{
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.1em;
+  color:#795f49;
+}
+.debt-asset-card strong{
+  font-size:13px;
+  line-height:1.15;
+  overflow-wrap:anywhere;
+}
+.debt-asset-card small{
+  font-size:10px;
+  color:#756251;
+}
+.debt-asset-card .game-btn{
+  min-width:112px;
+  min-height:36px;
+  padding:6px 9px;
+  font-size:10px;
+}
+.debt-no-assets{
+  grid-column:1/-1;
+  padding:18px;
+  border:1px dashed rgba(110,56,45,.4);
+  border-radius:10px;
+  background:rgba(137,59,48,.07);
+  font-size:12px;
+}
+.debt-rule{
+  margin-top:11px;
+  background:rgba(0,0,0,.045);
+  color:#665649;
+}
+
+@media(max-height:820px){
+  .debt-screen{padding-top:13px}
+  .debt-summary{margin:6px 0 9px}
+  .debt-summary>div{padding:9px 11px}
+  .debt-summary strong{font-size:21px}
+  .debt-asset-grid{max-height:39vh;gap:7px}
+  .debt-asset-card{padding:9px 10px}
+  .debt-asset-card strong{font-size:12px}
+  .debt-rule{margin-top:8px}
+}
