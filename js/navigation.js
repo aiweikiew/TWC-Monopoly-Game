@@ -54,6 +54,11 @@ if(typeof document !== "undefined" && !document.querySelector('script[src="js/in
   industrialReviewScript.src = "js/industrial-review-v12.js";
   document.head.appendChild(industrialReviewScript);
 }
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/flow-back-v13.js"]')){
+  const flowBackScript = document.createElement("script");
+  flowBackScript.src = "js/flow-back-v13.js";
+  document.head.appendChild(flowBackScript);
+}
 
 // navigationState is only for transient UI drill-downs such as an unconfirmed decision.
 // Committed game screens use gameState.flowHistory so Back follows the actual game sequence.
