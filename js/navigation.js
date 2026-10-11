@@ -143,6 +143,7 @@ function captureFlowSnapshot(){
   return {
     state:cloneFlowState(),
     viewType:navigationState.currentView?.type || null,
+    previousViewTypes:navigationState.previousViews.map(view => view.type),
     selection:navigationState.selection ? JSON.parse(JSON.stringify(navigationState.selection)) : null
   };
 }
@@ -170,6 +171,9 @@ function restoreFlowSnapshot(){
     currentView:null,previousViews:[],selection:null,sessionBoard:null,observedKey:null,revision:0
   });
   syncNavigation();
+  navigationState.previousViews = Array.isArray(entry.previousViewTypes)
+    ? entry.previousViewTypes.map(type => makeView(type))
+    : [];
   if(entry.viewType === "selection" && entry.selection){
     navigationState.selection = JSON.parse(JSON.stringify(entry.selection));
     replaceView("selection");
