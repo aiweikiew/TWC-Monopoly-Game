@@ -1,6 +1,11 @@
 /* Tourismopoly · Grand Tour board v3
    Readable one-screen layout: compact controls, larger player text, no scrolling. */
 
+/* Reserve the Back-button gutter at all times so the board never shifts during a roll. */
+.monopoly-shell{
+  padding-left:90px !important;
+}
+
 /* Give the sidebar a little more width so portfolio text stays readable. */
 .monopoly-shell .side-column{
   width:400px;
