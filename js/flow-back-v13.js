@@ -14,9 +14,6 @@
     return key && futureStrategies?.[key] ? futureStrategies[key].name : null;
   }
 
-  // Older saves created before deterministic flow history can contain a Future review
-  // with the strategies already applied to the teams but the decisions map cleared.
-  // Repair that state instead of showing three impossible "Pending" rows.
   function repairImpossibleReviewState(){
     if(gameState.mode !== "strategy" || gameState.uiStage !== "review") return false;
     if(!gameState.decisions || typeof gameState.decisions !== "object") gameState.decisions = {};
@@ -42,8 +39,6 @@
       }
     }
 
-    // A review page is only valid after every team has a recorded decision. If a restored
-    // session reaches review early, resume the first unfinished team instead of trapping it.
     const firstMissing = gameState.teams.findIndex(team => !gameState.decisions[team.id]);
     if(firstMissing >= 0){
       gameState.currentTeam = firstMissing;
@@ -73,10 +68,6 @@
       gameState.teams.every(team => Boolean(futureStrategyName(team)));
   }
 
-  // For an old save with no exact snapshot, rebuild the immediately previous Future screen:
-  // Team C's decision. The crisis baseline is deterministic, so its strategy effects can be
-  // reversed without touching Teams A/B. We also save the review screen as the previous
-  // flow snapshot so Back remains available on the reconstructed decision screen.
   function restoreLegacyPreviousFutureDecision(){
     if(!isLegacyFutureReview()) return false;
     const reviewSnapshot = typeof captureFlowSnapshot === "function" ? captureFlowSnapshot() : null;
@@ -93,10 +84,10 @@
     if(!strategy) return false;
 
     team.cash -= strategy.cash;
-    team.visitorExperience = 1;
-    const destinationBaseline = Math.max(0,Math.min(5,2 - (team.destinationPressure || 0)));
-    team.residentWellbeing = destinationBaseline;
-    team.environmentalHealth = destinationBaseline;
+    team.visitorExperience -= strategy.visitorExperience;
+    team.residentWellbeing -= strategy.residentWellbeing;
+    team.environmentalHealth -= strategy.environmentalHealth;
+    clampScores(team);
     team.futureStrategy = null;
     team.futureInnovationCredit = 1;
 
@@ -113,6 +104,59 @@
     navigationState.currentView = null;
 
     if(reviewSnapshot && typeof commitFlowSnapshot === "function") commitFlowSnapshot(reviewSnapshot);
+    if(typeof saveGameState === "function") saveGameState();
+    return true;
+  }
+
+  function isLegacyFutureDecision(){
+    return gameState.mode === "strategy" &&
+      gameState.phase === "future" &&
+      gameState.uiStage === "decisions" &&
+      (!Array.isArray(gameState.flowHistory) || gameState.flowHistory.length === 0) &&
+      typeof navigationState !== "undefined" &&
+      navigationState.previousViews.length === 0 &&
+      gameState.currentTeam >= 0 &&
+      gameState.currentTeam < gameState.teams.length;
+  }
+
+  function restoreLegacyPreviousFutureStep(){
+    if(!isLegacyFutureDecision()) return false;
+
+    const currentIndex = gameState.currentTeam;
+    if(currentIndex === 0){
+      gameState.uiStage = "crisis";
+      gameState.phaseComplete = false;
+      gameState.decisions = {};
+      gameState.lastDecision = null;
+      gameState.message = "";
+    } else {
+      const previousIndex = currentIndex - 1;
+      const team = gameState.teams[previousIndex];
+      const strategyKey = team.futureStrategy;
+      const strategy = strategyKey ? futureStrategies[strategyKey] : null;
+
+      if(strategy){
+        team.cash -= strategy.cash;
+        team.visitorExperience -= strategy.visitorExperience;
+        team.residentWellbeing -= strategy.residentWellbeing;
+        team.environmentalHealth -= strategy.environmentalHealth;
+        clampScores(team);
+        team.futureStrategy = null;
+        team.futureInnovationCredit = 1;
+      }
+
+      delete gameState.decisions[team.id];
+      gameState.currentTeam = previousIndex;
+      gameState.uiStage = "decisions";
+      gameState.phaseComplete = false;
+      gameState.lastDecision = null;
+      gameState.message = `${team.name}, choose your Future strategy.`;
+    }
+
+    navigationState.selection = null;
+    navigationState.previousViews = [];
+    navigationState.observedKey = null;
+    navigationState.currentView = null;
     if(typeof saveGameState === "function") saveGameState();
     return true;
   }
@@ -147,13 +191,14 @@
 
     const originalCanNavigateBack = canNavigateBack;
     canNavigateBack = function(){
-      if(isLegacyFutureReview()) return true;
+      if(isLegacyFutureReview() || isLegacyFutureDecision()) return true;
       return originalCanNavigateBack();
     };
 
     const originalNavigateBack = navigateBack;
     navigateBack = function(){
       if(isLegacyFutureReview()) return restoreLegacyPreviousFutureDecision();
+      if(isLegacyFutureDecision()) return restoreLegacyPreviousFutureStep();
       return originalNavigateBack();
     };
 
@@ -162,7 +207,6 @@
       repairImpossibleReviewState();
       originalRenderGame();
       syncGlobalBack();
-      // Some screen-specific render wrappers insert their inline Back after the core render.
       window.setTimeout(syncGlobalBack,0);
     };
 
