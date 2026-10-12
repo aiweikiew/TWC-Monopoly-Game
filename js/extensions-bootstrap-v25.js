@@ -22,7 +22,8 @@
     "js/flow-back-v13.js",
     "js/strategy-layout-v14.js",
     "js/narrative-cycle-v27.js",
-    "js/narrative-decisions-v28.js"
+    "js/narrative-decisions-v28.js",
+    "js/ui-fix-v29.js"
   ];
 
   function baseReady(){
