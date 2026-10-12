@@ -1,0 +1,251 @@
+/* v27: projected-classroom readability + narrative framing */
+
+/* Once gameplay starts, keep navigation forward-facing. */
+#backBtn,
+.strategy-back-btn,
+.shock-back-btn,
+#revaluationShockBackBtn{display:none!important}
+
+/* Shared narrative labels */
+.narrative-cycle-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:34px;
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:clamp(13px,.9vw,17px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.10em;
+  color:#fff;
+  background:linear-gradient(90deg,#315f9e,#5f4ab7);
+  box-shadow:0 5px 14px rgba(49,74,145,.14);
+}
+.narrative-cause-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(49,95,158,.20);
+  background:rgba(255,255,255,.62);
+  color:#263a64;
+  font-size:clamp(13px,.92vw,17px);
+  line-height:1.15;
+  font-weight:800;
+  text-align:center;
+}
+.narrative-cause-link span{font-size:1.25em;color:#6652b8}
+.narrative-cause-link.consequence{
+  border-color:rgba(159,75,75,.22);
+  background:rgba(255,246,244,.78);
+  color:#793d42;
+}
+.narrative-shock-explain{
+  margin:4px auto 10px!important;
+  max-width:1220px;
+  text-align:center;
+  font-size:clamp(14px,.96vw,18px)!important;
+  line-height:1.35!important;
+  color:#4b5871!important;
+}
+
+/* Global strategy readability */
+.strategy-modern-screen{padding:22px 28px 18px!important;gap:14px!important}
+.strategy-modern-header{gap:7px!important}
+.strategy-modern-header .screen-kicker{
+  font-size:clamp(14px,.9vw,17px)!important;
+  line-height:1.15!important;
+  letter-spacing:.12em!important;
+}
+.strategy-modern-header h2{
+  font-size:clamp(34px,2.6vw,48px)!important;
+  line-height:1.04!important;
+}
+.strategy-modern-header p{
+  max-width:1080px!important;
+  font-size:clamp(15px,1vw,19px)!important;
+  line-height:1.35!important;
+}
+.strategy-event-icon{font-size:42px!important}
+.strategy-quest{
+  padding:8px 16px!important;
+  font-size:clamp(12px,.78vw,15px)!important;
+  line-height:1.15!important;
+}
+
+.strategy-team-head strong,.strategy-team-block-head strong{font-size:clamp(16px,1vw,19px)!important}
+.strategy-team-head span,.strategy-team-block-head span{font-size:clamp(11px,.72vw,14px)!important}
+.strategy-team-head>b,.strategy-team-block-head>b{font-size:20px!important}
+.strategy-team-icon{width:44px!important;height:44px!important;flex-basis:44px!important;font-size:24px!important}
+.strategy-team-money span,.strategy-team-flags span{
+  font-size:clamp(10px,.7vw,13px)!important;
+  line-height:1.2!important;
+}
+.strategy-team-money strong{font-size:clamp(14px,.9vw,17px)!important}
+.strategy-team-state{font-size:clamp(10px,.68vw,13px)!important;line-height:1.2!important}
+
+.strategy-choice-card{padding:16px 18px!important;gap:9px!important}
+.strategy-choice-card>span{font-size:clamp(11px,.7vw,14px)!important}
+.strategy-choice-card h3{font-size:clamp(21px,1.35vw,27px)!important;line-height:1.1!important}
+.strategy-choice-card p{font-size:clamp(14px,.88vw,17px)!important;line-height:1.35!important}
+.strategy-choice-card small{font-size:12px!important}
+.strategy-choice-card select{min-height:44px!important;font-size:14px!important}
+.strategy-choice-price{font-size:28px!important}
+.future-strategy-card h3{font-size:clamp(25px,1.55vw,31px)!important}
+.strategy-impact-grid span{font-size:clamp(11px,.72vw,14px)!important;padding:9px 10px!important}
+.strategy-impact-grid b{font-size:clamp(14px,.86vw,17px)!important}
+
+.strategy-modern-screen .game-btn,
+.strategy-modern-screen .strategy-footer .game-btn{
+  min-height:46px!important;
+  padding:10px 18px!important;
+  font-size:clamp(13px,.82vw,16px)!important;
+  line-height:1.15!important;
+}
+.strategy-footer{min-height:50px!important;gap:12px!important}
+
+.strategy-confirm-card{width:min(760px,84vw)!important;padding:32px 38px!important}
+.strategy-confirm-card h2{font-size:36px!important}
+.strategy-confirm-card h3{font-size:28px!important}
+.strategy-confirm-card p{max-width:620px!important;font-size:16px!important;line-height:1.35!important}
+.strategy-confirm-action{font-size:13px!important}
+.strategy-confirm-note{font-size:13px!important;line-height:1.3!important}
+
+.strategy-team-block{padding:16px!important;gap:10px!important}
+.strategy-metric-pair span{font-size:clamp(10px,.65vw,12px)!important}
+.strategy-metric-pair strong{font-size:clamp(20px,1.3vw,25px)!important}
+.strategy-portfolio-title{font-size:12px!important}
+.strategy-portfolio-row{font-size:clamp(12px,.76vw,14px)!important;padding:7px 9px!important}
+.strategy-portfolio-row strong{font-size:14px!important}
+.strategy-portfolio-row small{font-size:9px!important}
+.strategy-empty{font-size:13px!important}
+.strategy-score-grid span{font-size:clamp(10px,.68vw,13px)!important;line-height:1.2!important}
+.strategy-decision-pill{font-size:clamp(11px,.72vw,14px)!important;line-height:1.2!important}
+.strategy-impact-banner span{font-size:clamp(12px,.78vw,15px)!important;padding:9px 15px!important}
+.strategy-event-result strong{font-size:26px!important}
+.strategy-event-result span{font-size:14px!important}
+.strategy-crisis-tags span{font-size:clamp(11px,.72vw,14px)!important;line-height:1.25!important;padding:10px!important}
+.strategy-checkpoint-card span{font-size:12px!important}
+.strategy-checkpoint-card strong{font-size:26px!important}
+.strategy-checkpoint-card p{font-size:14px!important}
+
+/* Market revaluation screens */
+.industrial-summary-screen .screen-kicker{
+  font-size:clamp(13px,.82vw,16px)!important;
+  line-height:1.15!important;
+}
+.industrial-summary-topline h2{font-size:clamp(32px,2.3vw,44px)!important;line-height:1.05!important}
+.industrial-summary-topline p{font-size:clamp(14px,.9vw,17px)!important;line-height:1.35!important}
+.industrial-summary-topline .narrative-cycle-chip{margin:8px 0 6px}
+.industrial-summary-screen>.narrative-cause-link{margin:4px auto 0;max-width:1300px}
+.industrial-team-name{font-size:clamp(17px,1vw,20px)!important}
+.industrial-team-identity{font-size:clamp(11px,.72vw,14px)!important}
+.industrial-total-chip span{font-size:11px!important}
+.industrial-total-chip strong{font-size:18px!important}
+.industrial-worth-label,.industrial-assets-label{font-size:11px!important}
+.industrial-worth-flow span,.industrial-worth-flow strong{font-size:clamp(20px,1.2vw,24px)!important}
+.industrial-asset-row{font-size:clamp(12px,.76vw,14px)!important;line-height:1.2!important}
+.industrial-asset-name{font-size:clamp(12px,.76vw,14px)!important}
+.industrial-summary-actions .game-btn{min-height:46px!important;font-size:14px!important}
+
+/* Tech Shock readability */
+.industrial-shock-screen .shock-kicker{font-size:clamp(18px,1.2vw,24px)!important}
+.industrial-shock-screen h1{font-size:clamp(54px,5vw,88px)!important;line-height:1!important}
+.narrative-shock-cycle{margin:10px auto 8px!important}
+.narrative-shock-line{
+  max-width:1080px;
+  margin:16px auto 20px;
+  text-align:center;
+  font-size:clamp(16px,1.08vw,21px);
+  line-height:1.35;
+  font-weight:700;
+  color:#4a4661;
+}
+.industrial-shock-screen .game-btn{min-height:50px!important;font-size:16px!important;padding:12px 20px!important}
+
+/* Winner: market success first, consequence check second */
+.narrative-winner-screen{grid-template-rows:auto minmax(0,1fr) auto auto!important}
+.narrative-winner-screen .strategy-winner-worth{font-size:clamp(56px,4.5vw,82px)!important}
+.narrative-winner-check{
+  min-height:0;
+  padding:18px 20px;
+  border-radius:16px;
+  border:1px solid rgba(103,74,180,.22);
+  background:rgba(255,255,255,.62);
+  text-align:center;
+  overflow:hidden;
+}
+.narrative-winner-check h3{
+  margin:10px 0 5px;
+  font-size:clamp(28px,2vw,38px);
+  line-height:1.05;
+  color:#2a2455;
+}
+.narrative-winner-check>p{
+  margin:0 auto 14px;
+  max-width:1050px;
+  font-size:clamp(14px,.9vw,17px);
+  line-height:1.35;
+  color:#586177;
+}
+.narrative-adaptation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.narrative-adaptation-card{
+  min-width:0;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid rgba(77,79,135,.18);
+  background:rgba(255,255,255,.72);
+}
+.narrative-adaptation-card.market-winner{outline:2px solid rgba(92,71,185,.34);outline-offset:-3px}
+.narrative-adaptation-head{display:flex;align-items:center;justify-content:center;gap:8px;font-size:18px}
+.narrative-adaptation-head span{font-size:26px}
+.narrative-adaptation-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.narrative-adaptation-metrics span{
+  padding:7px 8px;
+  border-radius:8px;
+  background:rgba(63,73,122,.06);
+  font-size:clamp(11px,.72vw,14px);
+  font-weight:800;
+}
+.narrative-adaptation-metrics b{display:block;margin-top:2px;font-size:16px;color:#2f3866}
+.strategy-winner-handoff{font-size:clamp(14px,.92vw,18px)!important;line-height:1.3!important}
+
+/* Grand Tour / setup readability for projector use */
+.setup-kicker{font-size:14px!important}
+.setup-title{font-size:clamp(28px,2vw,40px)!important}
+.setup-subtitle{font-size:16px!important}
+.setup-quest strong{font-size:15px!important}
+.setup-quest span{font-size:13px!important}
+.setup-role{font-size:18px!important}
+.setup-desc{font-size:13px!important;line-height:1.3!important}
+.setup-stat label,.setup-slot-worth label{font-size:10px!important}
+.setup-stat strong,.setup-slot-worth strong{font-size:17px!important}
+.setup-legacy,.setup-slot-role,.setup-status{font-size:12px!important;line-height:1.3!important}
+.setup-btn{font-size:14px!important;min-height:44px!important}
+
+#boardResetBtn{font-size:13px!important;min-height:38px!important;padding:7px 10px!important}
+.presenter-toggle{font-size:13px!important;min-height:38px!important}
+.turn-badge{font-size:14px!important}
+.roll-text{font-size:18px!important}
+.roll-sub{font-size:13px!important;line-height:1.3!important}
+.roll-panel .game-btn{font-size:14px!important;min-height:42px!important}
+.player-card .team{font-size:16px!important}
+.player-card .identity{font-size:12px!important}
+.player-metrics,.portfolio-assets,.player-flags,.future-mini,.strategy-mini,.decision-record,.player-status{font-size:12px!important;line-height:1.3!important}
+.landing-card .landing-title,.chance-title{font-size:clamp(26px,2vw,36px)!important}
+.landing-card .landing-desc,.chance-story,.chance-sector,.modal-note,.landing-balance,.owner-line,.transfer-line{font-size:14px!important;line-height:1.35!important}
+.landing-actions .modal-btn{font-size:15px!important;min-height:46px!important}
+
+@media (max-height:820px){
+  .strategy-modern-screen{padding:14px 20px 12px!important;gap:9px!important}
+  .strategy-modern-header h2{font-size:32px!important}
+  .strategy-modern-header p{font-size:14px!important}
+  .strategy-choice-card{padding:12px 14px!important}
+  .strategy-choice-card p{font-size:13px!important}
+  .narrative-cause-link{padding:7px 10px;font-size:12px}
+  .narrative-winner-check{padding:12px 14px}
+}
