@@ -24,7 +24,8 @@
     "js/narrative-cycle-v27.js",
     "js/narrative-decisions-v28.js",
     "js/ui-fix-v29.js",
-    "js/game-audio-v30.js"
+    "js/game-audio-v30.js",
+    "js/game-audio-direct-v30.js"
   ];
 
   function baseReady(){
