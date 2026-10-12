@@ -1,0 +1,78 @@
+/* v27 extra: decision readability + pressure trade-off visibility */
+
+.narrative-pressure-impact{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:8px;
+  padding:9px 11px;
+  border-radius:9px;
+  background:rgba(84,93,137,.08);
+  border:1px solid rgba(84,93,137,.15);
+  font-size:clamp(12px,.78vw,15px);
+  font-weight:900;
+}
+.narrative-pressure-impact span{letter-spacing:.06em}
+.narrative-pressure-impact strong{font-size:clamp(18px,1.2vw,24px);color:#5f4ab7}
+.narrative-pressure-impact.reduces{
+  background:rgba(60,133,91,.10);
+  border-color:rgba(60,133,91,.25);
+}
+.narrative-pressure-impact.reduces strong{color:#2f7b4a}
+
+.narrative-team-pressure{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 10px;
+  border-radius:9px;
+  background:rgba(161,78,78,.08);
+  border:1px solid rgba(161,78,78,.16);
+  font-size:clamp(11px,.72vw,14px);
+  font-weight:900;
+}
+.narrative-team-pressure span{letter-spacing:.06em;color:#6f5258}
+.narrative-team-pressure strong{font-size:20px;color:#9b454d}
+
+/* Industrial response screen: readable from a classroom projector */
+.industrial-turn-screen .screen-kicker{font-size:clamp(13px,.85vw,16px)!important;line-height:1.15!important}
+.industrial-turn-heading h2{font-size:clamp(30px,2.2vw,42px)!important;line-height:1.05!important}
+.industrial-turn-heading p{font-size:clamp(14px,.9vw,17px)!important;line-height:1.35!important}
+.industrial-wallet span{font-size:11px!important}
+.industrial-wallet strong{font-size:28px!important}
+.industrial-wallet small{font-size:12px!important}
+.industrial-step-title strong{font-size:clamp(15px,.95vw,18px)!important}
+.industrial-step-title small{font-size:clamp(11px,.72vw,14px)!important;line-height:1.25!important}
+.industrial-market-card .market-card-tag{font-size:10px!important}
+.industrial-market-card>strong{font-size:clamp(15px,.95vw,18px)!important;line-height:1.15!important}
+.industrial-market-card .market-card-price{font-size:22px!important}
+.industrial-market-card .market-card-cta{font-size:clamp(11px,.7vw,13px)!important}
+.industrial-action-tab{font-size:13px!important;min-height:40px!important}
+.industrial-owned-card span{font-size:10px!important}
+.industrial-owned-card strong{font-size:clamp(14px,.88vw,17px)!important}
+.industrial-owned-card b{font-size:clamp(11px,.72vw,14px)!important}
+.industrial-hold-message strong{font-size:15px!important}
+.industrial-hold-message span{font-size:13px!important}
+.turn-summary-choice span,.turn-summary-finance span{font-size:10px!important}
+.turn-summary-choice strong{font-size:clamp(12px,.78vw,15px)!important;line-height:1.2!important}
+.turn-summary-finance strong{font-size:22px!important}
+.turn-summary-finance small{font-size:11px!important}
+.industrial-confirm-turn{font-size:14px!important;min-height:44px!important}
+.industrial-turn-warning,.industrial-decision-debt-alert p{font-size:13px!important;line-height:1.3!important}
+.industrial-decision-controls .game-btn{font-size:13px!important;min-height:42px!important}
+.industrial-decision-controls .decision-back-btn{display:none!important}
+
+/* Digital decision cards */
+.digital-era .strategy-choice-card p{font-size:clamp(14px,.9vw,17px)!important}
+.digital-era .strategy-choice-card h3{font-size:clamp(20px,1.3vw,26px)!important}
+
+/* Keep the cause/effect bar readable without cramping 1080p screens. */
+@media (max-height:900px){
+  .narrative-pressure-impact{padding:7px 9px;margin-top:5px}
+  .industrial-turn-heading h2{font-size:30px!important}
+  .industrial-turn-heading p{font-size:13px!important}
+  .industrial-step-title strong{font-size:14px!important}
+  .industrial-step-title small{font-size:11px!important}
+}
