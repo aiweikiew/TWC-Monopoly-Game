@@ -9,6 +9,7 @@
   document.documentElement.dataset.extensionsBootstrapV25 = "true";
 
   const orderedExtensions = [
+    "js/game-brand-v26.js",
     "js/board-review-v3.js",
     "js/chance-sum-v5.js",
     "js/debt-settlement-v4.js",
@@ -66,7 +67,7 @@
     await waitForBase();
     for(const src of orderedExtensions){
       try { await loadScript(src); }
-      catch(error){ console.error("Tourismopoly extension bootstrap:",error); break; }
+      catch(error){ console.error("Time to Travel extension bootstrap:",error); break; }
     }
     document.documentElement.dataset.extensionsReadyV25 = "true";
     if(typeof renderGame === "function") renderGame();
