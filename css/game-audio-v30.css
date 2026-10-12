@@ -1,0 +1,39 @@
+/* v30: compact global sound control */
+#gameSoundToggle{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:10050;
+  width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border-radius:50%;
+  border:1px solid rgba(46,52,96,.24);
+  background:rgba(255,255,255,.88);
+  color:#2e3160;
+  box-shadow:0 8px 24px rgba(38,43,89,.16);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  font-size:20px;
+  line-height:1;
+  cursor:pointer;
+  transition:transform .16s ease,opacity .16s ease,background .16s ease;
+}
+#gameSoundToggle:hover{transform:translateY(-1px) scale(1.04)}
+#gameSoundToggle:focus-visible{outline:3px solid rgba(91,76,190,.30);outline-offset:3px}
+#gameSoundToggle[data-muted="true"]{
+  opacity:.66;
+  background:rgba(245,245,248,.84);
+  color:#6f7286;
+}
+#gameSoundToggle.sound-pulse{animation:soundPulseV30 .24s ease-out}
+@keyframes soundPulseV30{
+  0%{transform:scale(1)}
+  45%{transform:scale(1.12)}
+  100%{transform:scale(1)}
+}
+@media(max-height:760px){
+  #gameSoundToggle{width:40px;height:40px;right:10px;bottom:10px;font-size:17px}
+}
