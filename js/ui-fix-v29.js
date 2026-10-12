@@ -15,11 +15,17 @@
       const primary=card.querySelector(".pressure-projection");
       if(!primary) return;
 
-      [...card.children].forEach(child=>{
-        if(child===primary) return;
-        const text=(child.textContent||"").trim().replace(/\s+/g," ").toUpperCase();
-        if(text.startsWith("DESTINATION PRESSURE")) child.remove();
+      const duplicates=new Set();
+      card.querySelectorAll("div,section,aside,p,span").forEach(node=>{
+        if(node===primary || node.closest(".pressure-projection")) return;
+        const text=(node.textContent||"").trim().replace(/\s+/g," ").toUpperCase();
+        if(!text.startsWith("DESTINATION PRESSURE")) return;
+
+        let block=node;
+        while(block.parentElement && block.parentElement!==card) block=block.parentElement;
+        if(block!==primary && block.parentElement===card) duplicates.add(block);
       });
+      duplicates.forEach(node=>node.remove());
     });
   }
 
