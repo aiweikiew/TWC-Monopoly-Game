@@ -12,16 +12,35 @@
     document.head.appendChild(link);
   }
 
-  function configureFutureStrategies(){
-    if(typeof futureStrategies === "undefined") return;
-    Object.assign(futureStrategies.agenticAI,{
-      pressureReduction:0,
-      purpose:"Optimise traveller journeys through prediction, personalisation and automated action. Protects growth, but does not reduce underlying destination pressure."
-    });
-    Object.assign(futureStrategies.regenerative,{
-      pressureReduction:2,
-      purpose:"Restore destination capacity by reinvesting in ecosystems, communities and infrastructure."
-    });
+  function configureNarrativeCopy(){
+    if(typeof futureStrategies !== "undefined"){
+      Object.assign(futureStrategies.agenticAI,{
+        pressureReduction:0,
+        purpose:"Optimise traveller journeys through prediction, personalisation and automated action. Protects growth, but does not reduce underlying destination pressure."
+      });
+      Object.assign(futureStrategies.regenerative,{
+        pressureReduction:2,
+        purpose:"Restore destination capacity by reinvesting in ecosystems, communities and infrastructure."
+      });
+    }
+
+    if(typeof phaseInfo !== "undefined"){
+      Object.assign(phaseInfo.starting,{slides:"After slide 3",returnTo:"Industrial Revolution"});
+      Object.assign(phaseInfo.steam,{slides:"After slides 4–5",returnTo:"Automobiles & Jet Age"});
+      Object.assign(phaseInfo.jet,{slides:"After slides 6–7",returnTo:"Digital Transformation"});
+      Object.assign(phaseInfo.digital,{slides:"After slides 8–9",returnTo:"Consequence & the Future"});
+      Object.assign(phaseInfo.future,{slides:"After slides 10–13",returnTo:"200 Years, Two Perspectives",next:"Show Market Winner"});
+      Object.assign(phaseInfo.winner,{title:"TIME TO TRAVEL · MARKET RESULT",slides:"After slide 14",returnTo:"Innovation → Disruption → Consequence → Adaptation"});
+    }
+
+    const setupKicker = document.querySelector(".setup-topbar .setup-kicker");
+    if(setupKicker) setupKicker.textContent = "Starting Economy · After slide 3";
+    const setupQuest = document.querySelector(".setup-quest span");
+    if(setupQuest) setupQuest.textContent = "Every Tech Shock changes traveller behaviour — and revalues the businesses serving them.";
+    const landingTagline = document.querySelector(".landing-tagline");
+    if(landingTagline) landingTagline.textContent = "How Technology Rewrote Tourism";
+    const landingTheme = document.querySelector(".landing-theme");
+    if(landingTheme) landingTheme.textContent = "ACCESS → AUTONOMY → ADAPTATION";
   }
 
   function phaseShockCopy(){
@@ -136,7 +155,7 @@
     </section>`;
   }
 
-  function decorateShock(title){
+  function decorateShock(){
     const screen = document.getElementById("industrialShockScreen");
     const kicker = screen?.querySelector(".shock-kicker");
     const titleEl = document.getElementById("industrialShockTitle");
@@ -157,6 +176,64 @@
       titleEl.insertAdjacentElement("afterend",line);
     }
     line.textContent = "New technology changes how people travel — then revalues the businesses serving them.";
+  }
+
+  function ensurePressureMetric(parent,label,value,extraClass=""){
+    if(!parent || parent.querySelector(`.${extraClass || "narrative-pressure-impact"}`)) return;
+    const metric = document.createElement("div");
+    metric.className = extraClass || "narrative-pressure-impact";
+    metric.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
+    parent.appendChild(metric);
+  }
+
+  function decorateFuturePressure(){
+    if(gameState?.phase !== "future") return;
+    const content = document.getElementById("phaseContent");
+    if(!content) return;
+
+    if(gameState.uiStage === "decisions"){
+      const cards = [...content.querySelectorAll(".future-strategy-card, .future-response-card")];
+      const keys = Object.keys(futureStrategies);
+      cards.forEach((card,index)=>{
+        const strategy = futureStrategies[keys[index]];
+        if(!strategy || card.querySelector(".narrative-pressure-impact")) return;
+        const reduction = Number(strategy.pressureReduction || 0);
+        const metric = document.createElement("div");
+        metric.className = `narrative-pressure-impact ${reduction>0?"reduces":"neutral"}`;
+        metric.innerHTML = `<span>DESTINATION PRESSURE</span><strong>${reduction>0?`−${reduction}`:"0"}</strong>`;
+        const impacts = card.querySelector(".strategy-impact-grid, .future-response-impacts");
+        if(impacts) impacts.insertAdjacentElement("afterend",metric);
+        else card.appendChild(metric);
+      });
+    }
+
+    if(navigationState?.currentView?.type === "selection" && navigationState.selection?.action === "strategy"){
+      const card = content.querySelector(".strategy-confirm-card, .future-confirm-card");
+      const strategy = futureStrategies[navigationState.selection.selection];
+      if(card && strategy && !card.querySelector(".narrative-pressure-impact")){
+        const reduction = Number(strategy.pressureReduction || 0);
+        const metric = document.createElement("div");
+        metric.className = `narrative-pressure-impact ${reduction>0?"reduces":"neutral"}`;
+        metric.innerHTML = `<span>DESTINATION PRESSURE</span><strong>${reduction>0?`−${reduction}`:"0"}</strong>`;
+        const note = card.querySelector(".strategy-confirm-note, p:last-of-type");
+        if(note) note.insertAdjacentElement("beforebegin",metric);
+        else card.appendChild(metric);
+      }
+    }
+
+    if(["review","results","crisis"].includes(gameState.uiStage)){
+      const cards = [...content.querySelectorAll(".strategy-team-block, .future-result-card, .crisis-team-v18")];
+      cards.slice(0,gameState.teams.length).forEach((card,index)=>{
+        const team = gameState.teams[index];
+        if(!team || card.querySelector(".narrative-team-pressure")) return;
+        const metric = document.createElement("div");
+        metric.className = "narrative-team-pressure";
+        metric.innerHTML = `<span>DESTINATION PRESSURE</span><strong>${Number(team.destinationPressure || 0)}</strong>`;
+        const scores = card.querySelector(".strategy-score-grid, .future-result-scores, .crisis-team-scores");
+        if(scores) scores.insertAdjacentElement("beforebegin",metric);
+        else card.appendChild(metric);
+      });
+    }
   }
 
   function wrapFuturePressureRule(){
@@ -187,7 +264,7 @@
 
     document.documentElement.dataset.narrativeCycleV27 = "true";
     loadStyles();
-    configureFutureStrategies();
+    configureNarrativeCopy();
     wrapFuturePressureRule();
 
     const previousRevaluation = renderRevaluation;
@@ -224,7 +301,7 @@
       const previousShock = configureShockScreen;
       configureShockScreen = function(title,...rest){
         const result = previousShock.call(this,title,...rest);
-        window.setTimeout(()=>decorateShock(title),0);
+        window.setTimeout(decorateShock,0);
         return result;
       };
     }
@@ -232,9 +309,10 @@
     const previousRenderGame = renderGame;
     renderGame = function(){
       previousRenderGame();
-      if(gameState.phase === "industrialShockRevealed") decorateShock("INDUSTRIAL REVOLUTION");
-      else if(gameState.mode === "strategy" && gameState.uiStage === "jetShock") decorateShock("JET AGE");
-      else if(gameState.mode === "strategy" && gameState.uiStage === "digitalShock") decorateShock("DIGITAL TRANSFORMATION");
+      configureNarrativeCopy();
+      if(gameState.phase === "industrialShockRevealed" ||
+         (gameState.mode === "strategy" && ["jetShock","digitalShock"].includes(gameState.uiStage))) decorateShock();
+      decorateFuturePressure();
     };
 
     renderGame();
