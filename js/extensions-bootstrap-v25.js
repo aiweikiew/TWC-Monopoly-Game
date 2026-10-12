@@ -23,7 +23,8 @@
     "js/strategy-layout-v14.js",
     "js/narrative-cycle-v27.js",
     "js/narrative-decisions-v28.js",
-    "js/ui-fix-v29.js"
+    "js/ui-fix-v29.js",
+    "js/game-audio-v30.js"
   ];
 
   function baseReady(){
