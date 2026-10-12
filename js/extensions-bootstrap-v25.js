@@ -21,7 +21,8 @@
     "js/industrial-review-v12.js",
     "js/flow-back-v13.js",
     "js/strategy-layout-v14.js",
-    "js/narrative-cycle-v27.js"
+    "js/narrative-cycle-v27.js",
+    "js/narrative-decisions-v28.js"
   ];
 
   function baseReady(){
