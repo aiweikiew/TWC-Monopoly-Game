@@ -1,14 +1,14 @@
 .decision-timer-v33{
   position:fixed;
   z-index:99999;
-  width:236px;
+  width:190px;
   margin:0;
-  padding:10px;
+  padding:7px 8px 8px;
   border:2px solid rgba(16,76,120,.34);
-  border-radius:14px;
+  border-radius:12px;
   background:rgba(255,255,255,.98);
   color:#104c78;
-  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
   font-family:Arial,Helvetica,sans-serif;
   user-select:none;
 }
@@ -17,27 +17,24 @@
 .decision-timer-drag{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  margin:-2px -2px 6px;
-  padding:3px 4px 5px;
-  color:#6e6e6e;
+  justify-content:center;
+  height:14px;
+  margin:-2px 0 1px;
+  color:#104c78;
   cursor:grab;
   touch-action:none;
-  font-size:10px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:.12em;
 }
 .decision-timer-grip{
-  font-size:15px;
+  font-size:13px;
   line-height:1;
-  color:#104c78;
+  letter-spacing:3px;
+  opacity:.55;
 }
 .decision-timer-v33.is-dragging .decision-timer-drag{cursor:grabbing}
 
 .decision-timer-clock{
   text-align:center;
-  font-size:58px;
+  font-size:52px;
   line-height:.95;
   font-weight:950;
   letter-spacing:-.05em;
@@ -48,17 +45,17 @@
 .decision-timer-controls{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:6px;
-  margin-top:9px;
+  gap:5px;
+  margin-top:7px;
 }
 .decision-timer-controls button{
-  min-height:32px;
-  padding:7px 6px;
+  min-height:29px;
+  padding:6px 4px;
   border:0;
-  border-radius:8px;
+  border-radius:7px;
   cursor:pointer;
-  font:900 10px/1 Arial,Helvetica,sans-serif;
-  letter-spacing:.03em;
+  font:900 9px/1 Arial,Helvetica,sans-serif;
+  letter-spacing:.02em;
 }
 #decisionTimerStart{
   background:#104c78;
@@ -73,34 +70,28 @@
   color:#69442f;
 }
 .decision-timer-controls button:disabled{
-  opacity:.42;
+  opacity:.4;
   cursor:default;
 }
 
-.decision-timer-v33.is-running{
-  border-color:#104c78;
-}
+.decision-timer-v33.is-running{border-color:#104c78}
 .decision-timer-v33.is-warning{
   border-color:#ffd034;
-  box-shadow:0 12px 30px rgba(255,208,52,.28);
+  box-shadow:0 10px 26px rgba(255,208,52,.28);
 }
-.decision-timer-v33.is-warning .decision-timer-clock{
-  color:#b36b00;
-}
+.decision-timer-v33.is-warning .decision-timer-clock{color:#b36b00}
 .decision-timer-v33.is-expired{
   border-color:#c93333;
   animation:decisionTimerPulse .7s ease-in-out 3;
 }
-.decision-timer-v33.is-expired .decision-timer-clock{
-  color:#c93333;
-}
+.decision-timer-v33.is-expired .decision-timer-clock{color:#c93333}
 @keyframes decisionTimerPulse{
   0%,100%{transform:scale(1)}
   50%{transform:scale(1.035)}
 }
 
 @media (max-height:760px){
-  .decision-timer-v33{width:210px;padding:8px}
-  .decision-timer-clock{font-size:48px}
-  .decision-timer-controls button{min-height:29px;font-size:9px}
+  .decision-timer-v33{width:176px;padding:6px 7px 7px}
+  .decision-timer-clock{font-size:46px}
+  .decision-timer-controls button{min-height:27px;font-size:8px}
 }
