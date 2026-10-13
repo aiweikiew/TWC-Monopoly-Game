@@ -69,10 +69,19 @@
     osc.stop(t+duration+.03);
   }
 
-  function warningBeep(second){
-    if(second > 5 || second < 1 || second === lastBeepSecond) return;
+  // Audible clock tick on EVERY second. Final five seconds are deliberately
+  // higher and louder so teams can feel the deadline approaching.
+  function countdownBeep(second){
+    if(second < 1 || second > DURATION || second === lastBeepSecond) return;
     lastBeepSecond = second;
-    beep(second <= 2 ? 980 : 760,.08,second <= 2 ? .13 : .09);
+
+    if(second <= 2){
+      beep(1040,.095,.15);
+    }else if(second <= 5){
+      beep(900,.09,.125);
+    }else{
+      beep(650,.065,.095);
+    }
   }
 
   function timeUpSound(){
@@ -177,7 +186,6 @@
     running = true;
     deadline = performance.now() + remaining*1000;
     lastBeepSecond = null;
-    beep(720,.08,.09);
     updatePanel();
   }
 
@@ -228,7 +236,7 @@
     if(!running || !decisionKey) return;
     remaining = Math.max(0,(deadline-performance.now())/1000);
     const second = Math.ceil(remaining);
-    warningBeep(second);
+    countdownBeep(second);
     if(remaining <= 0){
       remaining = 0;
       running = false;
