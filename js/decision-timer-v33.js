@@ -1,8 +1,7 @@
 "use strict";
 
-// v33: presenter-controlled 20-second timer for every team decision screen.
-// The timer resets for each new team/phase, but only starts when the presenter clicks it.
-// It can also be dragged anywhere on screen; double-click DRAG to dock it back inline.
+// Simple presenter-controlled 20-second timer shown as a floating overlay
+// on team decision screens. Drag it anywhere inside the browser viewport.
 (function(){
   if(typeof document === "undefined") return;
   if(document.documentElement.dataset.decisionTimerV33 === "true") return;
@@ -15,20 +14,16 @@
   let running = false;
   let deadline = 0;
   let lastBeepSecond = null;
-  let timerHandle = null;
+  let intervalId = null;
   let audioContext = null;
-  let userPositioned = false;
-  let savedPosition = null;
   let dragState = null;
+  let savedPosition = null;
 
   try{
     const stored = localStorage.getItem(POSITION_KEY);
     if(stored){
       const parsed = JSON.parse(stored);
-      if(Number.isFinite(parsed?.left) && Number.isFinite(parsed?.top)){
-        savedPosition = parsed;
-        userPositioned = true;
-      }
+      if(Number.isFinite(parsed?.left) && Number.isFinite(parsed?.top)) savedPosition = parsed;
     }
   }catch(_error){}
 
@@ -40,44 +35,13 @@
     document.head.appendChild(link);
   }
 
-  function visibleDecisionHost(){
-    const industrial = document.querySelector(".industrial-turn-screen.decision-screen .industrial-turn-heading");
-    if(industrial && industrial.offsetParent !== null) return industrial.parentElement;
-
-    const modern = document.querySelector(".strategy-modern-screen.decision-modern-screen .strategy-modern-header");
-    if(modern && modern.offsetParent !== null) return modern.parentElement;
-
-    return null;
-  }
-
-  function phaseLabel(){
-    const host = visibleDecisionHost();
-    if(host?.classList.contains("industrial-turn-screen")) return "INDUSTRIAL DECISION";
-    if(host?.classList.contains("digital-era")) return "DIGITAL DECISION";
-    if(host?.classList.contains("future-era")) return "FUTURE DECISION";
-    if(typeof gameState !== "undefined"){
-      if(gameState.phase === "steam") return "INDUSTRIAL DECISION";
-      if(gameState.phase === "digital") return "DIGITAL DECISION";
-      if(gameState.phase === "future") return "FUTURE DECISION";
-    }
-    return "TEAM DECISION";
-  }
-
-  function currentDecision(){
-    const host = visibleDecisionHost();
-    if(!host) return null;
-
+  function activeDecision(){
+    const industrial = document.querySelector(".industrial-turn-screen.decision-screen");
+    const modern = document.querySelector(".strategy-modern-screen.decision-modern-screen");
+    const visible = [industrial,modern].find(node=>node && node.offsetParent !== null);
+    if(!visible) return null;
     const team = typeof gameState !== "undefined" ? gameState.teams?.[gameState.currentTeam] : null;
-    const teamId = team?.id || "CURRENT";
-    const teamName = team?.name || "Current Team";
-    const phase = phaseLabel();
-
-    return {
-      key:`${phase}|${teamId}`,
-      teamName,
-      phase,
-      host
-    };
+    return {key:`${gameState?.phase || "decision"}|${team?.id || "current"}`};
   }
 
   function ensureAudio(){
@@ -88,7 +52,7 @@
     return audioContext;
   }
 
-  function beep(freq=720,duration=.09,volume=.11,delay=0){
+  function beep(freq=760,duration=.08,volume=.09,delay=0){
     const ctx = ensureAudio();
     if(!ctx) return;
     const t = ctx.currentTime + delay;
@@ -108,132 +72,64 @@
   function warningBeep(second){
     if(second > 5 || second < 1 || second === lastBeepSecond) return;
     lastBeepSecond = second;
-    beep(second <= 2 ? 980 : 760,.08,second <= 2 ? .14 : .10);
+    beep(second <= 2 ? 980 : 760,.08,second <= 2 ? .13 : .09);
   }
 
   function timeUpSound(){
-    beep(880,.13,.15,0);
-    beep(660,.16,.15,.16);
-    beep(440,.22,.17,.34);
+    beep(880,.12,.13,0);
+    beep(620,.14,.13,.14);
+    beep(420,.20,.15,.30);
   }
 
   function panel(){ return document.getElementById("decisionTimerV33"); }
 
   function clampPosition(el,left,top){
-    const gap = 8;
-    const width = el.offsetWidth || 520;
-    const height = el.offsetHeight || 100;
+    const gap = 6;
+    const width = el.offsetWidth || 240;
+    const height = el.offsetHeight || 150;
     return {
       left:Math.max(gap,Math.min(left,window.innerWidth-width-gap)),
       top:Math.max(gap,Math.min(top,window.innerHeight-height-gap))
     };
   }
 
-  function applyFloatingPosition(el,left,top,save=false){
-    if(el.parentElement !== document.body) document.body.appendChild(el);
-    el.classList.add("is-floating");
+  function place(el,left,top,save=false){
     const pos = clampPosition(el,left,top);
     el.style.left = `${pos.left}px`;
     el.style.top = `${pos.top}px`;
-    el.style.right = "auto";
-    el.style.bottom = "auto";
     savedPosition = pos;
-    userPositioned = true;
     if(save){
       try{ localStorage.setItem(POSITION_KEY,JSON.stringify(pos)); }catch(_error){}
     }
   }
 
-  function dockTimer(){
-    const el = panel();
-    if(!el) return;
-    userPositioned = false;
-    savedPosition = null;
-    dragState = null;
-    el.classList.remove("is-floating","is-dragging");
-    el.style.removeProperty("left");
-    el.style.removeProperty("top");
-    el.style.removeProperty("right");
-    el.style.removeProperty("bottom");
-    try{ localStorage.removeItem(POSITION_KEY); }catch(_error){}
-    syncDecisionContext();
-  }
-
   function installDrag(el){
     const handle = el.querySelector("#decisionTimerDrag");
-    if(!handle || handle.dataset.dragReady === "true") return;
-    handle.dataset.dragReady = "true";
-
     handle.addEventListener("pointerdown",event=>{
       if(event.button !== undefined && event.button !== 0) return;
       event.preventDefault();
-      event.stopPropagation();
-      ensureAudio();
-
-      const before = el.getBoundingClientRect();
-      const compactWidth = Math.min(560,Math.max(430,before.width));
-      const pointerRatio = before.width ? (event.clientX-before.left)/before.width : .5;
-
-      if(el.parentElement !== document.body) document.body.appendChild(el);
-      el.classList.add("is-floating","is-dragging");
-      el.style.width = `${compactWidth}px`;
-
-      const afterWidth = el.offsetWidth || compactWidth;
-      const initialLeft = event.clientX - Math.max(20,Math.min(afterWidth-20,pointerRatio*afterWidth));
-      const initialTop = before.top;
-      const initial = clampPosition(el,initialLeft,initialTop);
-      el.style.left = `${initial.left}px`;
-      el.style.top = `${initial.top}px`;
-      el.style.right = "auto";
-      el.style.bottom = "auto";
-
-      dragState = {
-        pointerId:event.pointerId,
-        offsetX:event.clientX-initial.left,
-        offsetY:event.clientY-initial.top
-      };
-      userPositioned = true;
+      const rect = el.getBoundingClientRect();
+      dragState = {pointerId:event.pointerId,offsetX:event.clientX-rect.left,offsetY:event.clientY-rect.top};
+      el.classList.add("is-dragging");
       try{ handle.setPointerCapture(event.pointerId); }catch(_error){}
     });
-
     handle.addEventListener("pointermove",event=>{
       if(!dragState || dragState.pointerId !== event.pointerId) return;
       event.preventDefault();
-      const pos = clampPosition(el,event.clientX-dragState.offsetX,event.clientY-dragState.offsetY);
-      el.style.left = `${pos.left}px`;
-      el.style.top = `${pos.top}px`;
-      savedPosition = pos;
+      place(el,event.clientX-dragState.offsetX,event.clientY-dragState.offsetY,false);
     });
-
-    function finishDrag(event){
+    function finish(event){
       if(!dragState || dragState.pointerId !== event.pointerId) return;
       try{ handle.releasePointerCapture(event.pointerId); }catch(_error){}
       dragState = null;
       el.classList.remove("is-dragging");
       const rect = el.getBoundingClientRect();
-      const pos = clampPosition(el,rect.left,rect.top);
-      savedPosition = pos;
-      userPositioned = true;
-      el.style.left = `${pos.left}px`;
-      el.style.top = `${pos.top}px`;
-      try{ localStorage.setItem(POSITION_KEY,JSON.stringify(pos)); }catch(_error){}
+      place(el,rect.left,rect.top,true);
     }
-
-    handle.addEventListener("pointerup",finishDrag);
-    handle.addEventListener("pointercancel",finishDrag);
-    handle.addEventListener("dblclick",event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      dockTimer();
-    });
-
+    handle.addEventListener("pointerup",finish);
+    handle.addEventListener("pointercancel",finish);
     window.addEventListener("resize",()=>{
-      if(!userPositioned || !el.classList.contains("is-floating")) return;
-      const rect = el.getBoundingClientRect();
-      const pos = clampPosition(el,rect.left,rect.top);
-      el.style.left = `${pos.left}px`;
-      el.style.top = `${pos.top}px`;
-      savedPosition = pos;
+      if(savedPosition) place(el,savedPosition.left,savedPosition.top,false);
     });
   }
 
@@ -243,39 +139,24 @@
     el.id = "decisionTimerV33";
     el.className = "decision-timer-v33";
     el.hidden = true;
-    el.setAttribute("aria-live","polite");
     el.innerHTML = `
-      <div class="decision-timer-main">
-        <div class="decision-timer-labels">
-          <div class="decision-timer-label-row">
-            <span class="decision-timer-kicker">DECISION TIMER</span>
-            <button type="button" class="decision-timer-drag" id="decisionTimerDrag" title="Drag timer · double-click to dock">↕ DRAG</button>
-          </div>
-          <strong id="decisionTimerTeam">TEAM DECISION</strong>
-        </div>
-        <div class="decision-timer-clock-wrap">
-          <span class="decision-timer-clock" id="decisionTimerClock">20</span>
-          <small>SEC</small>
-        </div>
-        <div class="decision-timer-track" aria-hidden="true"><span id="decisionTimerProgress"></span></div>
-        <span class="decision-timer-status" id="decisionTimerStatus">READY</span>
-        <button type="button" id="decisionTimerStart">START 20s</button>
-        <button type="button" id="decisionTimerReset">RESET</button>
+      <div class="decision-timer-drag" id="decisionTimerDrag" title="Drag timer">
+        <span>TIMER</span><span class="decision-timer-grip">⠿</span>
       </div>
-      <div class="decision-timer-note" id="decisionTimerNote">Click START when the team begins discussing. Drag to move · double-click DRAG to dock.</div>`;
+      <div class="decision-timer-clock" id="decisionTimerClock">20</div>
+      <div class="decision-timer-controls">
+        <button type="button" id="decisionTimerStart">START</button>
+        <button type="button" id="decisionTimerStop">STOP</button>
+        <button type="button" id="decisionTimerReset">RESET</button>
+      </div>`;
     document.body.appendChild(el);
-
     installDrag(el);
-    if(userPositioned && savedPosition) applyFloatingPosition(el,savedPosition.left,savedPosition.top,false);
+    if(savedPosition) place(el,savedPosition.left,savedPosition.top,false);
+    else place(el,Math.max(8,window.innerWidth-260),70,false);
 
     el.querySelector("#decisionTimerStart").addEventListener("pointerdown",ensureAudio,{passive:true});
-    el.querySelector("#decisionTimerStart").addEventListener("click",()=>{
-      syncDecisionContext();
-      if(!decisionKey) return;
-      if(remaining <= 0) resetTimer(false);
-      if(running) pauseTimer();
-      else startTimer();
-    });
+    el.querySelector("#decisionTimerStart").addEventListener("click",startTimer);
+    el.querySelector("#decisionTimerStop").addEventListener("click",stopTimer);
     el.querySelector("#decisionTimerReset").addEventListener("click",()=>resetTimer(true));
     return el;
   }
@@ -285,22 +166,24 @@
     deadline = 0;
     remaining = DURATION;
     lastBeepSecond = null;
-    if(playCue) beep(620,.07,.08);
+    if(playCue) beep(620,.07,.07);
     updatePanel();
   }
 
   function startTimer(){
+    syncContext();
+    if(!decisionKey || running) return;
     if(remaining <= 0) remaining = DURATION;
     running = true;
-    deadline = performance.now() + remaining * 1000;
+    deadline = performance.now() + remaining*1000;
     lastBeepSecond = null;
-    beep(720,.08,.10);
+    beep(720,.08,.09);
     updatePanel();
   }
 
-  function pauseTimer(){
+  function stopTimer(){
     if(!running) return;
-    remaining = Math.max(0,(deadline - performance.now()) / 1000);
+    remaining = Math.max(0,(deadline-performance.now())/1000);
     running = false;
     deadline = 0;
     updatePanel();
@@ -309,81 +192,26 @@
   function updatePanel(){
     const el = panel();
     if(!el) return;
-    const display = Math.max(0,Math.ceil(remaining));
-    const clock = el.querySelector("#decisionTimerClock");
-    const status = el.querySelector("#decisionTimerStatus");
-    const start = el.querySelector("#decisionTimerStart");
-    const note = el.querySelector("#decisionTimerNote");
-    const progress = el.querySelector("#decisionTimerProgress");
-
-    clock.textContent = String(display).padStart(2,"0");
-    progress.style.width = `${Math.max(0,Math.min(100,(remaining / DURATION) * 100))}%`;
+    el.querySelector("#decisionTimerClock").textContent = String(Math.max(0,Math.ceil(remaining))).padStart(2,"0");
     el.classList.toggle("is-running",running);
     el.classList.toggle("is-warning",remaining > 0 && remaining <= 5);
     el.classList.toggle("is-expired",remaining <= 0);
-
-    if(remaining <= 0){
-      status.textContent = "TIME'S UP";
-      start.textContent = "RESTART 20s";
-      note.textContent = "Decision window ended — confirm the team's choice now.";
-    }else if(running){
-      status.textContent = remaining <= 5 ? "HURRY" : "RUNNING";
-      start.textContent = "PAUSE";
-      note.textContent = remaining <= 5 ? "Final seconds — lock in a decision." : "Timer is running.";
-    }else if(remaining < DURATION){
-      status.textContent = "PAUSED";
-      start.textContent = "RESUME";
-      note.textContent = "Paused — resume when ready.";
-    }else{
-      status.textContent = "READY";
-      start.textContent = "START 20s";
-      note.textContent = userPositioned ? "Drag to reposition · double-click DRAG to dock." : "Click START when the team begins discussing. Drag to move.";
-    }
+    el.querySelector("#decisionTimerStart").disabled = running;
+    el.querySelector("#decisionTimerStop").disabled = !running;
   }
 
-  function placePanel(el,current){
-    if(!current?.host) return;
-
-    if(userPositioned){
-      const fallback = savedPosition || {left:Math.max(8,window.innerWidth-580),top:18};
-      applyFloatingPosition(el,fallback.left,fallback.top,false);
-      return;
-    }
-
-    el.classList.remove("is-floating","is-dragging");
-    el.style.removeProperty("left");
-    el.style.removeProperty("top");
-    el.style.removeProperty("right");
-    el.style.removeProperty("bottom");
-    el.style.removeProperty("width");
-
-    const host = current.host;
-    const anchor = host.querySelector(".industrial-turn-heading, .strategy-modern-header");
-    if(anchor){
-      if(el.parentElement !== host || el.previousElementSibling !== anchor){
-        anchor.insertAdjacentElement("afterend",el);
-      }
-    }else if(el.parentElement !== host){
-      host.prepend(el);
-    }
-  }
-
-  function syncDecisionContext(){
+  function syncContext(){
     const el = mount();
-    const current = currentDecision();
+    const current = activeDecision();
     if(!current){
       el.hidden = true;
-      if(decisionKey !== null){
-        decisionKey = null;
-        running = false;
-        remaining = DURATION;
-        deadline = 0;
-        lastBeepSecond = null;
-      }
+      decisionKey = null;
+      running = false;
+      remaining = DURATION;
+      deadline = 0;
+      lastBeepSecond = null;
       return;
     }
-
-    placePanel(el,current);
     el.hidden = false;
     if(current.key !== decisionKey){
       decisionKey = current.key;
@@ -391,33 +219,31 @@
       remaining = DURATION;
       deadline = 0;
       lastBeepSecond = null;
+      updatePanel();
     }
-    el.querySelector("#decisionTimerTeam").textContent = `${current.teamName.toUpperCase()} · ${current.phase}`;
-    updatePanel();
   }
 
   function tick(){
-    syncDecisionContext();
-    if(running && decisionKey){
-      remaining = Math.max(0,(deadline - performance.now()) / 1000);
-      const second = Math.ceil(remaining);
-      warningBeep(second);
-      if(remaining <= 0){
-        remaining = 0;
-        running = false;
-        deadline = 0;
-        timeUpSound();
-      }
-      updatePanel();
+    syncContext();
+    if(!running || !decisionKey) return;
+    remaining = Math.max(0,(deadline-performance.now())/1000);
+    const second = Math.ceil(remaining);
+    warningBeep(second);
+    if(remaining <= 0){
+      remaining = 0;
+      running = false;
+      deadline = 0;
+      timeUpSound();
     }
+    updatePanel();
   }
 
   function init(){
     loadStyles();
     mount();
-    syncDecisionContext();
-    if(timerHandle) window.clearInterval(timerHandle);
-    timerHandle = window.setInterval(tick,100);
+    syncContext();
+    if(intervalId) window.clearInterval(intervalId);
+    intervalId = window.setInterval(tick,100);
   }
 
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded",init,{once:true});
