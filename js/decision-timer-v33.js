@@ -24,23 +24,43 @@
     document.head.appendChild(link);
   }
 
+  function visibleDecisionHost(){
+    const industrial = document.querySelector(".industrial-turn-screen.decision-screen .industrial-turn-heading");
+    if(industrial && industrial.offsetParent !== null) return industrial.parentElement;
+
+    const modern = document.querySelector(".strategy-modern-screen.decision-modern-screen .strategy-modern-header");
+    if(modern && modern.offsetParent !== null) return modern.parentElement;
+
+    return null;
+  }
+
   function phaseLabel(){
-    if(typeof gameState === "undefined") return "TEAM DECISION";
-    if(gameState.phase === "steam") return "INDUSTRIAL DECISION";
-    if(gameState.phase === "digital") return "DIGITAL DECISION";
-    if(gameState.phase === "future") return "FUTURE DECISION";
+    const host = visibleDecisionHost();
+    if(host?.classList.contains("industrial-turn-screen")) return "INDUSTRIAL DECISION";
+    if(host?.classList.contains("digital-era")) return "DIGITAL DECISION";
+    if(host?.classList.contains("future-era")) return "FUTURE DECISION";
+    if(typeof gameState !== "undefined"){
+      if(gameState.phase === "steam") return "INDUSTRIAL DECISION";
+      if(gameState.phase === "digital") return "DIGITAL DECISION";
+      if(gameState.phase === "future") return "FUTURE DECISION";
+    }
     return "TEAM DECISION";
   }
 
   function currentDecision(){
-    if(typeof gameState === "undefined") return null;
-    if(gameState.mode !== "strategy" || gameState.uiStage !== "decisions") return null;
-    const team = gameState.teams?.[gameState.currentTeam];
-    if(!team) return null;
+    const host = visibleDecisionHost();
+    if(!host) return null;
+
+    const team = typeof gameState !== "undefined" ? gameState.teams?.[gameState.currentTeam] : null;
+    const teamId = team?.id || "CURRENT";
+    const teamName = team?.name || "Current Team";
+    const phase = phaseLabel();
+
     return {
-      key:`${gameState.phase}|${team.id}`,
-      teamName:team.name || `Team ${team.id}`,
-      phase:phaseLabel()
+      key:`${phase}|${teamId}`,
+      teamName,
+      phase,
+      host
     };
   }
 
@@ -81,9 +101,7 @@
     beep(440,.22,.17,.34);
   }
 
-  function panel(){
-    return document.getElementById("decisionTimerV33");
-  }
+  function panel(){ return document.getElementById("decisionTimerV33"); }
 
   function mount(){
     if(panel()) return panel();
@@ -93,17 +111,17 @@
     el.hidden = true;
     el.setAttribute("aria-live","polite");
     el.innerHTML = `
-      <div class="decision-timer-topline">
-        <div>
+      <div class="decision-timer-main">
+        <div class="decision-timer-labels">
           <span class="decision-timer-kicker">DECISION TIMER</span>
           <strong id="decisionTimerTeam">TEAM DECISION</strong>
         </div>
+        <div class="decision-timer-clock-wrap">
+          <span class="decision-timer-clock" id="decisionTimerClock">20</span>
+          <small>SEC</small>
+        </div>
+        <div class="decision-timer-track" aria-hidden="true"><span id="decisionTimerProgress"></span></div>
         <span class="decision-timer-status" id="decisionTimerStatus">READY</span>
-      </div>
-      <div class="decision-timer-clock" id="decisionTimerClock">20</div>
-      <div class="decision-timer-seconds">SECONDS</div>
-      <div class="decision-timer-track" aria-hidden="true"><span id="decisionTimerProgress"></span></div>
-      <div class="decision-timer-actions">
         <button type="button" id="decisionTimerStart">START 20s</button>
         <button type="button" id="decisionTimerReset">RESET</button>
       </div>
@@ -183,6 +201,19 @@
     }
   }
 
+  function placePanel(el,current){
+    if(!current?.host) return;
+    const host = current.host;
+    const anchor = host.querySelector(".industrial-turn-heading, .strategy-modern-header");
+    if(anchor){
+      if(el.parentElement !== host || el.previousElementSibling !== anchor){
+        anchor.insertAdjacentElement("afterend",el);
+      }
+    }else if(el.parentElement !== host){
+      host.prepend(el);
+    }
+  }
+
   function syncDecisionContext(){
     const el = mount();
     const current = currentDecision();
@@ -198,6 +229,7 @@
       return;
     }
 
+    placePanel(el,current);
     el.hidden = false;
     if(current.key !== decisionKey){
       decisionKey = current.key;
