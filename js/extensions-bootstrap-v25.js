@@ -26,7 +26,8 @@
     "js/ui-fix-v29.js",
     "js/game-audio-v30.js",
     "js/game-audio-direct-v30.js",
-    "js/game-audio-boost-v31.js"
+    "js/game-audio-boost-v31.js",
+    "js/game-audio-reliable-v32.js"
   ];
 
   function baseReady(){
