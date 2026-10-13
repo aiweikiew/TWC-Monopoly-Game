@@ -2,12 +2,14 @@
 
 // v33: presenter-controlled 20-second timer for every team decision screen.
 // The timer resets for each new team/phase, but only starts when the presenter clicks it.
+// It can also be dragged anywhere on screen; double-click DRAG to dock it back inline.
 (function(){
   if(typeof document === "undefined") return;
   if(document.documentElement.dataset.decisionTimerV33 === "true") return;
   document.documentElement.dataset.decisionTimerV33 = "true";
 
   const DURATION = 20;
+  const POSITION_KEY = "timeToTravel:decisionTimerPosition:v33";
   let decisionKey = null;
   let remaining = DURATION;
   let running = false;
@@ -15,6 +17,20 @@
   let lastBeepSecond = null;
   let timerHandle = null;
   let audioContext = null;
+  let userPositioned = false;
+  let savedPosition = null;
+  let dragState = null;
+
+  try{
+    const stored = localStorage.getItem(POSITION_KEY);
+    if(stored){
+      const parsed = JSON.parse(stored);
+      if(Number.isFinite(parsed?.left) && Number.isFinite(parsed?.top)){
+        savedPosition = parsed;
+        userPositioned = true;
+      }
+    }
+  }catch(_error){}
 
   function loadStyles(){
     if(document.querySelector('link[href="css/decision-timer-v33.css"]')) return;
@@ -103,6 +119,124 @@
 
   function panel(){ return document.getElementById("decisionTimerV33"); }
 
+  function clampPosition(el,left,top){
+    const gap = 8;
+    const width = el.offsetWidth || 520;
+    const height = el.offsetHeight || 100;
+    return {
+      left:Math.max(gap,Math.min(left,window.innerWidth-width-gap)),
+      top:Math.max(gap,Math.min(top,window.innerHeight-height-gap))
+    };
+  }
+
+  function applyFloatingPosition(el,left,top,save=false){
+    if(el.parentElement !== document.body) document.body.appendChild(el);
+    el.classList.add("is-floating");
+    const pos = clampPosition(el,left,top);
+    el.style.left = `${pos.left}px`;
+    el.style.top = `${pos.top}px`;
+    el.style.right = "auto";
+    el.style.bottom = "auto";
+    savedPosition = pos;
+    userPositioned = true;
+    if(save){
+      try{ localStorage.setItem(POSITION_KEY,JSON.stringify(pos)); }catch(_error){}
+    }
+  }
+
+  function dockTimer(){
+    const el = panel();
+    if(!el) return;
+    userPositioned = false;
+    savedPosition = null;
+    dragState = null;
+    el.classList.remove("is-floating","is-dragging");
+    el.style.removeProperty("left");
+    el.style.removeProperty("top");
+    el.style.removeProperty("right");
+    el.style.removeProperty("bottom");
+    try{ localStorage.removeItem(POSITION_KEY); }catch(_error){}
+    syncDecisionContext();
+  }
+
+  function installDrag(el){
+    const handle = el.querySelector("#decisionTimerDrag");
+    if(!handle || handle.dataset.dragReady === "true") return;
+    handle.dataset.dragReady = "true";
+
+    handle.addEventListener("pointerdown",event=>{
+      if(event.button !== undefined && event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      ensureAudio();
+
+      const before = el.getBoundingClientRect();
+      const compactWidth = Math.min(560,Math.max(430,before.width));
+      const pointerRatio = before.width ? (event.clientX-before.left)/before.width : .5;
+
+      if(el.parentElement !== document.body) document.body.appendChild(el);
+      el.classList.add("is-floating","is-dragging");
+      el.style.width = `${compactWidth}px`;
+
+      const afterWidth = el.offsetWidth || compactWidth;
+      const initialLeft = event.clientX - Math.max(20,Math.min(afterWidth-20,pointerRatio*afterWidth));
+      const initialTop = before.top;
+      const initial = clampPosition(el,initialLeft,initialTop);
+      el.style.left = `${initial.left}px`;
+      el.style.top = `${initial.top}px`;
+      el.style.right = "auto";
+      el.style.bottom = "auto";
+
+      dragState = {
+        pointerId:event.pointerId,
+        offsetX:event.clientX-initial.left,
+        offsetY:event.clientY-initial.top
+      };
+      userPositioned = true;
+      try{ handle.setPointerCapture(event.pointerId); }catch(_error){}
+    });
+
+    handle.addEventListener("pointermove",event=>{
+      if(!dragState || dragState.pointerId !== event.pointerId) return;
+      event.preventDefault();
+      const pos = clampPosition(el,event.clientX-dragState.offsetX,event.clientY-dragState.offsetY);
+      el.style.left = `${pos.left}px`;
+      el.style.top = `${pos.top}px`;
+      savedPosition = pos;
+    });
+
+    function finishDrag(event){
+      if(!dragState || dragState.pointerId !== event.pointerId) return;
+      try{ handle.releasePointerCapture(event.pointerId); }catch(_error){}
+      dragState = null;
+      el.classList.remove("is-dragging");
+      const rect = el.getBoundingClientRect();
+      const pos = clampPosition(el,rect.left,rect.top);
+      savedPosition = pos;
+      userPositioned = true;
+      el.style.left = `${pos.left}px`;
+      el.style.top = `${pos.top}px`;
+      try{ localStorage.setItem(POSITION_KEY,JSON.stringify(pos)); }catch(_error){}
+    }
+
+    handle.addEventListener("pointerup",finishDrag);
+    handle.addEventListener("pointercancel",finishDrag);
+    handle.addEventListener("dblclick",event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      dockTimer();
+    });
+
+    window.addEventListener("resize",()=>{
+      if(!userPositioned || !el.classList.contains("is-floating")) return;
+      const rect = el.getBoundingClientRect();
+      const pos = clampPosition(el,rect.left,rect.top);
+      el.style.left = `${pos.left}px`;
+      el.style.top = `${pos.top}px`;
+      savedPosition = pos;
+    });
+  }
+
   function mount(){
     if(panel()) return panel();
     const el = document.createElement("aside");
@@ -113,7 +247,10 @@
     el.innerHTML = `
       <div class="decision-timer-main">
         <div class="decision-timer-labels">
-          <span class="decision-timer-kicker">DECISION TIMER</span>
+          <div class="decision-timer-label-row">
+            <span class="decision-timer-kicker">DECISION TIMER</span>
+            <button type="button" class="decision-timer-drag" id="decisionTimerDrag" title="Drag timer · double-click to dock">↕ DRAG</button>
+          </div>
           <strong id="decisionTimerTeam">TEAM DECISION</strong>
         </div>
         <div class="decision-timer-clock-wrap">
@@ -125,8 +262,11 @@
         <button type="button" id="decisionTimerStart">START 20s</button>
         <button type="button" id="decisionTimerReset">RESET</button>
       </div>
-      <div class="decision-timer-note" id="decisionTimerNote">Click START when the team begins discussing.</div>`;
+      <div class="decision-timer-note" id="decisionTimerNote">Click START when the team begins discussing. Drag to move · double-click DRAG to dock.</div>`;
     document.body.appendChild(el);
+
+    installDrag(el);
+    if(userPositioned && savedPosition) applyFloatingPosition(el,savedPosition.left,savedPosition.top,false);
 
     el.querySelector("#decisionTimerStart").addEventListener("pointerdown",ensureAudio,{passive:true});
     el.querySelector("#decisionTimerStart").addEventListener("click",()=>{
@@ -197,12 +337,26 @@
     }else{
       status.textContent = "READY";
       start.textContent = "START 20s";
-      note.textContent = "Click START when the team begins discussing.";
+      note.textContent = userPositioned ? "Drag to reposition · double-click DRAG to dock." : "Click START when the team begins discussing. Drag to move.";
     }
   }
 
   function placePanel(el,current){
     if(!current?.host) return;
+
+    if(userPositioned){
+      const fallback = savedPosition || {left:Math.max(8,window.innerWidth-580),top:18};
+      applyFloatingPosition(el,fallback.left,fallback.top,false);
+      return;
+    }
+
+    el.classList.remove("is-floating","is-dragging");
+    el.style.removeProperty("left");
+    el.style.removeProperty("top");
+    el.style.removeProperty("right");
+    el.style.removeProperty("bottom");
+    el.style.removeProperty("width");
+
     const host = current.host;
     const anchor = host.querySelector(".industrial-turn-heading, .strategy-modern-header");
     if(anchor){
