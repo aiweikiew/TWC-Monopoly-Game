@@ -1,6 +1,6 @@
 "use strict";
 
-// Simple presenter-controlled 20-second timer shown as a floating overlay
+// Simple presenter-controlled 20-second timer shown as a compact floating overlay
 // on team decision screens. Drag it anywhere inside the browser viewport.
 (function(){
   if(typeof document === "undefined") return;
@@ -85,8 +85,8 @@
 
   function clampPosition(el,left,top){
     const gap = 6;
-    const width = el.offsetWidth || 240;
-    const height = el.offsetHeight || 150;
+    const width = el.offsetWidth || 190;
+    const height = el.offsetHeight || 118;
     return {
       left:Math.max(gap,Math.min(left,window.innerWidth-width-gap)),
       top:Math.max(gap,Math.min(top,window.innerHeight-height-gap))
@@ -140,8 +140,8 @@
     el.className = "decision-timer-v33";
     el.hidden = true;
     el.innerHTML = `
-      <div class="decision-timer-drag" id="decisionTimerDrag" title="Drag timer">
-        <span>TIMER</span><span class="decision-timer-grip">⠿</span>
+      <div class="decision-timer-drag" id="decisionTimerDrag" title="Drag timer" aria-label="Drag timer">
+        <span class="decision-timer-grip">•••</span>
       </div>
       <div class="decision-timer-clock" id="decisionTimerClock">20</div>
       <div class="decision-timer-controls">
@@ -152,7 +152,7 @@
     document.body.appendChild(el);
     installDrag(el);
     if(savedPosition) place(el,savedPosition.left,savedPosition.top,false);
-    else place(el,Math.max(8,window.innerWidth-260),70,false);
+    else place(el,Math.max(8,window.innerWidth-210),70,false);
 
     el.querySelector("#decisionTimerStart").addEventListener("pointerdown",ensureAudio,{passive:true});
     el.querySelector("#decisionTimerStart").addEventListener("click",startTimer);
