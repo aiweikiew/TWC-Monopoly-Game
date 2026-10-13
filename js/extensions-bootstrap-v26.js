@@ -25,7 +25,7 @@
     "js/game-audio-direct-v30.js",
     "js/game-audio-boost-v31.js",
     "js/game-audio-reliable-v32.js",
-    "js/decision-timer-v34.js?v=1"
+    "js/decision-timer-v35.js?v=1"
   ];
 
   function baseReady(){
