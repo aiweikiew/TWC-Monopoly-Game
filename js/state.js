@@ -20,9 +20,9 @@ if(typeof document !== "undefined" && !document.querySelector('link[href="css/er
   eraThemeStyles.href = "css/era-theme-v14.css";
   document.head.appendChild(eraThemeStyles);
 }
-if(typeof document !== "undefined" && !document.querySelector('script[src="js/extensions-bootstrap-v25.js"]')){
+if(typeof document !== "undefined" && !document.querySelector('script[src="js/extensions-bootstrap-v26.js?v=1"]')){
   const extensions = document.createElement("script");
-  extensions.src = "js/extensions-bootstrap-v25.js";
+  extensions.src = "js/extensions-bootstrap-v26.js?v=1";
   extensions.async = false;
   document.head.appendChild(extensions);
 }
