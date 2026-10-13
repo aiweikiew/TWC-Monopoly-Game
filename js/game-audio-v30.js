@@ -34,7 +34,8 @@
     if(!ctx){
       ctx = new AudioContextCtor();
       master = ctx.createGain();
-      master.gain.value = 0.72;
+      // Classroom boost: raise every game cue together while preserving their relative hierarchy.
+      master.gain.value = 1.25;
       master.connect(ctx.destination);
     }
     if(ctx.state === "suspended") ctx.resume().catch(()=>{});
